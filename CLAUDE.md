@@ -21,5 +21,12 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 3. On the server: `./scripts/update.sh` (downloads the release, backs up, upgrades, runs doctor).
 4. Only read the files you need (grep first). Prefer diffs over whole files. Avoid screenshots unless the task is visual.
 
-## Local test env (cloud sandbox only; not in repo)
-Playwright scripts live in the session scratchpad `testenv/tools`; copy needed ones from `tests/e2e/`. Docker is unavailable there.
+## Where things stand (update this section at the end of every task)
+- Current release: see `VERSION`. Repo: private `amirebi9156/tikootak`; server install dir `/root/tikootak` (update with `./scripts/update.sh`, config in `.update.conf`).
+- Default look: navy palette + built-in wallpapers (dusk/aurora/peaks), liquid-glass lens on pills/menus/Now Playing (Chromium only; `localStorage tikootak.glass=lite` turns it off).
+- Owner wants the CHAT UI to feel like Telegram + iOS "Liquid Glass" (reference: a video of a glass music card with edge refraction). Next planned task: rework the chat area with the frontend-design skill.
+- Known limits: nothing is tested on real phones/Docker/Caddy; upload category is client-declared; existing channels still allow member pinning; no ready-made sticker packs/GIFs; old CSS layers (styles/theme/ui34/tg/q/lg) still stack with many `!important`.
+- Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
+
+## Local test env (cloud sandbox; Docker is unavailable)
+`bash tests/env/setup.sh` (once: Synapse in a venv + gateway deps + Playwright proxy), `bash tests/env/start.sh` (build UI + start everything), `bash tests/env/run-regression.sh [filter]` (all `tests/e2e/*.mjs`, prints FAIL counts). Test admin key: `adminkey`. LiveKit is not part of it (call tests are skipped).
