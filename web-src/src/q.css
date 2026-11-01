@@ -1,0 +1,410 @@
+/* Q1 — حساب خصوصی و درخواست دنبال‌کردن. استایل‌های جدید فقط اینجا. */
+.prof-lock {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-inline-start: 6px;
+  color: var(--muted, #8b8b8b);
+}
+
+.prof-private-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.follow-chip.pending {
+  opacity: 0.75;
+  border-style: dashed;
+}
+
+/* Q6 — پیام‌های کانال به نام کانال، و امضای اختیاری ادمین */
+.msg.chan .msg-name {
+  letter-spacing: 0.2px;
+}
+
+.chan-sign {
+  display: block;
+  flex-basis: 100%;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--dim, #71717a);
+  opacity: 0.9;
+}
+
+.member-inviter {
+  display: block;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+/* Q3 — منوی پیام با یک تپ، دابل‌کلیک پاسخ، و دسترسی کیبورد */
+.msg:focus-visible {
+  outline: 2px solid var(--accent, #fff);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.ctx-react {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* Q2 — پیشنهاد کاربر/کانال هنگام تایپ */
+.suggest-wrap {
+  position: relative;
+  display: block;
+}
+
+.suggest-pop {
+  position: absolute;
+  z-index: 20;
+  inset-inline: 0;
+  top: calc(100% + 4px);
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--raise);
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.28);
+}
+
+.suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 9px;
+  text-align: start;
+}
+
+.suggest-row:hover,
+.suggest-row.on,
+.suggest-row[aria-selected='true'] {
+  background: var(--raise2);
+}
+
+.suggest-main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.suggest-main strong {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggest-main .muted {
+  font-size: 11.5px;
+  direction: ltr;
+  text-align: start;
+}
+
+.verified-badge {
+  display: inline-flex;
+  width: 15px;
+  height: 15px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-2, #4f9cf9);
+  color: #fff;
+}
+
+/* unread indicator next to the chat back button: arrow + count pill, like Telegram */
+.chat-head .back:has(.back-badge) { width: auto; min-width: 40px; padding-inline: 8px 6px; display: inline-flex; align-items: center; gap: 4px; }
+.back-badge { position: static; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--accent); color: var(--on-accent, #04120c); font-size: 11.5px; font-weight: 700; display: inline-grid; place-items: center; line-height: 1; animation: bb-pop .25s ease-out; }
+@keyframes bb-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.chat-head .back svg { flex: none; }
+.tab-badge { min-width: 17px !important; height: 17px !important; font-size: 10.5px !important; font-weight: 700; display: inline-grid; place-items: center; line-height: 1; box-shadow: 0 0 0 2px var(--night, #0b1411); }
+
+/* one-tap public/private account switch on own profile */
+.acct-toggle { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line, rgb(255 255 255 / .1)); background: var(--panel, rgb(255 255 255 / .05)); color: inherit; text-align: start; cursor: pointer; }
+.acct-toggle > span:nth-of-type(1) { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.acct-toggle small { color: var(--dim, #8aa); font-size: 11.5px; line-height: 1.5; }
+.acct-toggle.priv { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.acct-sw { width: 38px; height: 22px; border-radius: 99px; background: rgb(255 255 255 / .18); position: relative; flex: none; transition: background .2s; }
+.acct-sw i { position: absolute; top: 3px; inset-inline-start: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: inset-inline-start .2s; }
+.acct-toggle.priv .acct-sw { background: var(--accent); }
+.acct-toggle.priv .acct-sw i { inset-inline-start: 19px; }
+
+/* avatar crop editor */
+.crop { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.crop-stage { position: relative; overflow: hidden; border-radius: 18px; background: #000; touch-action: none; cursor: grab; user-select: none; }
+.crop-stage:active { cursor: grabbing; }
+.crop-stage canvas { display: block; }
+.crop-mask { position: absolute; inset: 0; pointer-events: none; }
+.crop-stage.circle .crop-mask { background: radial-gradient(circle at center, transparent 0, transparent calc(50% - 1px), rgb(0 0 0 / .6) 50%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); }
+.crop-stage.square .crop-mask { box-shadow: inset 0 0 0 2px rgb(255 255 255 / .55); border-radius: 22%; clip-path: none; }
+.crop-ctl { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 320px; }
+.crop-ctl input[type=range] { flex: 1; accent-color: var(--accent); }
+.crop-ctl .icon { width: 36px; height: 36px; font-size: 20px; }
+
+/* Q8 — دکمهٔ ثابت ساخت گروه/کانال (غیرشناور) و بخش‌های جستجوی یکپارچه */
+.compose-fab { display: none !important; }
+.side-foot { flex: none; padding: 8px 12px; border-top: 1px solid var(--line-soft); background: var(--bg); }
+.new-conv-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.list .suggest-pop { position: static; box-shadow: none; border: 0; max-height: none; margin: 0; padding: 0; width: auto; }
+@media (max-width: 760px) { .list { padding-bottom: 12px !important; } .side-foot { margin-bottom: 58px; } }
+
+/* Q4 — کارت آهنگ چت (شبیه تلگرام): کاور دایره‌ای با دکمهٔ پلی وسطش */
+.music-card { display: flex; align-items: center; gap: 10px; min-width: 190px; max-width: 300px; padding: 0; }
+.music-card .mc-cover { position: relative; flex: none; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; overflow: hidden; cursor: pointer; background: var(--accent); color: #fff; }
+.music-card .mc-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.music-card .mc-btn { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; }
+.music-card .mc-cover.has .mc-btn { background: rgba(0,0,0,.34); }
+.music-card .mc-cover.none .mc-btn { background: transparent; color: var(--on-accent, #fff); }
+.music-card .mc-ring { animation: mcspin 1.2s linear infinite; }
+@keyframes mcspin { to { transform: rotate(360deg); } }
+.music-card .mc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; text-align: start; }
+.music-card .mc-main strong { font-weight: 600; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.music-card .mc-sub { font-size: 12.5px; opacity: .72; font-variant-numeric: tabular-nums; }
+.trk-pls { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.trk-pls em { font-style: normal; font-size: 11px; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.addto-list { display: flex; flex-direction: column; gap: 4px; max-height: 40vh; overflow: auto; }
+.addto-row { width: 100%; display: flex; align-items: center; gap: 10px; justify-content: flex-start; }
+.addto-tick { width: 20px; height: 20px; flex: none; border-radius: 6px; border: 1.5px solid var(--line); display: inline-flex; align-items: center; justify-content: center; }
+.addto-row.on .addto-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+/* مینی‌پلیر نرم‌تر: از پایین می‌لغزد، حرکت‌ها با transition */
+.player-bar { animation: pbIn .32s cubic-bezier(.2,.8,.2,1) both; transition: box-shadow .2s ease, transform .2s ease; }
+@keyframes pbIn { from { opacity: 0; transform: translateY(16px) scale(.985); } to { opacity: 1; transform: none; } }
+.player-bar .icon { transition: background-color .15s ease, transform .12s ease, opacity .15s ease; }
+.player-bar .icon:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.player-bar .icon:active { transform: scale(.9); }
+.player-bar .icon[data-testid='pp']:hover { filter: brightness(1.08); }
+.player-bar .mini-open { border-radius: 12px; transition: background-color .15s ease; }
+.player-bar .mini-open:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.player-bar .seek { -webkit-appearance: none; appearance: none; height: 14px; background: transparent; cursor: pointer; }
+.player-bar .seek::-webkit-slider-runnable-track { height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.player-bar .seek::-webkit-slider-thumb { -webkit-appearance: none; width: 0; height: 0; transition: all .15s ease; margin-top: -4px; }
+.player-bar .seek:hover::-webkit-slider-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); }
+.player-bar .seek::-moz-range-track { height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.player-bar .seek::-moz-range-progress { height: 3px; border-radius: 3px; background: var(--accent); }
+.player-bar .seek::-moz-range-thumb { width: 0; height: 0; border: 0; }
+.player-bar .seek:hover::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); }
+
+/* «در حال پخش» به‌صورت پنجرهٔ شناور روی صفحهٔ کدرشده، نه تمام‌صفحه */
+.np-scrim { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: rgb(0 0 0 / .55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: npFade .22s ease both; }
+.np-scrim .np { position: relative; inset: auto; z-index: auto; width: min(100%, 400px); max-height: min(92vh, 720px); border-radius: 26px; border: 1px solid var(--line);
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / .65); padding: 12px 20px 22px; gap: 12px; animation: npPop .28s cubic-bezier(.2,.9,.25,1) both; }
+.np-scrim .np-cover { padding: 0; border: 0; }
+.np-scrim .np-cover .cover { width: min(64vw, 260px) !important; height: min(64vw, 260px) !important; }
+@keyframes npFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes npPop { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .player-bar, .np-scrim, .np-scrim .np { animation: none; } }
+
+/* کشیدن پیام برای پاسخ */
+.timeline { overscroll-behavior-x: contain; touch-action: pan-y; }
+.msg { touch-action: pan-y; }
+.swipe-ico { position: absolute; top: 50%; inset-inline-start: 100%; margin-inline-start: 10px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--ink) 14%, transparent); color: var(--ink); opacity: 0; transform: translateY(-50%) scale(.6); pointer-events: none; }
+.swipe-ico.on { background: var(--accent); color: var(--on-accent, #fff); }
+
+/* منوی شیشه‌ای پیام (مثل تلگرام): ردیف واکنش جدا بالا، منو پایین، کنار نقطهٔ لمس */
+.ctx-layer.glass { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; animation: none; }
+.ctx-layer.glass .ctx-pill, .ctx-layer.glass .ctx-menu {
+  position: fixed; margin: 0;
+  background: color-mix(in srgb, var(--surface) 66%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.38);
+  animation: ctx-pop 0.26s cubic-bezier(.2, .9, .25, 1.15) both;
+}
+.ctx-layer.glass .ctx-pill {
+  display: flex; align-items: center; gap: 2px; padding: 3px 5px; border-radius: 26px;
+  max-width: calc(100vw - 20px); flex-wrap: wrap; justify-content: center;
+}
+.ctx-layer.glass .ctx-pill button {
+  width: 34px; height: 34px; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: transparent;
+  font-size: 21px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: transform .12s, background .12s;
+}
+.ctx-layer.glass .ctx-pill button:active, .ctx-layer.glass .ctx-pill button:hover { transform: scale(1.2); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.ctx-layer.glass .ctx-pill button.on { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+.ctx-layer.glass .ctx-menu { min-width: 190px; max-width: min(250px, calc(100vw - 20px)); padding: 4px; border-radius: 16px; animation-delay: 0.02s; }
+.ctx-layer.glass.touch .ctx-item { min-height: 38px; font-size: 14.5px; padding: 5px 12px; gap: 12px; border-radius: 11px; }
+.ctx-layer.glass .ctx-item { min-height: 36px; font-size: 14px; padding: 5px 11px; }
+.ctx-layer.glass .ctx-item .ico { width: 18px; height: 18px; }
+.ctx-layer.glass .ctx-item:active { background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.ctx-layer.glass .ctx-item .ico { color: var(--ink); opacity: .85; }
+.ctx-layer.glass .ctx-item.danger .ico, .ctx-layer.glass .ctx-item.danger { color: var(--danger); opacity: 1; }
+.ctx-layer.glass .ctx-sep { background: color-mix(in srgb, var(--ink) 10%, transparent); }
+@keyframes ctx-pop { from { opacity: 0; transform: scale(.78); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ctx-layer.glass, .ctx-layer.glass .ctx-pill, .ctx-layer.glass .ctx-menu { animation: none; } }
+
+/* ---------- نوار پایین چت: شیشه‌ای و شناور ---------- */
+form.composer, .composer.recording {
+  margin: 6px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+  padding: 5px 6px !important; gap: 4px !important; align-items: flex-end;
+  background: color-mix(in srgb, var(--surface) 62%, transparent) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 8px 26px -8px rgb(0 0 0 / 0.45) !important;
+  transition: border-color .2s, box-shadow .25s;
+}
+form.composer:focus-within { border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important; box-shadow: 0 8px 26px -8px rgb(0 0 0 / 0.45) !important; }
+form.composer textarea {
+  background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 20px !important;
+  min-height: 40px !important; padding: 9px 6px !important; font-size: 15px; line-height: 1.55; transition: height .12s;
+}
+form.composer textarea::placeholder { opacity: .6; }
+form.composer .icon, form.composer .attach-wrap > .icon, form.composer .emoji-wrap > .icon {
+  width: 40px; height: 40px; border-radius: 50%; color: var(--muted); background: transparent;
+  transition: background .15s, color .15s, transform .2s;
+}
+@media (hover: hover) { form.composer .icon:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); } }
+form.composer .icon:active { background: color-mix(in srgb, var(--ink) 14%, transparent); }
+form.composer .icon:active { transform: scale(.88); }
+form.composer .attach-wrap > .icon.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent) }
+form.composer .send {
+  width: 40px; height: 40px; min-height: 40px; margin: 0; flex: none; border-radius: 50%; border: 0;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important; color: var(--on-accent, #fff) !important;
+  box-shadow: 0 6px 14px -6px var(--accent) !important;
+  transition: background .2s, color .2s, transform .15s, box-shadow .2s;
+}
+form.composer .send:active { transform: scale(.88); }
+form.composer .send.mic { background: transparent !important; color: var(--muted) !important; border: 0 !important; box-shadow: none !important; }
+@media (hover: hover) { form.composer .send.mic:hover { background: color-mix(in srgb, var(--ink) 10%, transparent) !important; color: var(--ink) !important; } }
+form.composer .send:not(.mic) { animation: sendPop .22s cubic-bezier(.2, .9, .25, 1.3); }
+@keyframes sendPop { from { transform: scale(.6); opacity: .4; } to { transform: none; opacity: 1; } }
+.composer.recording { align-items: center !important; padding: 6px 10px !important; }
+
+/* پیش‌نمایش پاسخ/ویرایش */
+.ctx-bar {
+  margin: 6px 10px -2px !important; padding: 7px 12px !important; border: 0 !important; border-radius: 18px 18px 8px 8px;
+  background: color-mix(in srgb, var(--surface) 62%, transparent) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+  animation: ctxbarIn .2s cubic-bezier(.2, .9, .25, 1);
+}
+@keyframes ctxbarIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* منوی پیوست و ایموجی */
+.attach-menu, .emoji-pop {
+  background: color-mix(in srgb, var(--surface) 70%, transparent) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.7); backdrop-filter: blur(24px) saturate(1.7);
+  border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent) !important; border-radius: 20px !important;
+  box-shadow: 0 12px 34px -8px rgb(0 0 0 / 0.5) !important;
+  transform-origin: bottom left; animation: attachPop .22s cubic-bezier(.2, .9, .25, 1.15) both !important;
+}
+[dir='rtl'] .attach-menu, [dir='rtl'] .emoji-pop { transform-origin: bottom right; }
+@keyframes attachPop { from { opacity: 0; transform: translateY(10px) scale(.85); } to { opacity: 1; transform: none; } }
+.attach-menu { min-width: 190px !important; padding: 5px !important; }
+.attach-menu button { min-height: 44px !important; border-radius: 14px !important; gap: 12px !important; font-size: 14.5px !important; }
+.attach-menu button:active { background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.attach-menu button .ico { width: 30px; height: 30px; padding: 6px; border-radius: 50%; color: #fff; opacity: 1; box-sizing: border-box; }
+.attach-menu button:nth-child(1) .ico { background: #3b82f6; }
+.attach-menu button:nth-child(2) .ico { background: #ec4899; }
+.attach-menu button:nth-child(3) .ico { background: #22c55e; }
+.attach-menu button:nth-child(4) .ico { background: #f59e0b; }
+.emoji-pop button:active { transform: scale(1.25); }
+@media (prefers-reduced-motion: reduce) { .attach-menu, .emoji-pop, .ctx-bar, form.composer .send:not(.mic) { animation: none !important; } form.composer .icon { transition: none; } }
+
+/* دکمهٔ شناور «گفتگوی جدید» — کوچک و گوشهٔ پایین */
+.sidebar { position: relative; }
+.side-foot { position: absolute !important; inset-inline-end: 16px; bottom: 16px; padding: 0 !important; border: 0 !important; background: transparent !important; margin: 0 !important; z-index: 6; pointer-events: none; }
+@media (max-width: 760px) { .side-foot { bottom: 74px; } }
+.new-conv-btn {
+  pointer-events: auto; width: 54px !important; height: 54px; min-height: 54px; padding: 0 !important; border-radius: 18px !important; border: 0 !important;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important; color: var(--on-accent, #fff) !important;
+  box-shadow: 0 10px 24px -8px var(--accent), 0 4px 10px rgb(0 0 0 / .35);
+  transition: transform .18s cubic-bezier(.2, .9, .25, 1.2), box-shadow .2s;
+}
+.new-conv-btn:active { transform: scale(.9); }
+@media (hover: hover) { .new-conv-btn:hover { transform: translateY(-2px); } }
+.list { padding-bottom: 84px !important; }
+
+/* همهٔ آیکن‌های پروفایل/گفتگو دایره‌ای (مثل تلگرام) */
+.avatar, .avatar img, .room .avatar, .chat-head .avatar, .msg-av .avatar, .post > header .avatar, .prof-av .avatar, .prof-av .avatar img,
+.set-me .avatar, .block-list .avatar, .msgreq > .avatar, .room-avatar .avatar, .room-avatar.square .avatar, .chat-avatar .avatar,
+.chat-avatar.square .avatar, .room-photo .avatar, .notif .avatar, .room.invite .avatar, .me-avatar-btn, .me-avatar-btn .avatar,
+.me-avatar-btn img, .story-item .avatar, .mutual-avs .avatar, .sk-av, .edit-av .avatar, .edit-av img { border-radius: 50% !important; }
+.room-avatar, .chat-avatar { border-radius: 50%; }
+@media (max-width: 760px) { .prof-av .avatar { border-radius: 50% !important; } }
+.attach-menu button:disabled, form.composer .send.mic:disabled { opacity: .38; cursor: not-allowed; filter: grayscale(.8); }
+
+/* ---------- پنل ایموجی/استیکر (شیشه‌ای، مثل تلگرام) ---------- */
+form.composer { position: relative; }
+form.composer .emoji-wrap { position: static; }
+.emoji-panel {
+  position: absolute; bottom: calc(100% + 8px); inset-inline: 0; z-index: 40; height: min(50vh, 400px);
+  display: flex; flex-direction: column; overflow: hidden; border-radius: 24px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
+  border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent); box-shadow: 0 14px 40px -10px rgb(0 0 0 / .55);
+  animation: attachPop .22s cubic-bezier(.2, .9, .25, 1.1) both; transform-origin: bottom;
+}
+@media (min-width: 761px) { .emoji-panel { inset-inline-end: auto; width: 400px; } }
+.ep-top { padding: 8px 10px 4px; display: flex; flex-direction: column; gap: 6px; flex: none; }
+.ep-tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; align-items: center; }
+.ep-tabs::-webkit-scrollbar { display: none; }
+.ep-tabs button { flex: none; width: 38px; height: 34px; min-height: 0; padding: 0; border: 0; border-radius: 12px; background: transparent; font-size: 20px; line-height: 1; color: var(--muted); display: grid; place-items: center; filter: grayscale(.9) opacity(.75); transition: background .15s, filter .15s; }
+.ep-tabs button.on { background: color-mix(in srgb, var(--accent) 22%, transparent); filter: none; color: var(--accent); }
+.ep-title { font-weight: 700; padding: 6px 6px; }
+.ep-search { display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 38px; border-radius: 14px; background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--muted); }
+.ep-search input { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; outline: none; box-shadow: none !important; color: var(--ink); font-size: 14px; padding: 0 !important; min-height: 0 !important; height: 100%; }
+.ep-grid { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 0 8px 8px; scroll-behavior: auto; }
+.ep-grid section { content-visibility: auto; contain-intrinsic-size: auto 260px; }
+.ep-grid h4 { margin: 10px 4px 4px; font-size: 12px; font-weight: 600; color: var(--muted); display: flex; align-items: center; letter-spacing: .02em; }
+.ep-grid h4 .sp { flex: 1; }
+.ep-cells { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0; }
+.ep-cells button { height: 42px; min-height: 0; padding: 0; border: 0; border-radius: 12px; background: transparent; font-size: 27px; line-height: 1; font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif; transition: transform .1s, background .12s; }
+.ep-cells button:active { transform: scale(1.3); background: color-mix(in srgb, var(--ink) 12%, transparent); }
+@media (hover: hover) { .ep-cells button:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); } }
+.ep-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 18px 12px; }
+.ep-stk { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 4px; }
+.ep-stk button { padding: 0; border: 0; background: transparent; }
+.ep-add { aspect-ratio: 1; border-radius: 18px !important; border: 2px dashed color-mix(in srgb, var(--ink) 25%, transparent) !important; color: var(--muted); display: grid; place-items: center; min-height: 0; }
+.ep-stk-item { position: relative; aspect-ratio: 1; }
+.ep-stk-item > button:first-child { width: 100%; height: 100%; min-height: 0; border-radius: 14px; }
+.ep-stk-item img, .st-ph { width: 100%; height: 100%; object-fit: contain; display: block; }
+.st-ph { background: color-mix(in srgb, var(--ink) 8%, transparent); border-radius: 14px; }
+.ep-stk-item:active img { transform: scale(.94); }
+.ep-del { position: absolute; top: -4px; inset-inline-end: -4px; width: 22px !important; height: 22px !important; min-height: 0; border-radius: 50% !important; background: var(--danger) !important; color: #fff; display: grid; place-items: center; }
+.ep-link { margin-inline-start: auto; background: transparent; border: 0; color: var(--accent); font-size: 12px; padding: 2px 6px; min-height: 0; }
+.ep-big { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+.ep-big button { height: 66px; min-height: 0; padding: 0; border: 0; border-radius: 16px; background: transparent; font-size: 44px; line-height: 1; font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif; transition: transform .12s; }
+.ep-big button:active { transform: scale(1.18) rotate(-4deg); background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.ep-bottom { flex: none; display: flex; justify-content: center; padding: 6px 10px 8px; }
+.ep-bottom { gap: 4px; margin: 0 auto 8px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 10%, transparent); width: fit-content; }
+.ep-bottom button { min-height: 0; height: 32px; padding: 0 22px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; transition: background .2s, color .2s; }
+.ep-bottom button.on { background: color-mix(in srgb, var(--ink) 16%, transparent); color: var(--ink); }
+
+/* پیام استیکر و ایموجی بزرگ: بدون حباب */
+.msg .bubble.sticker, .msg.mine .bubble.sticker, .msg .bubble:has(.text[data-emoji-only]), .msg.mine .bubble:has(.text[data-emoji-only]) {
+  background: none !important; background-color: transparent !important; box-shadow: none !important; border: 0 !important; padding: 2px 4px !important;
+}
+.msg .bubble.sticker { padding: 0 !important; }
+.bubble.sticker .att-img, .bubble.sticker img { max-width: 170px; max-height: 170px; border-radius: 0 !important; background: transparent !important; }
+.bubble.sticker .att-wrap, .bubble.sticker .att-img { background: transparent !important; box-shadow: none !important; }
+.msg .bubble .text[data-emoji-only] { font-size: 46px; line-height: 1.15; }
+.msg .bubble:has(.text[data-emoji-only]) .bubble-foot, .msg .bubble.sticker .bubble-foot { opacity: .7; }
+@media (prefers-reduced-motion: reduce) { .emoji-panel { animation: none; } }
+form.composer { z-index: 31; }
+
+/* پنل جای کیبورد (موبایل): کشویی از پایین، زیر نوار پیام */
+.emoji-dock { flex: none; height: 0; overflow: hidden; transition: height .28s cubic-bezier(.2, .85, .25, 1); }
+.emoji-dock.open { height: var(--dock-h, 310px); }
+.emoji-panel.docked {
+  position: relative; bottom: auto; inset-inline: auto; height: calc(var(--dock-h, 310px) - 8px); margin: 0 10px 8px; animation: none;
+  border-radius: 22px 22px 18px 18px;
+  transform: translateY(0); transition: transform .28s cubic-bezier(.2, .85, .25, 1), opacity .2s;
+}
+.emoji-dock:not(.open) .emoji-panel.docked { transform: translateY(40%); opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .emoji-dock, .emoji-panel.docked { transition: none; } }

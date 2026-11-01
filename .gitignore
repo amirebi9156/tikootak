@@ -1,0 +1,12 @@
+.env
+data/
+backups/
+certs/
+config/
+images.tar.gz
+node_modules/
+
+.update.conf
+web/dist/
+web-src/node_modules/
+*.log

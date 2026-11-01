@@ -1,0 +1,6 @@
+# copy to .update.conf (it is git-ignored and never overwritten by updates)
+REPO=YOUR_GITHUB_USER/tikootak
+# only needed when the repo is private: a fine-grained token with "Contents: read" on this one repo
+TOKEN=
+# optional: if GitHub is filtered on the server, serve the release files from any URL and set it here
+MIRROR_BASE=

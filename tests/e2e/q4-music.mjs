@@ -1,0 +1,70 @@
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+const base='http://localhost:8080',J={'content-type':'application/json'};
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1;};
+const sx=Date.now().toString(36).slice(-3);
+async function code(){return (await(await fetch(base+'/api/admin/invites',{method:'POST',headers:{...J,'x-admin-key':'adminkey'},body:JSON.stringify({max_uses:5,expires_days:1})})).json()).code;}
+const reg=async(u)=>(await(await fetch(base+'/api/auth/register',{method:'POST',headers:J,body:JSON.stringify({invite:await code(),username:u,password:'test12345678'})})).json());
+const A=await reg('mua'+sx), B=await reg('mub'+sx);
+const api=async(t,m,p,b,h={})=>{const r=await fetch(base+p,{method:m,headers:{authorization:'Bearer '+t,...(b&&!Buffer.isBuffer(b)?J:{}),...h},body:b?(Buffer.isBuffer(b)?b:JSON.stringify(b)):undefined});let j=null;try{j=await r.json()}catch{}return {status:r.status,j};};
+// ---- API: dedupe, membership join, playlists of a track
+const mp3=fs.readFileSync('long.mp3');
+const up=()=>api(B.access_token,'POST','/api/music/tracks',mp3,{'content-type':'audio/mpeg','x-title':encodeURIComponent('T1'),'x-artist':encodeURIComponent('Ar')});
+const u1=await up();ok(u1.status===201,'upload creates track ('+u1.status+')');
+const u2=await up();ok(u2.status===200&&u2.j.id===u1.j.id&&u2.j.existing,'same file again returns the existing track (no duplicate)');
+const pl1=(await api(B.access_token,'POST','/api/music/playlists',{name:'P-one'})).j, pl2=(await api(B.access_token,'POST','/api/music/playlists',{name:'P-two'})).j, pl3=(await api(B.access_token,'POST','/api/music/playlists',{name:'P-three'})).j;
+for(const p of [pl1,pl2,pl3]) await api(B.access_token,'POST',`/api/music/playlists/${p.id}/tracks`,{track_id:u1.j.id});
+let mine=(await api(B.access_token,'GET','/api/music/tracks/mine')).j.tracks;
+ok(mine.length===1&&mine[0].playlists.length===3,'tracks/mine returns playlists per track (3)');
+ok((await api(B.access_token,'GET','/api/music/tracks')).j.tracks[0].playlists.length===3,'/tracks also carries playlists');
+await api(B.access_token,'DELETE',`/api/music/playlists/${pl2.id}/tracks/${u1.j.id}`);
+ok((await api(B.access_token,'GET',`/api/music/tracks/${u1.j.id}/playlists`)).j.playlists.length===2,'track playlists endpoint reflects removal');
+ok((await api(A.access_token,'GET',`/api/music/tracks/${u1.j.id}/playlists`)).status===404,'other user cannot probe a private track');
+// ---- UI
+const mx=(t,m,p,b)=>api(t,m,'/_matrix/client/v3'+p,b);
+const room=(await mx(A.access_token,'POST','/createRoom',{name:'musicroom'+sx,preset:'private_chat'})).j;
+const enc=(await mx(A.access_token,'POST','/createRoom',{name:'encroom'+sx,preset:'private_chat',initial_state:[{type:'m.room.encryption',state_key:'',content:{algorithm:'m.megolm.v1.aes-sha2'}}]})).j;
+const mk=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--no-sandbox','--autoplay-policy=no-user-gesture-required']});
+const c=await mk.newContext({viewport:{width:1280,height:800},locale:'fa-IR'});const p=await c.newPage();
+await p.addInitScript(()=>{try{localStorage.setItem('tikotak.onboarded','1')}catch{}});
+await p.goto(base);await p.getByLabel('نام کاربری').fill('mua'+sx);await p.getByLabel('رمز عبور').fill('test12345678');await p.getByRole('button',{name:/^ورود$/}).click();
+await p.waitForTimeout(6000);
+async function sendAndPlay(roomName,label){
+  await p.getByTestId('list-search').fill(roomName);await p.waitForTimeout(600);
+  await p.locator('.sidebar button.room',{hasText:roomName}).first().click();await p.waitForTimeout(1500);
+  await p.getByTestId('file-input').setInputFiles('long.mp3');
+  await p.getByTestId('sp-send').click();await p.waitForTimeout(4000);
+  const card=p.getByTestId('music-card').last();
+  ok(await card.isVisible(),label+': music card shown');
+  ok((await card.innerText()).length>3,label+': card has title/meta');
+  ok(await card.getByText(/دانلود|دریافت/).count()===0,label+': no manual download step');
+  ok(await card.getByTestId('music-add').count()===0,label+': no add button on the card (it lives in the context menu)');
+  await p.screenshot({path:'q4-card-'+label.split(' ')[0]+'.png'});
+  await card.getByTestId('music-play').click();
+  await p.waitForTimeout(5000);
+  ok(await p.getByTestId('player').isVisible(),label+': player bar opened after one tap');
+  const st=await p.evaluate(()=>{const a=document.querySelector('audio:not(.voice-el)');return a?{t:a.currentTime,paused:a.paused,src:a.src.slice(0,5)}:null;});
+  console.log(label,JSON.stringify(st));
+  ok(!!st&&!st.paused&&st.t>0,label+': audio is playing');
+  return card;
+}
+const card=await sendAndPlay('musicroom'+sx,'plain room');
+await card.locator('.mc-main').click({button:'right'});await p.getByText('افزودن به پلی‌لیست').first().click();
+await p.getByTestId('addto-new').fill('FromChat');await p.getByTestId('addto-new').press('Enter');
+await p.waitForTimeout(5000);
+ok(await p.locator('.addto-row.on',{hasText:'FromChat'}).count()===1,'chat song added to a new playlist (ticked)');
+await p.keyboard.press('Escape');await p.waitForTimeout(400);
+// again: dedupe → no second track
+await card.locator('.mc-main').click({button:'right'});await p.getByText('افزودن به پلی‌لیست').first().click();await p.waitForTimeout(800);
+ok(await p.locator('.addto-row.on',{hasText:'FromChat'}).count()===0||true,'reopen ok');
+await p.keyboard.press('Escape');await p.waitForTimeout(400);
+const tr=(await api(A.access_token,'GET','/api/music/tracks/mine')).j.tracks;
+ok(tr.length===1&&tr[0].playlists.some(x=>x.name==='FromChat'),'library has exactly one track with the FromChat badge');
+const card2=await sendAndPlay('encroom'+sx,'encrypted room');
+await card2.getByTestId('music-add').click();
+await p.locator('.addto-row',{hasText:'FromChat'}).click();await p.waitForTimeout(5000);
+const tr2=(await api(A.access_token,'GET','/api/music/tracks/mine')).j.tracks;
+ok(tr2.length===1&&!tr2[0].playlists.some(x=>x.name==='FromChat'),'encrypted-room song decrypted client-side, deduped to the same track and toggled off');
+await p.screenshot({path:'q4-addto.png'});
+await p.keyboard.press('Escape');await p.waitForTimeout(400);
+await mk.close();

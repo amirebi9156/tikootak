@@ -1,0 +1,28 @@
+const base='http://localhost:8080',J={'content-type':'application/json'};
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1;};
+const sx=Date.now().toString(36).slice(-3);
+const code=async()=>(await(await fetch(base+'/api/admin/invites',{method:'POST',headers:{...J,'x-admin-key':'adminkey'},body:JSON.stringify({max_uses:5,expires_days:1})})).json()).code;
+const reg=async(u)=>(await(await fetch(base+'/api/auth/register',{method:'POST',headers:J,body:JSON.stringify({invite:await code(),username:u,password:'test12345678'})})).json());
+const A=await reg('upa'+sx),B=await reg('upb'+sx);
+const adm=(b)=>fetch(base+'/api/admin/upload-policy',{method:'POST',headers:{...J,'x-admin-key':'adminkey'},body:JSON.stringify(b)}).then(r=>r.json());
+const up=async(u,type,size)=>{const r=await fetch(base+'/_matrix/media/v3/upload?filename=x',{method:'POST',headers:{authorization:'Bearer '+u.access_token,'content-type':type},body:Buffer.alloc(size,1)});return r.status;};
+const pol=async(u)=>(await fetch(base+'/api/uploads/policy',{headers:{authorization:'Bearer '+u.access_token}})).json();
+const ALL={image:{mode:'all'},video:{mode:'all'},voice:{mode:'all'},music:{mode:'all'},file:{mode:'all'}};
+await adm({small_kb:100,kinds:ALL});
+ok(await up(A,'image/png',300000)===200,'all: image upload ok');
+await adm({kinds:{file:{mode:'none'}}});
+{const s=await up(A,'application/pdf',300000);ok(s===403,'file none: pdf blocked ('+s+')');}
+ok(await up(A,'application/pdf',50000)===200,'small file (<100KB) always allowed');
+ok(await up(A,'image/png',300000)===200,'other kinds still allowed');
+ok(await up(A,'application/octet-stream; tk=image',300000)===200,'encrypted blob labeled image allowed');
+ok(await up(A,'application/octet-stream',300000)===403,'unlabeled octet-stream counts as file -> blocked');
+const pa=await pol(A);ok(pa.allowed.file===false&&pa.allowed.image===true,'policy endpoint reflects');
+await adm({kinds:{music:{mode:'users',users:['upa'+sx]}}});
+ok(await up(A,'audio/mpeg',300000)===200,'users mode: listed user allowed');
+ok(await up(B,'audio/mpeg',300000)===403,'users mode: other user blocked');
+ok((await pol(B)).allowed.music===false&&(await pol(A)).allowed.music===true,'policy per user');
+const t=await fetch(base+'/api/music/tracks',{method:'POST',headers:{authorization:'Bearer '+B.access_token,'content-type':'audio/mpeg','x-title':'t'},body:Buffer.alloc(300000,1)});
+ok(t.status===403,'music library blocked for unlisted user');
+const noauth=await fetch(base+'/_matrix/media/v3/upload',{method:'POST',headers:{'content-type':'image/png'},body:Buffer.alloc(10)});
+ok(noauth.status===401,'no token -> 401');
+await adm({small_kb:512,kinds:ALL});

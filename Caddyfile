@@ -1,0 +1,68 @@
+# حالت خودکار: Caddy خودش گواهی HTTPS می‌گیرد.
+# توجه: سرور باید به سرورهای ACME (Let's Encrypt) دسترسی داشته باشد.
+# اگه نداشت از Caddyfile.manual-cert استفاده کن.
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# هدرهای امنیتی (S1)
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' wss://{host}; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# API ادمین Synapse هرگز از بیرون در دسترس نباشد
+	handle /_synapse/admin/* {
+		respond 403
+	}
+
+	# Q7: فقط مسیرهای حساس اعضا/رویدادها از gateway عبور می‌کنند؛ بقیه مستقیم به Synapse.
+	# user_directory عمداً بسته است؛ جستجوی کاربر از /api/people/suggest انجام می‌شود.
+	handle /_matrix/client/*/user_directory/* {
+		respond 404
+	}
+
+	@matrix_private {
+		method GET
+		path_regexp matrix_private "^/_matrix/client/[^/]+/(sync|initialSync|events/[^/]+|rooms/[^/]+/(messages|members|joined_members|state(/.*)?|context/.*|event/.*|relations/.*))/?$"
+	}
+	handle @matrix_private {
+		reverse_proxy gateway:3000
+	}
+
+	# کنترل ادمین روی آپلود: آپلود رسانه از gateway عبور می‌کند و به Synapse پراکسی می‌شود
+	@media_upload {
+		method POST PUT
+		path_regexp media_up "^/_matrix/media/[^/]+/(upload|create)(/.*)?$"
+	}
+	handle @media_upload {
+		reverse_proxy gateway:3000
+	}
+
+	handle /_matrix/client/* {
+		reverse_proxy synapse:8008
+	}
+
+	handle /_matrix/* {
+		reverse_proxy synapse:8008
+	}
+
+	handle /api/* {
+		reverse_proxy gateway:3000
+	}
+
+	handle_path /livekit/* {
+		reverse_proxy livekit:7880
+	}
+
+	handle {
+		root * /srv/web
+		try_files {path} /index.html
+		file_server
+	}
+}

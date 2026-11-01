@@ -1,0 +1,104 @@
+/* ui34.css — اصلاح‌های ظاهری مرحله‌ای (آخرین لایه؛ بعد از theme.css) */
+
+/* ── هدر چت: عنوان تک‌خطی، بدون شکستن زیرعنوان ───────────────── */
+.chat-head .chat-title { flex: 1 1 0; min-width: 0; align-items: flex-start; text-align: start; }
+.chat-head .chat-title strong { min-width: 0; max-width: 100%; }
+.chat-head .chat-title strong .room-kind { flex: none; display: inline-flex; }
+.chat-head .t-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-title .sub-line { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; white-space: nowrap; }
+.chat-title .sub-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chat-title .sub-lock { display: inline-flex; align-items: center; gap: 3px; flex: none; color: var(--accent); }
+.chat-head .icon, .chat-head .chat-avatar, .chat-head .back { flex: none; }
+@media (max-width: 900px) {
+  .chat-head { gap: 4px !important; padding-inline: 8px !important; }
+  .chat-title .sub-lock-t { display: none; }
+  .chat-head .icon { width: 34px !important; height: 34px !important; }
+}
+@media (max-width: 480px) {
+  .chat-head [data-testid='chat-mute'] { display: none; }   /* بی‌صدا از تنظیمات گفتگو در دسترس است */
+}
+
+/* ── هدر سایدبار دسکتاپ: لوگو و آیکن‌ها روی هم نیفتند ──────── */
+.side-head { gap: 2px !important; flex-wrap: nowrap; }
+.side-head .brand { flex: 0 1 auto; min-width: 0; overflow: hidden; margin-inline-end: 0; }
+.side-head .brand-text { min-width: 0; overflow: hidden; }
+.side-head .brand-text strong, .side-head .brand-text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-head .grow { flex: 1 1 4px; min-width: 4px; }
+.side-head .icon, .side-head .me-avatar-btn { flex: none; }
+.side-head .icon { width: 36px; height: 36px; }
+
+/* ── سوییچ استاندارد ─────────────────────────────────────────── */
+.sw-row, .form label.sw-row {
+  display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 10px 2px; cursor: pointer; color: var(--ink); font-size: 14px;
+}
+.sw-row.dis { opacity: .55; cursor: not-allowed; }
+.sw-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw-text b { font-weight: 600; font-size: 14px; }
+.sw-text small { color: var(--muted); font-size: 12px; line-height: 1.5; }
+input.sw, .form input.sw {
+  -webkit-appearance: none; appearance: none; flex: none; position: relative;
+  width: 44px !important; height: 26px !important; padding: 0 !important; border-radius: 999px;
+  background: var(--surface-3); border: 1px solid var(--line); cursor: inherit; transition: background .18s, border-color .18s;
+}
+input.sw::after {
+  content: ''; position: absolute; top: 2px; inset-inline-start: 2px; width: 20px; height: 20px; border-radius: 50%;
+  background: #cfd8d6; box-shadow: 0 1px 3px rgb(0 0 0 / .4); transition: inset-inline-start .18s, background .18s; transform: none !important;
+}
+input.sw:checked { background: var(--accent); border-color: var(--accent); }
+input.sw:checked::after { inset-inline-start: 20px; background: var(--on-accent, #fff); transform: none !important; }
+input.sw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── منوی کشویی (Drawer) ───────────────────────────────────────── */
+.menu-btn { margin-inline-end: 2px; }
+.drawer-wrap { position: fixed; inset: 0; z-index: 60; background: rgb(0 0 0 / .55); animation: dr-fade .18s ease; }
+.drawer {
+  --dx: -1; position: absolute; inset-block: 0; inset-inline-start: 0; width: min(320px, 86vw);
+  background: var(--surface); border-inline-end: 1px solid var(--line); display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top); animation: dr-in .22s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 40px rgb(0 0 0 / .45);
+  overflow-y: auto;
+}
+html[dir='rtl'] .drawer { --dx: 1; }
+@keyframes dr-in { from { transform: translateX(calc(var(--dx) * 100%)); } to { transform: none; } }
+@keyframes dr-fade { from { opacity: 0; } to { opacity: 1; } }
+.drawer-head { position: relative; padding: 22px 18px 16px; background: linear-gradient(160deg, var(--surface-2), var(--surface)); border-bottom: 1px solid var(--line); }
+.drawer-me { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+.drawer-me .avatar { margin-bottom: 10px; }
+.drawer-name { font-weight: 700; font-size: 16px; color: var(--ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drawer-id { font-size: 13px; }
+.drawer-theme { position: absolute; top: 14px; inset-inline-end: 12px; }
+.drawer-list { display: flex; flex-direction: column; padding: 8px 8px; gap: 2px; }
+.drawer-item { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 12px 12px; border-radius: 12px; cursor: pointer; color: var(--ink); font-size: 15px; }
+.drawer-item .ico { color: var(--muted); flex: none; }
+.drawer-item:hover, .drawer-item:focus-visible { background: var(--surface-3); }
+.drawer-list .sw-row { padding: 12px 12px; margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0; }
+.drawer-foot { margin-top: auto; padding: 14px 18px calc(14px + env(safe-area-inset-bottom)); font-size: 12px; letter-spacing: .14em; }
+
+/* ── تنظیمات: صفحهٔ اصلی دسته‌بندی‌شده ─────────────────────────── */
+.set-hero { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 14px; width: calc(100% - 24px); margin: 12px; padding: 16px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); cursor: pointer; }
+.set-hero-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 2px; }
+.set-hero-txt strong { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.set-hero > .ico, .set-item > .ico { color: var(--dim); flex: none; }
+html[dir='ltr'] .set-hero > .ico, html[dir='ltr'] .set-item > .ico { transform: scaleX(-1); }
+.set-menu { display: flex; flex-direction: column; margin: 0 12px 12px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.set-item { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 13px 16px; cursor: pointer; color: var(--ink); }
+.set-item + .set-item { border-top: 1px solid var(--line); }
+.set-item:hover, .set-item:focus-visible { background: var(--surface-3); }
+.set-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: #fff; flex: none; background: #3f8f7b; }
+.set-ico.c-security { background: #c0762e; } .set-ico.c-privacy { background: #4f7fd1; } .set-ico.c-appearance { background: #8a5cc4; }
+.set-ico.c-chatlook { background: #d9638a; } .set-ico.c-invite { background: #2e9e6e; } .set-ico.c-about { background: #6b7a86; } .set-ico.c-account { background: #3f8f7b; }
+.set-item-txt { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.set-item-txt strong { font-weight: 600; font-size: 15px; }
+.set-item-txt .muted { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.set-item-txt .muted:empty { display: none; }
+.side-head .menu-btn { display: inline-flex !important; }
+@media (max-width: 900px) { .side-head .side-search { display: none; } }
+
+/* install-as-app banner (mobile browsers only) */
+.install-bar{margin:8px 10px 0;padding:10px 12px;border-radius:14px;background:var(--panel,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.1))}
+.install-row{display:flex;align-items:center;gap:10px}
+.install-txt{flex:1;display:flex;flex-direction:column;min-width:0;font-size:13px}
+.install-txt span{font-size:12px}
+.install-go{padding:6px 14px;min-height:34px}
+.install-x{width:30px;height:30px}
+.install-help{margin-top:8px;font-size:12.5px;line-height:1.6}

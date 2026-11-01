@@ -1,0 +1,220 @@
+/* ===== TIKOOTAK × Telegram look (UI34-S3): آخرین لایهٔ CSS ===== */
+/* پالت: شب = آبیِ تیرهٔ تلگرام با کمی سبزآبی؛ روز = سفید + آبی تلگرام */
+/* پالت پیش‌فرض = سبز برند (data-palette="green")؛ پالت آبی تلگرام با data-palette="blue" */
+:root {
+  --bg: #07110d; --night: #07110d; --deep: #0d1a14; --surface: #0d1a14; --surface-2: #14261d; --surface-3: #1b3427;
+  --raise: #0d1a14; --raise2: #1b3427;
+  --line: rgb(255 255 255 / 0.07); --line-soft: rgb(255 255 255 / 0.045); --line2: rgb(255 255 255 / 0.12);
+  --ink: #eef7f2; --muted: #9db8aa; --dim: #6b8878;
+  --accent: #34d399; --accent-2: #6ee7b7; --accent-3: #10b981; --on-accent: #03140c;
+  --mine-2: #2c9a73; --mine: #0f4a35; --on-mine: #ffffff; --bubble-me: #1c6b4e; --bubble-me-ink: #fff; --bubble-other: #12231b;
+  --bt: #12231b; --mine-meta: rgb(255 255 255 / 0.68); --tick-read: #6ee7b7;
+  --glow: rgb(52 211 153 / 0.14); --glass: rgb(13 26 20 / 0.78);
+  --ring: 0 0 0 3px rgb(52 211 153 / 0.32);
+  --tg-wall: #08130e; --tg-pat: rgb(255 255 255 / 0.03);
+  --name-1: #6ee7b7; --name-2: #b8e986; --name-3: #f4c06a; --name-4: #f48d96; --name-5: #a7b7ff; --name-6: #d0a5ff; --name-7: #5fdccc; --name-8: #f5a6d2;
+}
+:root[data-theme='light'] {
+  --bg: #e4efe9; --night: #e4efe9; --deep: #ffffff; --surface: #ffffff; --surface-2: #eff6f2; --surface-3: #e0ece5;
+  --raise: #ffffff; --raise2: #ecf4ef;
+  --line: rgb(8 50 30 / 0.10); --line-soft: rgb(8 50 30 / 0.06); --line2: rgb(8 50 30 / 0.16);
+  --ink: #0d1f17; --muted: #4c6b5c; --dim: #7a9486;
+  --accent: #0e9468; --accent-2: #10b981; --accent-3: #0b7a55; --on-accent: #ffffff;
+  --mine-2: #eaf9f1; --mine: #bfeed7; --on-mine: #0d1f17; --bubble-me: #d3f1e2; --bubble-me-ink: #0d1f17; --bubble-other: #ffffff;
+  --bt: #ffffff; --mine-meta: #3f7a62; --tick-read: #0b7a55;
+  --glow: rgb(14 148 104 / 0.10); --glass: rgb(255 255 255 / 0.82);
+  --ring: 0 0 0 3px rgb(14 148 104 / 0.25);
+  --tg-wall: #dbe9e1; --tg-pat: rgb(10 90 60 / 0.05);
+  --name-1: #0b7a55; --name-2: #3f6b0b; --name-3: #8a5a00; --name-4: #a63a32; --name-5: #4f5bd5; --name-6: #8a3fd0; --name-7: #0e7490; --name-8: #bf3b86;
+}
+:root[data-theme='oled'] {
+  --mine: #0b3b2a; --mine-2: #258a66;
+  --bg: #000; --night: #000; --deep: #0a0a0b; --surface: #0a0a0b; --surface-2: #151517; --surface-3: #1e1e21;
+  --raise: #0a0a0b; --raise2: #1e1e21; --glass: rgb(0 0 0 / 0.82);
+  --bt: #1c1c1f; --tg-wall: #000; --tg-pat: rgb(255 255 255 / 0.035);
+  --muted: #a3a3aa; --dim: #6e6e76; --ink: #f4f4f5;
+}
+/* ---- پالت آبی تلگرام ---- */
+:root[data-palette='blue'] {
+  --bg: #0e1621; --night: #0e1621; --deep: #17212b; --surface: #17212b; --surface-2: #1d2a38; --surface-3: #243447;
+  --raise: #17212b; --raise2: #243447;
+  --muted: #9fb2c5; --dim: #6d8398;
+  --accent: #5eb5f7; --accent-2: #8ccbfa; --accent-3: #3d9be0; --on-accent: #04101b;
+  --mine-2: #3d7ab8; --mine: #1c3f78; --bubble-me: #1c3f78; --bubble-other: #182533; --bt: #182533; --tick-read: #5eb5f7;
+  --glow: rgb(94 181 247 / 0.14); --glass: rgb(23 33 43 / 0.78); --ring: 0 0 0 3px rgb(94 181 247 / 0.32);
+  --tg-wall: #0b121a; --tg-pat: rgb(255 255 255 / 0.028);
+  --name-1: #6ec9ff; --name-2: #8dde93;
+}
+:root[data-palette='blue'][data-theme='light'] {
+  --bg: #e6ebee; --night: #e6ebee; --deep: #ffffff; --surface: #ffffff; --surface-2: #f1f4f7; --surface-3: #e5ebf0;
+  --raise: #ffffff; --raise2: #eef2f5;
+  --line: rgb(15 40 70 / 0.10); --line-soft: rgb(15 40 70 / 0.06); --line2: rgb(15 40 70 / 0.16);
+  --ink: #0f1a24; --muted: #51677b; --dim: #7d90a2;
+  --accent: #2a8bdc; --accent-2: #3d9be0; --accent-3: #1f74bd; --on-accent: #ffffff;
+  --mine-2: #eef6ff; --mine: #c4e2ff; --on-mine: #0f1a24; --bubble-me: #d6ecff; --bubble-me-ink: #0f1a24; --bubble-other: #ffffff;
+  --bt: #ffffff; --mine-meta: #4a6b8a; --tick-read: #1f74bd;
+  --glow: rgb(42 139 220 / 0.10); --glass: rgb(255 255 255 / 0.82); --ring: 0 0 0 3px rgb(42 139 220 / 0.25);
+  --tg-wall: #dfe7ec; --tg-pat: rgb(30 80 120 / 0.045);
+  --name-1: #1f74bd; --name-2: #2e8b3d;
+}
+:root[data-palette='blue'][data-theme='oled'] {
+  --bg: #000; --night: #000; --deep: #0a0a0b; --surface: #0a0a0b; --surface-2: #151517; --surface-3: #1e1e21;
+  --raise: #0a0a0b; --raise2: #1e1e21; --bt: #1c1c1f; --tg-wall: #000; --mine: #14336b; --mine-2: #2f6fb3;
+}
+/* ---- پالت سرمه‌ای (پیش‌فرض): مشکیِ آبی‌فام + حباب سرمه‌ایِ پررنگ مثل تلگرام ---- */
+:root[data-palette='navy'] {
+  --bg: #070a14; --night: #070a14; --deep: #0d111d; --surface: #0d111d; --surface-2: #151a28; --surface-3: #1e2437;
+  --raise: #0d111d; --raise2: #1e2437;
+  --line: rgb(255 255 255 / 0.07); --line-soft: rgb(255 255 255 / 0.045); --line2: rgb(255 255 255 / 0.13);
+  --ink: #eef1fb; --muted: #a2abc6; --dim: #6d7694;
+  --accent: #5a7bff; --accent-2: #8aa1ff; --accent-3: #3f5fe8; --on-accent: #ffffff;
+  --mine: #0e1773; --mine-2: #2234c4; --on-mine: #ffffff; --bubble-me: #16208f; --bubble-me-ink: #fff;
+  --bubble-other: #1b1e2a; --bt: #1b1e2a; --mine-meta: rgb(255 255 255 / 0.7); --tick-read: #9db0ff;
+  --glow: rgb(90 123 255 / 0.16); --glass: rgb(16 20 36 / 0.62); --ring: 0 0 0 3px rgb(90 123 255 / 0.35);
+  --tg-wall: #070a14; --tg-pat: rgb(255 255 255 / 0.03);
+  --name-1: #8aa1ff; --name-2: #7be0b0; --name-3: #f4c06a; --name-4: #f48d96; --name-5: #b69cff; --name-6: #d0a5ff; --name-7: #5fd6e6; --name-8: #f5a6d2;
+}
+:root[data-palette='navy'][data-theme='light'] {
+  --bg: #e7ebf7; --night: #e7ebf7; --deep: #ffffff; --surface: #ffffff; --surface-2: #f1f3fb; --surface-3: #e4e8f6;
+  --raise: #ffffff; --raise2: #eef0fa;
+  --line: rgb(20 30 80 / 0.10); --line-soft: rgb(20 30 80 / 0.06); --line2: rgb(20 30 80 / 0.16);
+  --ink: #0e1330; --muted: #525a7e; --dim: #8089ab;
+  --accent: #3b57e0; --accent-2: #5a7bff; --accent-3: #2a43bd; --on-accent: #ffffff;
+  --mine: #cdd6ff; --mine-2: #e6ebff; --on-mine: #0e1330; --bubble-me: #d9e0ff; --bubble-me-ink: #0e1330; --bubble-other: #ffffff;
+  --bt: #ffffff; --mine-meta: #4a58a0; --tick-read: #2a43bd;
+  --glow: rgb(59 87 224 / 0.10); --glass: rgb(255 255 255 / 0.72); --ring: 0 0 0 3px rgb(59 87 224 / 0.25);
+  --tg-wall: #dde2f3; --tg-pat: rgb(30 40 120 / 0.05);
+  --name-1: #2a43bd; --name-2: #2e8b5d;
+}
+:root[data-palette='navy'][data-theme='oled'] {
+  --bg: #000; --night: #000; --deep: #05060b; --surface: #05060b; --surface-2: #0f121c; --surface-3: #181c2a;
+  --raise: #05060b; --raise2: #181c2a; --bt: #14161f; --bubble-other: #14161f; --tg-wall: #000; --mine: #0a1060; --mine-2: #1c2bb0; --glass: rgb(0 0 0 / 0.6);
+}
+body { background: var(--bg) !important; }
+:root[data-theme='light'] .primary, .primary { background: var(--accent); color: var(--on-accent); box-shadow: none; }
+:root[data-theme='light'] .primary:hover:not(:disabled), .primary:hover:not(:disabled) { background: var(--accent-3); }
+
+/* پس‌زمینهٔ چت: رنگ ساده + الگوی بسیار ملایم */
+.timeline {
+  background-color: var(--tg-wall) !important;
+  background-image: var(--wall-bg, radial-gradient(var(--tg-pat) 1.2px, transparent 1.4px)) !important;
+  background-size: var(--wall-size, 22px 22px) !important;
+  background-position: center !important;
+}
+
+/* حباب‌ها */
+.msg .bubble { border: 0 !important; border-radius: var(--msg-r, 14px) !important; padding: 6px 10px 5px !important; box-shadow: 0 1px 1px rgb(0 0 0 / 0.14); position: relative; line-height: 1.55; }
+.msg.mine .bubble { background: linear-gradient(115deg, var(--mine) 0%, var(--mine-2, var(--mine)) 100%) !important; color: var(--on-mine) !important; }
+.msg.theirs .bubble { background: var(--bt) !important; color: var(--ink); }
+.msg.mine .bubble .msg-time, .msg.mine .bubble .tick { color: var(--mine-meta) !important; opacity: 1; }
+.msg .bubble .tick.read { color: var(--tick-read) !important; opacity: 1; }
+.msg { margin-top: 2px !important; }
+.msg:not(.grouped) { margin-top: 8px !important; }
+/* گوشهٔ دم‌دار: همیشه پیام خودم راست، پیام دیگران چپ (مثل تلگرام) */
+.msg.tail.mine .bubble { border-bottom-right-radius: 4px !important; }
+.msg.tail.theirs .bubble { border-bottom-left-radius: 4px !important; }
+.msg.tail .bubble::after { content: ''; position: absolute; bottom: 0; width: 9px; height: 13px; }
+.msg.tail.mine .bubble::after { right: -8px; left: auto; background: var(--mine-2, var(--mine)); clip-path: polygon(0 0, 0 100%, 100% 100%, 35% 70%); }
+.msg.tail.theirs .bubble::after { left: -8px; right: auto; background: var(--bt); clip-path: polygon(100% 0, 100% 100%, 0 100%, 65% 70%); }
+/* ساعت کنار آخرین خط متن */
+.msg .bubble:has(> .text) { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 10px; }
+.msg .bubble:has(> .text) > .text { min-width: 0; overflow-wrap: anywhere; }
+.msg .bubble:has(> .text) > .msg-time { display: inline-flex; align-items: center; gap: 3px; margin: 0 0 0 auto; margin-inline-start: auto; flex: none; opacity: 0.6; padding: 0; }
+.msg .bubble > .quote, .msg .bubble > .fwd-mark, .msg .bubble > .reacts, .msg .bubble > .bubble-foot { flex-basis: 100%; }
+/* عکس + کپشن */
+.att-wrap { display: flex; flex-direction: column; gap: 4px; }
+.att-cap { white-space: pre-wrap; overflow-wrap: anywhere; padding: 2px 4px 0; font-size: 14.5px; line-height: 1.55; max-width: min(320px, 70vw); }
+.bubble:has(.att-wrap) { padding: 4px 4px 4px !important; }
+.bubble:has(.att-wrap) .att-img { margin: 0; }
+.bubble:has(.att-wrap) .att-img img { border-radius: 10px; }
+
+/* پیش‌نمایش ارسال */
+.sp-back { position: fixed; inset: 0; z-index: 90; background: rgb(0 0 0 / 0.55); display: flex; align-items: flex-end; justify-content: center; backdrop-filter: blur(3px); }
+@media (min-width: 700px) { .sp-back { align-items: center; } }
+.sp-card { width: min(460px, 100%); max-height: 92dvh; background: var(--surface); color: var(--ink); border-radius: 18px 18px 0 0; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-2); }
+@media (min-width: 700px) { .sp-card { border-radius: 18px; } }
+.sp-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.sp-grid { padding: 10px; overflow: auto; display: grid; gap: 6px; grid-template-columns: 1fr; justify-items: center; }
+.sp-grid.many { grid-template-columns: repeat(2, 1fr); }
+.sp-item { position: relative; width: 100%; display: flex; justify-content: center; }
+.sp-item img, .sp-item video { max-width: 100%; max-height: 52dvh; border-radius: 12px; object-fit: contain; display: block; background: #000; }
+.sp-grid.many .sp-item img, .sp-grid.many .sp-item video { height: 140px; width: 100%; object-fit: cover; }
+.sp-file { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px; background: var(--surface-2); border-radius: 12px; width: 100%; text-align: center; overflow-wrap: anywhere; }
+.sp-x { position: absolute; top: 4px; inset-inline-end: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: rgb(0 0 0 / 0.6); color: #fff; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.sp-foot { display: flex; align-items: flex-end; gap: 8px; padding: 8px 10px 10px; border-top: 1px solid var(--line); }
+.sp-foot textarea { flex: 1; resize: none; max-height: 110px; border-radius: 18px; padding: 9px 14px; background: var(--surface-2); border: 0; color: var(--ink); min-height: 40px; }
+.sp-foot .send { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: var(--on-accent); border: 0; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.sp-note { padding: 0 14px 8px; display: flex; gap: 4px; align-items: center; }
+.views { display: inline-flex; align-items: center; gap: 3px; margin-inline-end: 6px; }
+.att-wrap { align-items: flex-start; min-width: min(230px, 66vw); }
+.att-wrap .att-img { align-self: center; }
+.att-cap { max-width: 100%; }
+/* تب نوع گفتگو در دیالوگ ساخت: له نشود */
+.conv-kinds { flex: 0 0 auto !important; min-height: 44px; overflow: visible; }
+.conv-kinds button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.conv-kinds button.on { background: var(--accent) !important; color: var(--on-accent) !important; }
+/* انتخاب رنگ‌بندی */
+.pal-line { flex-direction: column; align-items: stretch !important; gap: 10px; }
+.pal-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pal-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 8px; border-radius: 14px; border: 2px solid var(--line2); background: var(--surface-2); color: var(--ink); font-size: 13px; }
+.pal-card.on { border-color: var(--accent); }
+.pal-sw { display: flex; gap: 4px; }
+.pal-sw i { width: 22px; height: 22px; border-radius: 50%; display: block; }
+.pal-green .pal-sw i:nth-child(1) { background: #07110d; border: 1px solid rgb(255 255 255 / 0.2); } .pal-green .pal-sw i:nth-child(2) { background: #1c6b4e; } .pal-green .pal-sw i:nth-child(3) { background: #34d399; }
+.pal-navy .pal-sw i:nth-child(1) { background: #070a14; border: 1px solid rgb(255 255 255 / 0.2); } .pal-navy .pal-sw i:nth-child(2) { background: #101a7a; } .pal-navy .pal-sw i:nth-child(3) { background: #5a7bff; }
+.pal-blue .pal-sw i:nth-child(1) { background: #0e1621; border: 1px solid rgb(255 255 255 / 0.2); } .pal-blue .pal-sw i:nth-child(2) { background: #2b5278; } .pal-blue .pal-sw i:nth-child(3) { background: #5eb5f7; }
+
+/* اندازهٔ متن */
+.msg .bubble .text, .att-cap, .msg .bubble .quote span { font-size: var(--msg-fs, 15px); }
+/* ===== صفحهٔ شخصی‌سازی چت ===== */
+.look-page { display: flex; flex-direction: column; gap: 12px; }
+.lp-wall { display: flex; flex-direction: column; gap: 4px; padding: 18px 16px; border-radius: 16px; background-color: var(--tg-wall); background-image: var(--wall-bg, radial-gradient(var(--tg-pat) 1.2px, transparent 1.4px)); background-size: var(--wall-size, 22px 22px); background-position: center; border: 1px solid var(--line); overflow: hidden; }
+.lp-wall .msg { max-width: 82%; margin: 0 !important; }
+.lp-wall .msg.mine { align-self: flex-end; } .lp-wall .msg.theirs { align-self: flex-start; }
+.lp-wall .msg .bubble { display: flex; align-items: flex-end; column-gap: 10px; }
+.lp-wall .msg-time { font-size: 10.5px; opacity: .7; white-space: nowrap; }
+.look-card { background: var(--surface-2); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.look-card h4 { margin: 0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--accent); }
+.look-card input[type=range] { width: 100%; accent-color: var(--accent); }
+.look-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+.look-pal { flex: 0 0 auto; width: 84px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 4px; border-radius: 14px; border: 2px solid transparent; background: transparent; color: var(--ink); font-size: 11.5px; }
+.look-pal.on { border-color: var(--accent); }
+.lp-mini { width: 64px; height: 84px; border-radius: 12px; position: relative; overflow: hidden; display: block; border: 1px solid var(--line2); }
+.lp-mini i { position: absolute; top: 16px; inset-inline-end: 8px; width: 38px; height: 16px; border-radius: 9px; display: block; }
+.lp-mini i.o { top: 42px; inset-inline-end: auto; inset-inline-start: 8px; width: 34px; opacity: .95; }
+.look-row { display: flex; align-items: center; gap: 12px; padding: 10px 4px; background: none; border: 0; color: var(--accent); font-size: 14px; text-align: start; }
+.look-custom { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; }
+.look-custom input[type=color] { width: 56px; height: 34px; border: 0; padding: 0; border-radius: 10px; background: none; }
+.look-seg { align-self: flex-start; }
+.look-wall { flex: 0 0 auto; width: 92px; height: 64px; border-radius: 12px; border: 2px solid transparent; color: var(--ink); font-size: 11.5px; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 6px; background-color: var(--tg-wall); background-position: center; }
+.look-wall span { background: rgb(0 0 0 / .45); color: #fff; padding: 1px 7px; border-radius: 8px; }
+.look-wall.on { border-color: var(--accent); }
+.look-wall.w-dots { background-image: radial-gradient(var(--tg-pat) 1.2px, transparent 1.4px); background-size: 14px 14px; }
+.look-wall.w-dusk { background: linear-gradient(180deg, #0a1038, #2a1d63); } .look-wall.w-aurora { background: radial-gradient(circle at 30% 30%, #1fd1b0aa, transparent 60%), radial-gradient(circle at 80% 80%, #6a3df0aa, transparent 55%), #050816; } .look-wall.w-peaks { background: linear-gradient(180deg, #0b1530, #1a3a6b); }
+.look-wall.w-lines { background-image: repeating-linear-gradient(45deg, var(--tg-pat) 0 2px, transparent 2px 12px); }
+.look-wall.w-grad { background-image: linear-gradient(160deg, var(--surface-3), var(--accent-3)); }
+
+:root[data-grad='0'] { --mine-2: var(--mine); }
+/* نقل‌قول داخل حباب (مثل تلگرام) */
+.msg .bubble .quote { border: 0 !important; border-inline-start: 3px solid var(--accent-2) !important; background: rgb(255 255 255 / 0.08) !important; border-radius: 8px !important; padding: 4px 8px !important; }
+:root[data-theme='light'] .msg .bubble .quote { background: rgb(0 0 0 / 0.05) !important; }
+.msg .bubble .quote strong { color: var(--accent-2); }
+:root[data-theme='light'] .msg .bubble .quote strong { color: var(--accent-3); }
+/* انتخاب‌گر تم: روز / شب / مشکی */
+.look-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.look-mode { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 4px; border-radius: 14px; border: 2px solid transparent; background: transparent; color: var(--ink); font-size: 12px; }
+.look-mode.on { border-color: var(--accent); }
+.lm-prev { width: 100%; height: 72px; border-radius: 10px; position: relative; border: 1px solid var(--line2); overflow: hidden; display: block; }
+.lm-prev i { position: absolute; height: 16px; border-radius: 8px; display: block; }
+.lm-prev i:nth-child(1) { top: 12px; inset-inline-start: 8px; width: 55%; }
+.lm-prev i:nth-child(2) { top: 38px; inset-inline-end: 8px; width: 60%; }
+.lm-dark { background: #0d1a14; } .lm-dark i:nth-child(1) { background: #1b2b23; } .lm-dark i:nth-child(2) { background: linear-gradient(115deg, #0f4a35, #2c9a73); }
+.lm-light { background: #e4efe9; } .lm-light i:nth-child(1) { background: #fff; } .lm-light i:nth-child(2) { background: linear-gradient(115deg, #bfeed7, #eaf9f1); }
+.lm-oled { background: #000; } .lm-oled i:nth-child(1) { background: #1c1c1f; } .lm-oled i:nth-child(2) { background: linear-gradient(115deg, #0b3b2a, #258a66); }
+
+/* chat view: no leftover space where the bottom bar used to be (installed app / full screen) */
+@media (max-width: 900px) {
+  .shell[data-bar='off'] .chat { padding-bottom: 0 !important; }
+  .shell[data-bar='off'] { grid-template-rows: minmax(0, 1fr) !important; }
+  .shell[data-bar='off'] .composer { padding-bottom: max(8px, env(safe-area-inset-bottom)) !important; }
+}
