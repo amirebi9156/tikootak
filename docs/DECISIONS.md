@@ -1,0 +1,11 @@
+# Decisions and history (newest first)
+- **0.41 lens everywhere**: auto lens on pills/menus because the owner's reference (a glass music card video) needs edge refraction; costs GPU, kill-switch `tikootak.glass=lite`.
+- **0.40 Now Playing = real liquid glass**; ambient cover-colored backdrop gives the glass something to refract.
+- **0.39 design.css**: single newest design layer instead of editing 6 old layers.
+- **0.38 navy default + built-in wallpapers**: flat dark wallpaper made glass look flat. Moon removed from "peaks" (looked like halos).
+- **0.37 liquid-glass chat redesign**, 0.36 glass emoji/sticker panel docked over keyboard, admin upload control (resource saving on a small server), 0.35.x Telegram-like gestures/menu/composer/FAB/round avatars.
+- **Repo + releases (0.41)**: private GitHub repo, tag `vX.Y.Z` → Action builds `tikootak-X.Y.Z.tar.gz`; server runs `scripts/update.sh`. Reason: stop shipping tars through chat (token cost), allow quick server moves.
+- **Web only**: no native app planned (owner decision, Nov 2026).
+- **Client-declared upload category** is accepted as resource saving, not security.
+- **No federation**; Synapse admin API blocked at Caddy; user directory closed (people search via `/api/people/suggest`).
+- Owner workflow: gives one task at a time, judges visually, reports in Persian; wants honest "tested / not tested" statements.
