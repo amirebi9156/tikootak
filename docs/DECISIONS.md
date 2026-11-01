@@ -1,4 +1,6 @@
 # Decisions and history (newest first)
+- **0.42 keyboard/panel swap**: instead of blur + animating the dock while the OS keyboard also animates (two moving things = jumps), we lock `--app-h`, put the dock in flow at the old keyboard height instantly and let the keyboard slide away/up underneath; unlock when `visualViewport` settles. `inputmode=none` keeps focus/caret without the keyboard. Cannot be fully verified without a real phone (tests simulate by resizing the viewport).
+- **0.42 floating player** is a separate component (FloatPlayer) so the full-screen dialog keeps its modal/back-layer behaviour; the float has no back layer and no scrim. Never animate `transform` on the float root (the drag uses it).
 - **0.41 lens everywhere**: auto lens on pills/menus because the owner's reference (a glass music card video) needs edge refraction; costs GPU, kill-switch `tikootak.glass=lite`.
 - **0.40 Now Playing = real liquid glass**; ambient cover-colored backdrop gives the glass something to refract.
 - **0.39 design.css**: single newest design layer instead of editing 6 old layers.

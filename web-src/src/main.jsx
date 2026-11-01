@@ -8,6 +8,7 @@ import './lg.css';
 import './design.css';
 import { initGlass } from './glass.js';
 import { initAutoLens } from './lens.js';
+import { initViewport } from './viewport.js';
 import App from './App.jsx';
 import { initTheme } from './ui.jsx';
 import { applyLangAttrs } from './i18n.js';
@@ -18,6 +19,7 @@ initTheme();
 applyLangAttrs();
 initGlass();
 initAutoLens();
+initViewport();
 
 createRoot(document.getElementById('root')).render(<App />);
 

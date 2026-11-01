@@ -68,7 +68,7 @@ export function useLens(ref, { radius = 36, bezel = 30, scale = 46, aberration =
 
 // ===== عدسی خودکار برای همهٔ سطوح شیشه‌ای (هدر، نوار نوشتن، منوها، پنل‌ها) =====
 // یک فیلتر برای هر اندازهٔ یکتا ساخته و بین عنصرهای هم‌اندازه به اشتراک گذاشته می‌شود.
-const AUTO = ['.hp.lg', '.chat-head .icon.back', '.pinbar', '.cpill.lg', '.ctx-pill', '.ctx-menu', '.attach-menu', '.emoji-pop', '.chat .day', '.chat .older', '.scroll-down'].join(',');
+const AUTO = ['.hp.lg', '.player-bar.lg', '.chat-head .icon.back', '.pinbar', '.cpill.lg', '.ctx-pill', '.ctx-menu', '.attach-menu', '.emoji-pop', '.chat .day', '.chat .older', '.scroll-down'].join(',');
 const filters = new Map(); // key -> {id, f, ready}
 const tracked = new WeakMap(); // el -> {key, ro, t}
 

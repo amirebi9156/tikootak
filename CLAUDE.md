@@ -48,6 +48,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - Default look: navy palette + built-in wallpapers (dusk/aurora/peaks), liquid-glass lens on pills/menus/Now Playing (Chromium only; `localStorage tikootak.glass=lite` turns it off).
 - Owner wants the CHAT UI to feel like Telegram + iOS "Liquid Glass" (reference: a video of a glass music card with edge refraction). Next planned task: rework the chat area with the frontend-design skill.
 - Known limits: nothing is tested on real phones/Docker/Caddy; upload category is client-declared; existing channels still allow member pinning; no ready-made sticker packs/GIFs; old CSS layers (styles/theme/ui34/tg/q/lg) still stack with many `!important`.
+- 0.42: glass mini player (MiniPlayer.jsx), floating glass Now Playing window (FloatPlayer in NowPlaying.jsx), keyboard<->sticker panel swap (viewport.js + Chat.jsx), tidy sticker grid. Keyboard behaviour only tested by viewport-resize simulation, not on a real phone.
 - Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
 
 ## Local test env (cloud sandbox; Docker is unavailable)

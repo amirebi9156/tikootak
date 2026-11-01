@@ -804,5 +804,9 @@ export default {
  "سرمه‌ای": "Navy",
  "غروب": "Dusk",
  "شفق": "Aurora",
- "قله‌ها": "Peaks"
+ "قله‌ها": "Peaks",
+ "بستن پنجرهٔ شناور": "Close floating player",
+ "باز کردن در پنجرهٔ شناور": "Open in floating window",
+ "پخش‌کنندهٔ شناور": "Floating player",
+ "جابه‌جایی پنجره؛ با کلیدهای جهت‌دار": "Move window (use arrow keys)"
 };
