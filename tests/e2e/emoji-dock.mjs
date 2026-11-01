@@ -36,7 +36,7 @@ await ta.tap();await p.waitForTimeout(300);ok(await foc(),'textarea focused (key
 const eb=p.getByRole('button',{name:'ایموجی',exact:true}).first();
 await eb.tap();await p.waitForTimeout(700);
 ok(await dock()>240,'tap emoji: dock slides up ('+Math.round(await dock())+'px)');
-ok(!(await foc()),'tap emoji: keyboard dismissed (textarea blurred)');
+ok(await p.evaluate(()=>document.querySelector('textarea').inputMode==='none'),'tap emoji: keyboard suppressed (inputmode=none, caret kept)');
 await p.screenshot({path:'dock-open.png'});
 await eb.tap();await p.waitForTimeout(700);
 ok(await dock()<2,'tap emoji again: dock collapses');

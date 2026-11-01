@@ -18,9 +18,8 @@ import { roomsSuggest, feedPost, notificationsUnread, feedShare, followList, blo
 import { setPeopleToken, resetPeople, usePerson } from './people.js';
 import { blockPerson, setIgnored } from './social.js';
 import { usePlayer } from './player.js';
-import { fmtClock } from './util.js';
-import { Cover } from './cover.jsx';
-import NowPlaying from './NowPlaying.jsx';
+import NowPlaying, { FloatPlayer } from './NowPlaying.jsx';
+import MiniPlayer from './MiniPlayer.jsx';
 import { roomKind, kindIcon, kindIconName, kindLabel, ROOM_TYPE_EVENT, myPower, canModerate, roomAlias, mutedFromRules, muteUntil } from './roomtype.js';
 import CallView from './Call.jsx';
 import { useCall } from './call.js';
@@ -547,7 +546,7 @@ export default function Shell({
   const [kindFilter, setKindFilter] = useState('all');
   const [composeN, setComposeN] = useState(0);
   const [plOpen, setPlOpen] = useState(null);
-  const [npOpen, setNpOpen] = useState(false);
+  const [npMode, setNpMode] = useState(null); // null | 'full' | 'float'
   const [postView, setPostView] = useState(null);
   const [postShare, setPostShare] = useState(null);
   const [sentTo, setSentTo] = useState('');
@@ -1102,20 +1101,9 @@ export default function Shell({
           </div>}
 
         <audio ref={player.audio} {...player.handlers} preload="auto" />
-        {player.track && <div className="player-bar" role="region" aria-label={tr("پخش‌کننده")} data-testid="player">
-            <button className="plainbtn mini-open" onClick={() => setNpOpen(true)} aria-label={tr("باز کردن صفحه پخش")}>
-              <Cover src={player.track.cover} seed={player.track.title} size={44} radius={0} />
-              <span className="trk-main"><strong dir="auto">{player.track.title}</strong>
-                <span className="muted" dir="auto">{player.error || player.track.artist || player.track.owner}</span></span>
-            </button>
-            <input type="range" className="seek" min="0" max={player.time.d || 0} step="1" value={Math.min(player.time.t, player.time.d || 0)} onChange={e => player.seek(Number(e.target.value))} aria-label={tr("جلو/عقب")} />
-            <span className="muted clock" dir="ltr">{fmtClock(player.time.t)}</span>
-            <button className="icon" onClick={player.prev} aria-label={tr("قبلی")}>⏮</button>
-            <button className="icon" onClick={player.toggle} aria-label={player.playing ? tr("توقف") : tr("پخش")} data-testid="pp">{player.playing ? <Icon n="pause" size={20} /> : <Icon n="play" size={20} />}</button>
-            <button className="icon" onClick={player.next} aria-label={tr("بعدی")}>⏭</button>
-            <button className="icon" onClick={player.stop} aria-label={tr("بستن پخش‌کننده")}><Icon n="close" size={18} /></button>
-          </div>}
-        {npOpen && player.track && <NowPlaying player={player} onClose={() => setNpOpen(false)} />}
+        {player.track && <MiniPlayer player={player} floating={npMode === 'float'} onOpen={() => setNpMode('full')} onFloat={() => setNpMode(m => m === 'float' ? null : 'float')} />}
+        {npMode === 'full' && player.track && <NowPlaying player={player} onClose={() => setNpMode(null)} onFloat={() => setNpMode('float')} />}
+        {npMode === 'float' && player.track && <FloatPlayer player={player} onClose={() => setNpMode(null)} onFull={() => setNpMode('full')} />}
         {inCall && !showCall && <div className="call-bar" role="status">
             <span>{tr("در تماس:")} {call.info.title}</span>
             <button className="small primary" onClick={() => setShowCall(true)}>{tr("برگشت به تماس")}</button>

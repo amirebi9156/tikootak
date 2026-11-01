@@ -27,6 +27,7 @@ import { attachSwipeReply, rowFromEvent } from './swipeReply.js';
 import { uploadPolicy } from './api.js';
 import EmojiPanel from './EmojiPanel.jsx';
 import { sendSticker, stickerFromMessage, ST_FLAG } from './stickers.js';
+import { keyboardHeight, lockViewport, unlockViewport, waitKeyboard } from './viewport.js';
 import { fmtDay, fmtTime, sameDay, fa, hue } from './util.js';
 import { EV, EV_OLD, pickEvent, hasEvent } from './eventTypes.js';
 import { getItem, setItem, removeItem, localStorageKeys } from './storage.js';
@@ -223,6 +224,7 @@ export default function Chat({
   const lastLen = useRef(0);
   const initialAwayCleared = useRef(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [dockInstant, setDockInstant] = useState(false);
   const [dockOn, setDockOn] = useState(false); // پنل هنوز در DOM است (برای انیمیشن بسته‌شدن)
   const [dockMode] = useState(() => { try { return !!window.matchMedia?.('(pointer: coarse)').matches; } catch { return false; } });
   const kbH = useRef(0);
@@ -245,27 +247,51 @@ export default function Chat({
     if (!h) { try { h = Number(localStorage.getItem('tikootak.kbh')) || 0; } catch { /* خالی */ } }
     return Math.max(240, Math.min(h || 310, 440));
   }
+  const swap = useRef(0); // شمارندهٔ جابه‌جایی کیبورد/پنل؛ برای لغو انتظارهای قدیمی
+  const setKb = (on) => { const el = taRef.current; if (el) el.inputMode = on ? 'text' : 'none'; };
+  // کیبورد → پنل: ارتفاع قفل می‌شود، پنل بی‌انیمیشن جای کیبورد را می‌گیرد و کیبورد زیر آن پایین می‌رود
+  async function openPanelFromKeyboard() {
+    const id = ++swap.current;
+    const kb = keyboardHeight();
+    if (kb > 150) { kbH.current = kb; try { localStorage.setItem('tikootak.kbh', String(kb)); } catch { /* مهم نیست */ } }
+    setDockInstant(true); lockViewport();
+    setDockOn(true); setEmojiOpen(true);
+    const el = taRef.current;
+    if (el) { el.inputMode = 'none'; el.blur(); el.focus({ preventScroll: true }); }
+    await waitKeyboard(h => h < 40, 700);
+    if (swap.current === id) unlockViewport();
+  }
+  // پنل → کیبورد: ارتفاع قفل می‌ماند تا کیبورد کامل بالا بیاید، بعد پنل بی‌انیمیشن جمع می‌شود
+  async function closePanelToKeyboard() {
+    const id = ++swap.current;
+    setDockInstant(true); lockViewport();
+    setKb(true);
+    const el = taRef.current;
+    if (el && document.activeElement === el) { el.blur(); el.focus({ preventScroll: true }); } else el?.focus({ preventScroll: true });
+    await waitKeyboard(h => h > 120, 700);
+    if (swap.current !== id) return;
+    setEmojiOpen(false); unlockViewport();
+  }
   function toggleEmoji() {
     if (!dockMode) { setEmojiOpen(o => !o); return; }
-    if (emojiOpen) { // دوباره روی دکمه: پنل جمع شود و کیبورد برگردد
-      setEmojiOpen(false);
-      taRef.current?.focus();
-      return;
-    }
-    const vv = window.visualViewport;
-    if (vv && document.activeElement === taRef.current) {
-      const kb = Math.round(window.innerHeight - vv.height - vv.offsetTop);
-      if (kb > 150) { kbH.current = kb; try { localStorage.setItem('tikootak.kbh', String(kb)); } catch { /* مهم نیست */ } }
-    }
-    setDockOn(true);
-    setEmojiOpen(true);
-    taRef.current?.blur();
+    if (emojiOpen) { closePanelToKeyboard(); return; }
+    if (keyboardHeight() > 120) { openPanelFromKeyboard(); return; }
+    swap.current++;
+    setDockInstant(false); setKb(false);
+    const el = taRef.current;
+    if (el && document.activeElement === el) { el.blur(); el.focus({ preventScroll: true }); }
+    setDockOn(true); setEmojiOpen(true);
   }
+  // پنل بسته شد بدون کیبورد (ارسال استیکر، لمس بیرون، برگشت): ارتفاع آزاد و انیمیشن عادی
+  function closePanel() { swap.current++; unlockViewport(); setDockInstant(false); setKb(true); setEmojiOpen(false); }
   useEffect(() => {
     if (emojiOpen) { setDockOn(true); return undefined; }
-    const t = setTimeout(() => setDockOn(false), 300);
+    const t = setTimeout(() => setDockOn(false), dockInstant ? 0 : 300);
     return () => clearTimeout(t);
-  }, [emojiOpen]);
+  }, [emojiOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { swap.current++; unlockViewport(); }, []);
+  // لمس خود فیلد وقتی پنل باز است = برگشت به کیبورد
+  function onFieldTouch() { if (dockMode && emojiOpen) { setKb(true); closePanelToKeyboard(); } }
   const taRef = useRef(null);
   const [mention, setMention] = useState(null); // { start, q, i }
   const mentionMap = useRef(new Map()); // نام نمایشی -> userId (برای m.mentions هنگام ارسال)
@@ -630,7 +656,7 @@ export default function Chat({
   useBackLayer(showMembers, () => setShowMembers(false));
   useBackLayer(!!ctx, () => { setCtx(null); setSel(null); setCtxMore(false); });
   useBackLayer(attachOpen, () => setAttachOpen(false));
-  useBackLayer(emojiOpen, () => setEmojiOpen(false));
+  useBackLayer(emojiOpen, () => closePanel());
   useBackLayer(searchOpen, () => setSearchOpen(false));
   useBackLayer(!!multi, () => setMulti(null));
   useBackLayer(!!staged, () => setStaged(null));
@@ -703,7 +729,7 @@ export default function Chat({
   }, [text]);
   useEffect(() => {
     if (!emojiOpen) return undefined;
-    const close = (e) => { if (!e.target.closest('.emoji-wrap, .emoji-dock')) setEmojiOpen(false); };
+    const close = (e) => { if (!e.target.closest('.emoji-wrap, .emoji-dock') && !(dockMode && e.target.closest('textarea'))) closePanel(); };
     document.addEventListener('pointerdown', close);
     return () => document.removeEventListener('pointerdown', close);
   }, [emojiOpen]);
@@ -1165,7 +1191,7 @@ export default function Chat({
               <button type="button" role="menuitem" onClick={() => { setAttachOpen(false); setPollOpen(true); }} data-testid="attach-poll"><Icon n="poll" size={18} /><span>{tr("نظرسنجی")}</span></button>
             </div>}
           </div>
-          <textarea ref={taRef} onFocus={() => { if (dockMode && emojiOpen) setEmojiOpen(false); }} onPaste={onPaste} value={text} onChange={e => {
+          <textarea ref={taRef} onPointerDown={onFieldTouch} onPaste={onPaste} value={text} onChange={e => {
           setText(e.target.value);
           pingTyping(e.target.value);
           const pos = e.target.selectionStart ?? e.target.value.length;
@@ -1176,17 +1202,17 @@ export default function Chat({
             <button type="button" className="icon" aria-label={tr('ایموجی')} title={tr('ایموجی')} aria-expanded={emojiOpen} onMouseDown={e => { if (dockMode) e.preventDefault(); }} onClick={toggleEmoji}><Icon n="emoji" /></button>
             {emojiOpen && !dockMode && <EmojiPanel client={client} onToast={setFileErr}
                 onEmoji={e => { setText(t => t + e); taRef.current?.focus({ preventScroll: true }); }}
-                onBig={e => { setEmojiOpen(false); stick.current = true; client.sendMessage(roomId, { msgtype: 'm.text', body: e }).catch(() => {}); }}
-                onSticker={st => { setEmojiOpen(false); stick.current = true; sendSticker(client, roomId, st).catch(err => setFileErr(err.message || '')); }} />}
+                onBig={e => { closePanel(); stick.current = true; client.sendMessage(roomId, { msgtype: 'm.text', body: e }).catch(() => {}); }}
+                onSticker={st => { closePanel(); stick.current = true; sendSticker(client, roomId, st).catch(err => setFileErr(err.message || '')); }} />}
           </div>
           </div>
           {text.trim() ? <button className="send" aria-label={tr("ارسال")}><Icon n="send" /></button> : <button type="button" className="send mic" aria-label={tr("ضبط ویس")} title={upAllowed.voice ? tr("ضبط پیام صوتی") : tr('توسط ادمین غیرفعال است')} disabled={!upAllowed.voice} onClick={startRec}><Icon n="mic" /></button>}
         </form>
-        {dockMode && <div className={`emoji-dock ${emojiOpen ? 'open' : ''}`} style={{ '--dock-h': `${dockHeight()}px` }} aria-hidden={!emojiOpen}>
+        {dockMode && <div className={`emoji-dock ${emojiOpen ? 'open' : ''} ${dockInstant ? 'instant' : ''}`} style={{ '--dock-h': `${dockHeight()}px` }} aria-hidden={!emojiOpen}>
             {dockOn && <EmojiPanel docked client={client} onToast={setFileErr}
               onEmoji={e => setText(t => t + e)}
-              onBig={e => { setEmojiOpen(false); stick.current = true; client.sendMessage(roomId, { msgtype: 'm.text', body: e }).catch(() => {}); }}
-              onSticker={st => { setEmojiOpen(false); stick.current = true; sendSticker(client, roomId, st).catch(err => setFileErr(err.message || '')); }} />}
+              onBig={e => { closePanel(); stick.current = true; client.sendMessage(roomId, { msgtype: 'm.text', body: e }).catch(() => {}); }}
+              onSticker={st => { closePanel(); stick.current = true; sendSticker(client, roomId, st).catch(err => setFileErr(err.message || '')); }} />}
           </div>}
         </>}
       {viewer && <MediaViewer item={viewer} onClose={() => setViewer(null)} />}

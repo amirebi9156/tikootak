@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.42.0
+- Mini player bar rebuilt as a glass capsule (MiniPlayer.jsx): centred max 760px on desktop with time labels and one row, compact two-line layout on phones, 44px touch targets, liquid-glass lens on Chromium, reduced-transparency fallback.
+- Now Playing: new "floating window" button. The glass player can leave full screen and live as a draggable glass window inside the app (no dimming, chat stays usable); drag by the handle or move with arrow keys; position is remembered; also openable from the bar; "full screen" button returns.
+- Phone keyboard <-> emoji/sticker panel: new viewport.js keeps `--app-h` = visualViewport and locks the height while swapping, the panel replaces the keyboard in place (no blur, `inputmode=none`) so the composer no longer jumps; tapping the field switches back; mini player hides while keyboard/panel is open. Viewport meta gets `interactive-widget=resizes-content`.
+- Sticker/emoji grids no longer stretch or overlap (square equal cells, `minmax(0,1fr)`-style auto-fill columns, transparent sticker background).
+- Tests: q9-glass-player.mjs, q9-sticker-dock.mjs (keyboard simulated by resizing the viewport); emoji-dock.mjs updated.
 ## 0.41.0
 - Liquid-glass lens now applied automatically to header pills, pinned card, composer pill, date chips, context menu, reactions pill, attach menu (Chromium; lens.js initAutoLens; one shared SVG filter per unique size). Disable with localStorage tikootak.glass=lite.
 ## 0.40.0

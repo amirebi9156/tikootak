@@ -25,3 +25,8 @@ All strings are written in Persian inside `tr('…')` (`i18n.js`); English lives
 
 ## Testing the UI
 `tests/e2e/*.mjs` (Playwright, Chromium) + `tests/env/` (local Synapse + gateway + proxy; see CLAUDE.md). Screenshot checks: `liquid-glass-shots.mjs`, `composer-shots.mjs`. Touch tests use CDP `Input.dispatchTouchEvent` (touchstart has no clientY → read `touches[0]`). After a UI change run the regression script and look at screenshots; say honestly that real phones were not tested.
+
+## Player bar, floating player, keyboard/panel swap (0.42)
+- `.player-bar.mp.lg` is the glass capsule; lens applied via `AUTO` in lens.js. Mobile hides it while the keyboard or emoji dock is open (`:has`).
+- `FloatPlayer` (NowPlaying.jsx): root is positioned with inline `transform` (so no animation on the root); lens + rim live on `.npf-glass`; shadow on a sibling `.npf-shadow` (lens elements must not have outer box-shadow).
+- viewport.js: `--app-h` from visualViewport (touch only), `lockViewport()/unlockViewport()` around keyboard<->dock swaps. Test with q9-sticker-dock.mjs (keyboard = viewport resize).
