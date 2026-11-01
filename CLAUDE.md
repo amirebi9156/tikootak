@@ -8,6 +8,28 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - `gateway/` Express + better-sqlite3 API in front of Matrix Synapse. `docker-compose.yml`, `Caddyfile`, `scripts/` ops scripts.
 - `tests/e2e/*.mjs` Playwright scripts (need the local test env, see below). `docs/` guides. `CHANGELOG.md` newest first.
 
+## Read these when the task touches them (do not read everything)
+- `docs/ARCHITECTURE.md` — services, request routing, auth/invites, gateway modules, DB/migrations, upload policy, chat model, client file map, backups.
+- `docs/UI-GUIDE.md` — CSS layer order, theming/look engine, glass material + SVG lens (and its pitfalls), gesture rules, i18n, UI testing.
+- `docs/DECISIONS.md` — why things are the way they are, newest first.
+- `docs/RUNBOOK.md`, `docs/MIGRATION.md`, `docs/INSTALL-FA.md`, `docs/UPLOAD-CONTROL.md` — operations. Other files in `docs/` are old history.
+
+## Product & owner
+- Platform for the owner's friends first; strangers may join by invite; security matters; must be movable to another server fast because Iranian servers may get filtered.
+- Owner (Amirreza, not a professional developer, Windows PC, free Claude plan) gives one task at a time and judges the result by looking at it. Explain things simply, in Persian. Give copy-paste commands for server steps.
+- Taste: Telegram's layout and behaviour + iOS "Liquid Glass" visuals (clear glass, thin bright rim, bent background at edges). He rejected: muddy dark blur, white smudges at pill edges, tails/halos around bubbles.
+- Never ask him to paste secrets in chat; he once pasted a GitHub token — tell him to revoke leaked tokens.
+
+## Pitfalls we already hit (save yourself the time)
+- Old CSS layers use `!important`; a new rule that "does nothing" is usually losing to `tg.css`/`q.css`/`lg.css`. Check computed style in Playwright before guessing.
+- Elements with an SVG lens must have no outer `box-shadow` (shifts filter origin); see `docs/UI-GUIDE.md`.
+- `touchstart` events have no `clientY` in CDP tests — use `touches[0]`.
+- Hover styles belong in `@media (hover:hover)` or they stick on touch screens.
+- Test env: registration rate limit ("Too many requests") → start gateway with `RATE_*` raised (tests/env/start.sh does); right after start Synapse/proxy can return bad gateway for ~20 s.
+- `web/dist` is not in git (CI/`build-web.sh` build it); the server needs no Node at runtime.
+- Release workflow can be re-run for an existing tag: Actions → Release → Run workflow → tag.
+- GitHub from the sandbox: only REST via `gh api repos/amirebi9156/tikootak/...`; no GraphQL; tags cannot be pushed from the session (owner creates Releases in the GitHub UI).
+
 ## Rules
 - Every user-visible string goes through `tr('فارسی')`; add the English with `python3 web-src/add-en.py '{"فارسی":"English"}'`, then `node web-src/check-i18n.mjs` must pass.
 - Bump `VERSION` + add a `CHANGELOG.md` entry for every release. Tag `vX.Y.Z` -> GitHub Action builds the release tar.
