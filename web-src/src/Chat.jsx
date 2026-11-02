@@ -12,6 +12,7 @@ import { usePerson } from './people.js';
 import { useBackLayer } from './backstack.js';
 import { AddTo } from './Music.jsx';
 import { isMusic, musicMeta, importFromMessage } from './chatMusic.js';
+import ChatInfo from './ChatInfo.jsx';
 import RoomSettings from './RoomSettings.jsx';
 import ForwardDialog from './ForwardDialog.jsx';
 import { saveToSaved } from './forward.js';
@@ -209,6 +210,7 @@ export default function Chat({
     return () => window.removeEventListener('resize', place);
   }, [attachOpen]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [forwardEv, setForwardEv] = useState(null);
   const [upAllowed, setUpAllowed] = useState({ image: true, video: true, voice: true, music: true, file: true });
   useEffect(() => {
@@ -1026,8 +1028,8 @@ export default function Chat({
       <header className="chat-head">
         <button className="icon back" onClick={onBack} aria-label={otherUnread > 0 ? tr("بازگشت") + ' (' + fa(otherUnread) + ')' : tr("بازگشت")} data-testid="chat-back"><Icon n="back" />{otherUnread > 0 && <span className="back-badge" data-testid="back-badge">{otherUnread > 99 ? '99+' : fa(otherUnread)}</span>}</button>
         <div className="hp hp-title lg">
-        <span className={`chat-avatar ${roomType === 'dm' ? 'dm' : 'square'}`}><RoomAvatar client={client} room={room} name={room.name} id={dmPeerId || room.roomId} size={42} /></span>
-        <button className="plainbtn chat-title" onClick={() => setSettingsOpen(true)} aria-label={tr("تنظیمات گفتگو")} data-testid="room-settings-btn">
+        <span className={`chat-avatar ${roomType === 'dm' ? 'dm' : 'square'}`} onClick={() => setInfoOpen(true)} role="presentation"><RoomAvatar client={client} room={room} name={room.name} id={dmPeerId || room.roomId} size={42} /></span>
+        <button className="plainbtn chat-title" onClick={() => setInfoOpen(true)} aria-label={tr("مشخصات گفتگو")} data-testid="room-settings-btn">
           <strong><span className="room-kind"><Icon n={kindIconName(roomType)} size={16} /></span><span className="t-name" dir="auto">{room.name}</span></strong>
           <span className="muted sub-line">{typers.length ? <span className="typing">{typers.length === 1 ? tr("در حال نوشتن") : tr("چند نفر در حال نوشتن")}<i>.</i><i>.</i><i>.</i></span> : <><span className="sub-text">{kindLabel(roomType)} · {members === 1 ? tr("یک عضو") : tr("{0} عضو", [fa(members)])}</span>{encrypted && <span className="sub-lock" title={tr('رمزنگاری‌شده')}><Icon n="lock" size={11} /><span className="sub-lock-t">{tr('رمزنگاری‌شده')}</span></span>}</>}</span>
         </button>
@@ -1101,6 +1103,10 @@ export default function Chat({
       {(sending > 0 || fileErr) && <div className="file-status" role="status">{sending > 0 ? tr("در حال ارسال فایل…") : fileErr}</div>}
       {savedMsg && <div className="file-status" role="status">{savedMsg}</div>}
       {ctx && meta.byId.get(ctx.id) && (() => { const m = menuFor(meta.byId.get(ctx.id)); return <ContextMenu x={ctx.x} y={ctx.y} label={tr("عملیات پیام")} header={m.header} items={m.items} onClose={closeCtx} />; })()}
+      {infoOpen && <ChatInfo client={client} room={room} me={me} kind={roomType} peerId={dmPeerId} muted={muted} onMute={onMute} onClose={() => setInfoOpen(false)}
+          onCall={() => { setInfoOpen(false); onCall(); }} onInvite={() => { setInfoOpen(false); onInvite(); }}
+          onSearch={() => { setInfoOpen(false); setSearchOpen(true); }} onSettings={() => setSettingsOpen(true)}
+          onProfile={(id) => { setInfoOpen(false); onProfile(id); }} onOpenMedia={setViewer} />}
       {settingsOpen && <RoomSettings
           client={client}
           room={room}

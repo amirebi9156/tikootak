@@ -809,4 +809,18 @@ export default {
  "باز کردن در پنجرهٔ شناور": "Open in floating window",
  "پخش‌کنندهٔ شناور": "Floating player",
  "جابه‌جایی پنجره؛ با کلیدهای جهت‌دار": "Move window (use arrow keys)",
+ "مشخصات گفتگو": "Chat info",
+ "تنظیمات و مدیریت": "Settings & management",
+ "مشاهدهٔ پروفایل": "View profile",
+ "تماس": "Call",
+ "تصویری": "Video",
+ "توضیح": "Description",
+ "لینک دعوت · لمس برای کپی": "Invite link · tap to copy",
+ "مدیا": "Media",
+ "فایل‌ها": "Files",
+ "لینک‌ها": "Links",
+ "هنوز مدیایی نیست.": "No media yet.",
+ "فایلی نیست.": "No files.",
+ "لینکی نیست.": "No links.",
+ "موزیکی نیست.": "No music."
 };
