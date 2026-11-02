@@ -6,13 +6,13 @@ import { PI } from './playerIcons.jsx';
 
 // نوار پخش پایین صفحه: کپسول شیشه‌ای (لنز لیکوید گلس از lens.js روی .player-bar.lg اعمال می‌شود)
 // موبایل: عنوان | کنترل‌ها | بستن + خط پیشرفت نازک؛ دسکتاپ: عنوان | نوار زمان با ساعت | کنترل‌ها | پنجرهٔ شناور و بستن
-export default function MiniPlayer({ player, onOpen, onFloat, floating }) {
+export default function MiniPlayer({ player, onOpen, onFloat, floating, docked }) {
   const { track, time, playing } = player;
   if (!track) return null;
   const max = time.d || 0;
   const t = Math.min(time.t, max);
   const pct = max ? Math.min(100, (t / max) * 100) : 0;
-  return <div className="player-bar mp lg" role="region" aria-label={tr("پخش‌کننده")} data-testid="player" data-floating={floating ? '' : undefined}>
+  return <div className={`player-bar mp ${docked ? 'docked' : 'lg'}`} role="region" aria-label={tr("پخش‌کننده")} data-testid="player" data-floating={floating ? '' : undefined}>
     <button type="button" className="plainbtn mp-open mini-open" onClick={onOpen} aria-label={tr("باز کردن صفحه پخش")}>
       <Cover src={track.cover} seed={track.title} size={44} radius={14} />
       <span className="mp-meta"><strong dir="auto">{track.title}</strong>

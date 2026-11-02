@@ -301,3 +301,33 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 
 /* منوی پیوست: پنجرهٔ شناور مستقل (پورتال روی body) */
 .attach-menu.attach-pop { position: fixed !important; z-index: 80; margin: 0; max-width: calc(100vw - 16px); }
+
+/* ===== v0.42.2: پین و پلیر یک تکهٔ شیشه‌ای (بدون فاصله و خط)؛ کارت اشتراک جمع‌وجور؛ دکمهٔ آخرین پیام داخل صفحه ===== */
+.chat-top .pin-stack { width: min(100%, 760px); margin-inline: auto; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; gap: 0; padding: 0; }
+.chat-top .pin-stack .pinbar, .chat-top .pin-stack .player-bar.mp {
+  background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; border: 0 !important;
+  border-radius: 0 !important; margin: 0 !important; width: 100% !important; animation: none !important; }
+.chat-top .pin-stack .pinbar::before, .chat-top .pin-stack .pinbar::after, .chat-top .pin-stack .player-bar.mp::before, .chat-top .pin-stack .player-bar.mp::after { display: none !important; }
+.chat-top .pin-stack .pinbar { min-height: 36px; padding: 3px 8px 3px 12px !important; }
+.chat-top .pin-stack .player-bar.mp { padding: 3px 8px 2px; }
+.chat-top .pin-stack .player-bar.mp .mp-open { min-height: 36px; }
+.chat-top .pin-stack .player-bar.mp .mp-open .cover { width: 30px !important; height: 30px !important; border-radius: 9px !important; }
+.chat-top .pin-stack .player-bar.mp .mp-b { width: 40px; height: 40px; min-height: 40px; }
+.chat-top .pin-stack .player-bar.mp .mp-seek { height: 10px; }
+.chat-top .pin-stack .pinbar .icon { width: 30px; height: 30px; }
+
+/* کارت اشتراک (آهنگ/پلی‌لیست): داخل حباب بماند، دکمهٔ پلی بیرون نزند */
+.share-card { grid-template-columns: 48px minmax(0, 1fr) 40px !important; min-width: 0 !important; width: min(260px, 100%); max-width: 100%; gap: 10px !important; }
+.share-card:not(.share-post) .cover { width: 48px !important; height: 48px !important; border-radius: 12px !important; }
+.share-card .share-main { min-width: 0; }
+.share-card .share-main strong, .share-card .share-main span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share-card .vp-btn { flex: none; }
+
+/* دکمهٔ رفتن به آخرین پیام: همیشه داخل صفحه */
+.chat .scroll-down { position: absolute !important; right: 14px !important; left: auto !important; bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important; }
+
+/* کارت آهنگ اشتراکی: مثل تلگرام، دکمهٔ پلی روی کاور و کوچک */
+.share-card.share-track { display: flex !important; width: auto; min-width: 170px; max-width: 232px; gap: 10px !important; grid-template-columns: none !important; }
+.share-card.share-track .mc-cover { width: 46px; height: 46px; }
+.share-card.share-track .mc-main strong { font-size: 14.5px; }
+.share-card.share-track .mc-sub { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

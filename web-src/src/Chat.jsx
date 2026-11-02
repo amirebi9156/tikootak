@@ -458,7 +458,7 @@ export default function Chat({
   }
   function isInteractiveMessageTarget(target) {
     const el = target?.closest ? target : target?.parentElement;
-    return !!el?.closest?.('a[href],button,input,textarea,select,label,audio,video,img,.att-wrap,.att-img,.att-video,.att-audio,.att-file,.voice-box,.vp-btn,.vp-wave,.qr,.reacts,.bubble-foot,.quote,[data-emoji-only]');
+    return !!el?.closest?.('a[href],button,input,textarea,select,label,audio,video,.att-wrap,.att-img,.att-video,.att-audio,.att-file,.voice-box,.vp-btn,.vp-wave,.qr,.reacts,.quote');
   }
   function openMessageMenu(id, x = 0, y = 0) {
     if (!id || id.startsWith('~')) return;
@@ -1047,6 +1047,7 @@ export default function Chat({
           <button className="small primary" onClick={onRecovery}>{tr("بازیابی کلید")}</button>
         </div>}
 
+      {(pinIds.length > 0 || topPlayer) && <div className="pin-stack lg">
       {pinIds.length > 0 && <div className="pinbar" data-testid="pinbar">
           <button className="plainbtn pin-main" onClick={() => {
         const id = pinIds[Math.min(pinIdx, pinIds.length - 1)];
@@ -1065,6 +1066,7 @@ export default function Chat({
       }} aria-label={tr("برداشتن پین")}><Icon n="close" size={18} /></button>}
         </div>}
       {topPlayer}
+      </div>}
       {searchOpen && <div className="chat-searchbar" role="search">
           <Icon n="search" size={18} />
           <input autoFocus value={searchQ} onChange={e => setSearchQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goHit(searchIdx + (e.shiftKey ? 1 : -1)); } if (e.key === 'Escape') { setSearchOpen(false); setSearchQ(''); } }} placeholder={tr("جستجو در این گفتگو")} aria-label={tr("جستجو در این گفتگو")} dir="auto" data-testid="chat-search-input" />

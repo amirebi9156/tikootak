@@ -29,7 +29,7 @@ const inView=async(p,loc)=>{const b=await loc.boundingBox();const v=p.viewportSi
   ok(await bar.isVisible(),'desktop: bar visible');
   const bb=await bar.boundingBox();
   ok(bb.width<=770&&bb.width>400,'desktop: bar is a centred capsule, not full width ('+Math.round(bb.width)+'px)');
-  const cs=await bar.evaluate(e=>{const s=getComputedStyle(e);return {r:parseFloat(s.borderTopLeftRadius),bf:s.backdropFilter||s.webkitBackdropFilter,sw:e.scrollWidth,cw:e.clientWidth};});
+  const cs=await bar.evaluate(e=>{e=e.closest('.pin-stack')||e;const s=getComputedStyle(e);return {r:parseFloat(s.borderTopLeftRadius),bf:s.backdropFilter||s.webkitBackdropFilter,sw:e.scrollWidth,cw:e.clientWidth};});
   ok(cs.r>=20,'desktop: rounded glass ('+cs.r+'px)');
   ok(/blur|url/.test(cs.bf),'desktop: backdrop-filter active ('+cs.bf.slice(0,40)+')');
   ok(cs.sw<=cs.cw+1,'desktop: no horizontal overflow in bar');
