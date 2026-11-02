@@ -383,3 +383,33 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 .ci-list em { font-style: normal; font-size: 12.5px; opacity: .6; }
 .ci-empty { margin: 0; padding: 36px 12px; text-align: center; color: color-mix(in srgb, var(--ink) 55%, transparent); }
 @media (prefers-reduced-transparency: reduce) { .cinfo { background: var(--bg, #060b1f); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* ---- User sheet (profile inside chat, Telegram style) ---- */
+.msg-av.tappable, .msg-name.tappable { cursor: pointer; }
+@media (hover: hover) { .msg-name.tappable:hover { text-decoration: underline; } }
+.usheet-wrap { position: absolute; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+.usheet-scrim { position: absolute; inset: 0; border: 0; padding: 0; background: rgb(0 0 0 / .42); animation: ushFade .2s ease both; }
+.usheet { position: relative; width: min(100%, 440px); max-height: 86%; overflow-y: auto; overscroll-behavior: contain; color: var(--ink);
+  padding: 10px 14px calc(18px + env(safe-area-inset-bottom, 0px)); border-radius: 26px 26px 0 0;
+  background: color-mix(in srgb, var(--surface) 62%, transparent); -webkit-backdrop-filter: blur(26px) saturate(1.6); backdrop-filter: blur(26px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), inset 0 1.5px 0 rgb(255 255 255 / .32); animation: ushUp .28s cubic-bezier(.2, .8, .2, 1) both; }
+@media (min-width: 700px) { .usheet-wrap { align-items: center; } .usheet { border-radius: 26px; max-height: 80%; } }
+.usheet-grab { display: block; width: 38px; height: 4px; border-radius: 4px; margin: 0 auto 10px; background: rgb(255 255 255 / .35); }
+.usheet-hero { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 4px 0 10px; }
+.usheet-hero h3 { margin: 6px 0 0; font-size: 1.15rem; }
+.usheet-shared { margin-top: 12px; }
+.usheet-shared h4 { margin: 0 0 8px; font-size: .85rem; opacity: .75; }
+.usheet-grid { grid-template-columns: repeat(3, 1fr); }
+.ci-act.danger { color: var(--danger, #ff6b6b); }
+.ci-members { list-style: none; margin: 0; padding: 0; }
+.ci-member { width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px 4px; min-height: 56px; border: 0; background: none; color: inherit; text-align: start; border-radius: 14px; cursor: pointer; }
+.ci-member span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: hover) { .ci-member:hover { background: rgb(255 255 255 / .08); } }
+@keyframes ushUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+@keyframes ushFade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .usheet, .usheet-scrim { animation: none; } }
+.usheet { background: color-mix(in srgb, var(--surface) 84%, transparent) !important; }
+.usheet-hero .role-tag { margin: 4px 0 0 !important; align-self: center; }
+.usheet .ci-acts { display: flex !important; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.usheet .ci-acts .ci-act { flex: 1 1 72px; max-width: 120px; min-width: 64px; }
+.usheet-scrim { background: rgb(0 0 0 / .55); }
