@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.43.0
+- New chat info page (Telegram style, glass): tap the avatar/name in the chat header -> big avatar, name, quick actions (message, mute, call, video/invite), about/username/invite link, tabs Media / Files / Links / Music built from the loaded timeline. Settings & management (the old dialog) moved behind its menu; the header dots still open it directly.
+
 ## 0.42.2
 - Message menu: tapping a message no longer triggers the item under the finger (copy/reply) - the tap that opens the menu is ignored by its items for 450 ms on touch. Taps on emoji, emote, long-text and music-card messages now open the menu.
 - Pin bar and mini player are merged into one glass block (no gap, no line); player is compact with a thin seek row.

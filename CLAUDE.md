@@ -51,6 +51,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - 0.42: glass mini player (MiniPlayer.jsx), floating glass Now Playing window (FloatPlayer in NowPlaying.jsx), keyboard<->sticker panel swap (viewport.js + Chat.jsx), tidy sticker grid. Keyboard behaviour only tested by viewport-resize simulation, not on a real phone.
 - 0.42.1: mini player now lives in `.chat-top` under the pin bar (Shell passes `topPlayer` to Chat; bottom bar only when no chat); attach menu is a portal (`.attach-pop`); dialogs glass with scrim z-index 75. Tested in Playwright at 390px/desktop, not on a real phone.
 - 0.42.2: `.pin-stack` wraps pinbar + docked MiniPlayer (one glass lens block); context menu ignores item clicks for 450 ms after a touch open (`ContextMenu.jsx openedAt`); share-track card reuses `.music-card` classes; `.scroll-down` needs `position:absolute !important` because the `.lg` rule sets relative.
+- 0.43.0: `ChatInfo.jsx` = Telegram-style glass info page opened from the chat header title/avatar (`infoOpen` in Chat.jsx); old `RoomSettings` dialog is reached via its menu or the header dots. Tabs scan only the loaded timeline (no server-side media search).
 - Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
 
 ## Local test env (cloud sandbox; Docker is unavailable)
