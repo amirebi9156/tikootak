@@ -1095,13 +1095,13 @@ export default function Shell({
         }} /> : tab === 'explore' ? <Explore key={exploreQ.n} initialQ={exploreQ.q} token={session.access_token} me={me} client={client} onProfile={openProfile} onRoomJoined={id => { setRoomId(id); setTab('chat'); }} /> : tab === 'feed' ? <Feed token={session.access_token} me={me} compose={composeN} onBack={() => setTab('chat')} onProfile={openProfile} onBlock={handleBlock} /> : tab === 'music' ? <Music key={plOpen || 'm'} token={session.access_token} me={me} player={player} initial={plOpen} onBack={() => {
           setPlOpen(null);
           setTab('chat');
-        }} /> : room ? <Chat key={room.roomId} client={client} room={room} version={version} me={me} otherUnread={otherUnread} onBack={() => setRoomId(null)} onInvite={() => setDialog('invite')} player={player} onOpenPost={setPostView} onProfile={openProfile} onCall={() => startCall(room)} callHere={inCall && call.info.roomId === room.roomId} onRecovery={() => setDialog('rrestore')} muted={isMuted(room.roomId)} onMute={(ms) => muteRoom(room.roomId, ms)} /> : <div className="placeholder">
+        }} /> : room ? <Chat key={room.roomId} topPlayer={player.track ? <MiniPlayer player={player} floating={npMode === 'float'} onOpen={() => setNpMode('full')} onFloat={() => setNpMode(m => m === 'float' ? null : 'float')} /> : null} client={client} room={room} version={version} me={me} otherUnread={otherUnread} onBack={() => setRoomId(null)} onInvite={() => setDialog('invite')} player={player} onOpenPost={setPostView} onProfile={openProfile} onCall={() => startCall(room)} callHere={inCall && call.info.roomId === room.roomId} onRecovery={() => setDialog('rrestore')} muted={isMuted(room.roomId)} onMute={(ms) => muteRoom(room.roomId, ms)} /> : <div className="placeholder">
             <LogoMark size={64} className="placeholder-logo" />
             <p>{tr("یک گفتگو را انتخاب کن یا گروه و کانال جدید بساز.")}</p>
           </div>}
 
         <audio ref={player.audio} {...player.handlers} preload="auto" />
-        {player.track && <MiniPlayer player={player} floating={npMode === 'float'} onOpen={() => setNpMode('full')} onFloat={() => setNpMode(m => m === 'float' ? null : 'float')} />}
+                {player.track && !(tab === 'chat' && room) && <MiniPlayer player={player} floating={npMode === 'float'} onOpen={() => setNpMode('full')} onFloat={() => setNpMode(m => m === 'float' ? null : 'float')} />}
         {npMode === 'full' && player.track && <NowPlaying player={player} onClose={() => setNpMode(null)} onFloat={() => setNpMode('float')} />}
         {npMode === 'float' && player.track && <FloatPlayer player={player} onClose={() => setNpMode(null)} onFull={() => setNpMode('full')} />}
         {inCall && !showCall && <div className="call-bar" role="status">

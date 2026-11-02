@@ -61,7 +61,7 @@ await p.keyboard.press('Escape');await p.waitForTimeout(400);
 const tr=(await api(A.access_token,'GET','/api/music/tracks/mine')).j.tracks;
 ok(tr.length===1&&tr[0].playlists.some(x=>x.name==='FromChat'),'library has exactly one track with the FromChat badge');
 const card2=await sendAndPlay('encroom'+sx,'encrypted room');
-await card2.getByTestId('music-add').click();
+await card2.locator('.mc-main').click({button:'right'});await p.getByText('افزودن به پلی‌لیست').first().click();
 await p.locator('.addto-row',{hasText:'FromChat'}).click();await p.waitForTimeout(5000);
 const tr2=(await api(A.access_token,'GET','/api/music/tracks/mine')).j.tracks;
 ok(tr2.length===1&&!tr2[0].playlists.some(x=>x.name==='FromChat'),'encrypted-room song decrypted client-side, deduped to the same track and toggled off');

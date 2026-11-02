@@ -2,7 +2,6 @@ import { tr } from './i18n.js';
 import { useEffect, useState } from 'react';
 import { shareGet, feedPost } from './api.js';
 import { Cover, PlaylistCover } from './cover.jsx';
-import { AddTo } from './Music.jsx';
 import { Icon } from './icons.jsx';
 import { fa } from './util.js';
 
@@ -16,7 +15,6 @@ export default function ShareCard({
   const token = client.getAccessToken();
   const [d, setD] = useState(null);
   const [gone, setGone] = useState(false);
-  const [addFor, setAddFor] = useState(null);
   useEffect(() => {
     let dead = false;
     const run = share.kind === 'post' ? feedPost(token, share.id).then(p => ({
@@ -43,8 +41,6 @@ export default function ShareCard({
         <button className="vp-btn" onClick={() => on ? player.toggle() : player.play([t], 0)} aria-label={on && player.playing ? tr("توقف") : tr("پخش آهنگ")} data-testid="share-play">
           {on && player.playing ? <Icon n="pause" size={18} /> : <Icon n="play" size={18} />}
         </button>
-        <button className="share-add" onClick={() => setAddFor(t)}>{tr("+ پلی‌لیست")}</button>
-        {addFor && <AddTo token={token} track={addFor} onClose={() => setAddFor(null)} />}
       </div>;
   }
   if (d.kind === 'playlist') {

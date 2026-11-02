@@ -56,7 +56,7 @@ export default function ShareMusic({
       </ul>
       <p className="muted small-note">{tr("کتابخانه‌ی موزیک روی سرور رمز نیست؛ فقط متن پیام‌ها رمزنگاری می‌شود.")}</p>
       {err && <p className="error" role="alert">{err}</p>}
-      <div className="row">
+      <div className="row sm-actions">
         <button className="ghost" onClick={() => {
         onClose();
         onDevice();

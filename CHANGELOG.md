@@ -1,4 +1,11 @@
 # CHANGELOG
+## 0.42.1
+- Send-music dialog: now a glass sheet above the composer (scrim z-index), buttons always visible and clickable, responsive.
+- Mini player moved to the top of the chat under the pin bar; compact, seek bar no longer overlaps cover/play. Pin bar made smaller. Bottom is only the composer.
+- Removed the big "+ Playlist" button from shared-track cards; added "Add to playlist" to the message context menu.
+- Attach menu opens as an independent floating glass menu (portal), not inside the composer pill.
+- Tests: q4-music uses the context menu; q9 expectations updated.
+
 ## 0.42.0
 - Mini player bar rebuilt as a glass capsule (MiniPlayer.jsx): centred max 760px on desktop with time labels and one row, compact two-line layout on phones, 44px touch targets, liquid-glass lens on Chromium, reduced-transparency fallback.
 - Now Playing: new "floating window" button. The glass player can leave full screen and live as a draggable glass window inside the app (no dimming, chat stays usable); drag by the handle or move with arrow keys; position is remembered; also openable from the bar; "full screen" button returns.

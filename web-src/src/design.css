@@ -263,3 +263,41 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 .ep-st section { content-visibility: visible; }
 .ep-add { width: 100%; }
 @media (prefers-reduced-motion: reduce) { .ep-stk-item .st-ph { animation: none; } }
+
+/* ===== v0.42.1: دیالوگ‌ها شیشه‌ای، بالای کامپوزر؛ پلیر و پین فشرده بالای چت؛ منوی پیوست مستقل ===== */
+.scrim { z-index: 75 !important; background: rgb(6 12 30 / .45) !important; }
+.dialog { background: linear-gradient(135deg, rgb(255 255 255 / .16), rgb(255 255 255 / .05)), color-mix(in srgb, var(--surface) 62%, transparent) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
+  border: 0 !important; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .22), inset 0 1.5px 0 rgb(255 255 255 / .35), 0 24px 60px -16px rgb(0 0 0 / .6) !important;
+  max-height: min(86dvh, 640px); overscroll-behavior: contain; }
+:root[data-theme='light'] .dialog { background: linear-gradient(135deg, rgb(255 255 255 / .85), rgb(255 255 255 / .62)) !important; }
+.dialog .pick-list { max-height: min(38dvh, 320px); border: 0; background: color-mix(in srgb, var(--ink) 6%, transparent); border-radius: 16px; }
+.dialog .sm-actions { position: sticky; bottom: -20px; margin: 12px -20px -20px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; flex-wrap: wrap;
+  background: linear-gradient(to top, color-mix(in srgb, var(--surface) 85%, transparent) 70%, transparent); }
+.dialog .sm-actions button { flex: 1 1 130px; min-height: 46px; }
+@media (max-width: 720px) { .dialog { border-radius: 28px 28px 0 0 !important; max-height: 88dvh; } }
+
+/* پلیر داخل بالای چت: یک ردیف کوچک، نوار پیشرفت در جریان (روی کاور/دکمه نمی‌افتد) */
+.chat-top .player-bar.mp { width: min(100%, 760px); margin: 0 auto; padding: 5px 8px 4px; border-radius: 22px; gap: 0 4px; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'meta ctl end' 'seek seek seek'; animation-name: mpTop; }
+@keyframes mpTop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.chat-top .player-bar.mp .mp-open { min-height: 40px; gap: 8px; }
+.chat-top .player-bar.mp .mp-open .cover { width: 34px !important; height: 34px !important; border-radius: 10px !important; }
+.chat-top .player-bar.mp .mp-meta strong { font-size: 13px; }
+.chat-top .player-bar.mp .mp-meta span { font-size: 11.5px; }
+.chat-top .player-bar.mp .mp-b { width: 40px; height: 40px; min-height: 40px; }
+.chat-top .player-bar.mp .mp-seek { position: relative; inset: auto; grid-area: seek; height: 12px; margin-top: 0; padding-inline: 6px; }
+.chat-top .player-bar.mp .mp-seek .clock { display: none; }
+.chat-top .player-bar.mp .mp-float { display: none; }
+@media (min-width: 761px) { .chat-top .player-bar.mp { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'meta ctl end' 'seek seek seek'; padding: 5px 10px 4px; }
+  .chat-top .player-bar.mp .mp-seek .clock { display: block; } .chat-top .player-bar.mp .mp-float { display: grid; } }
+@media (max-width: 380px) { .chat-top .player-bar.mp .mp-skip:first-child { display: none; } .chat-top .player-bar.mp .mp-b { width: 40px; height: 40px; min-height: 40px; } }
+/* بالای چت: پین کوچک‌تر */
+.chat-top .pinbar { min-height: 40px; padding: 4px 8px 4px 12px !important; border-radius: 18px; }
+.chat-top .pinbar .pin-main strong { font-size: 12.5px; }
+.chat-top .pinbar .pin-main span { font-size: 12.5px; }
+.chat-top .pinbar .icon { width: 32px; height: 32px; }
+/* وقتی کیبورد باز است پلیر بالا هم کوچک بماند ولی پنهان نشود */
+@media (pointer: coarse) { .shell:has(form.composer:focus-within) .chat-top .player-bar.mp { display: none; } }
+
+/* منوی پیوست: پنجرهٔ شناور مستقل (پورتال روی body) */
+.attach-menu.attach-pop { position: fixed !important; z-index: 80; margin: 0; max-width: calc(100vw - 16px); }
