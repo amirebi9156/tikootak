@@ -8,11 +8,12 @@ import { isMusic, musicMeta } from './chatMusic.js';
 import { kindLabel, roomAlias } from './roomtype.js';
 import { fa, fmtClock } from './util.js';
 import { useBackLayer } from './backstack.js';
+import { Avatar } from './ui.jsx';
 
 const URL_RE = /https?:\/\/[^\s<>"']+/g;
 
 // صفحهٔ مشخصات گفتگو (مثل تلگرام): عکس بزرگ، نام، دکمه‌های سریع، اطلاعات و تب‌های مدیا/فایل/لینک/موزیک
-function Thumb({ client, content, onOpen }) {
+export function Thumb({ client, content, onOpen }) {
   const [url, setUrl] = useState(null);
   const isVideo = content.msgtype === 'm.video';
   useEffect(() => {
@@ -27,7 +28,7 @@ function Thumb({ client, content, onOpen }) {
   </button>;
 }
 
-export default function ChatInfo({ client, room, me, kind, muted, onMute, onClose, onCall, onSearch, onInvite, onSettings, onProfile, onOpenMedia, peerId }) {
+export default function ChatInfo({ client, room, me, kind, muted, onMute, onClose, onCall, onSearch, onInvite, onSettings, onProfile, onOpenMedia, peerId, onUser, canSeeMembers }) {
   useBackLayer(true, onClose);
   const [tab, setTab] = useState('media');
   const [prof, setProf] = useState(null);
@@ -69,11 +70,16 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room, room.getLiveTimeline().getEvents().length]);
 
+  const roster = useMemo(() => (kind === 'dm' || !canSeeMembers ? [] : room.getMembersWithMembership('join')
+    .map(m => ({ id: m.userId, name: m.name || m.userId.split(':')[0].replace(/^@/, ''), power: m.powerLevel || 0 }))
+    .sort((a, b) => (b.power >= 50) - (a.power >= 50) || a.name.localeCompare(b.name))),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [room, kind, canSeeMembers, members]);
   const name = prof?.name || room.name;
   const sub = kind === 'dm'
     ? tr('پیوی')
     : `${kindLabel(kind)} · ${fa(members)} ${tr('عضو')}`;
-  const tabs = [['media', tr('مدیا')], ['files', tr('فایل‌ها')], ['links', tr('لینک‌ها')], ['music', tr('موزیک')]];
+  const tabs = [...(roster.length ? [['members', tr('اعضا')]] : []), ['media', tr('مدیا')], ['files', tr('فایل‌ها')], ['links', tr('لینک‌ها')], ['music', tr('موزیک')]];
   const act = (icon, label, fn, on) => <button type="button" className={`ci-act ${on ? 'on' : ''}`} onClick={fn}><Icon n={icon} size={24} /><span>{label}</span></button>;
 
   return <div className="cinfo" role="dialog" aria-label={tr('مشخصات گفتگو')} data-testid="chat-info">
@@ -105,9 +111,10 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
         {link && <button type="button" className="ci-line ci-btn" onClick={() => navigator.clipboard?.writeText(link)}><strong dir="ltr">{link.replace(/^https?:\/\//, '')}</strong><span>{tr('لینک دعوت · لمس برای کپی')}</span></button>}
       </div>}
       <div className="ci-tabs" role="tablist">
-        {tabs.map(([k, label]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{label}{items[k].length ? ` ${fa(items[k].length)}` : ''}</button>)}
+        {tabs.map(([k, label]) => <button key={k} type="button" role="tab" aria-selected={tab === k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{label}{k === 'members' ? ` ${fa(roster.length)}` : items[k].length ? ` ${fa(items[k].length)}` : ''}</button>)}
       </div>
       <div className="ci-pane">
+        {tab === 'members' && <ul className="ci-list ci-members" data-testid="info-members">{roster.map(m => <li key={m.id}><button type="button" className="ci-member" onClick={() => onUser?.(m.id)} data-testid="info-member"><Avatar name={m.name} id={m.id} size={42} /><span dir="auto">{m.name}</span>{m.power >= 50 && <em className="role-tag">{m.power >= 100 ? tr('مالک') : tr('مدیر')}</em>}</button></li>)}</ul>}
         {tab === 'media' && (items.media.length ? <div className="ci-grid">{items.media.map(m => <Thumb key={m.id} client={client} content={m.c} onOpen={onOpenMedia} />)}</div> : <p className="ci-empty">{tr('هنوز مدیایی نیست.')}</p>)}
         {tab === 'files' && (items.files.length ? <ul className="ci-list">{items.files.map(f => <li key={f.id}><Icon n="clip" size={20} /><span dir="auto">{f.c.body}</span><em>{f.c.info?.size ? fmtSize(f.c.info.size) : ''}</em></li>)}</ul> : <p className="ci-empty">{tr('فایلی نیست.')}</p>)}
         {tab === 'links' && (items.links.length ? <ul className="ci-list">{items.links.map(l => <li key={l.id}><Icon n="globe" size={20} /><a href={l.u} target="_blank" rel="noopener noreferrer" dir="ltr">{l.u}</a></li>)}</ul> : <p className="ci-empty">{tr('لینکی نیست.')}</p>)}

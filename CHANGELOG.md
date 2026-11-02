@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.44.0
+- Telegram-style user profile inside the chat (UserSheet.jsx): tap a sender's avatar or name in a group, or a row in the new "Members" tab of the chat info page, and a glass sheet opens in place (bottom sheet on phone, centred card on desktop) with avatar, @username, role (owner/admin/member), bio, quick actions (message, full profile, report, block) and what this person shared in the chat (media thumbnails, file/link/music counts). Chat is not left; Esc / back closes it.
+- Chat info page: new "Members" tab (owner/admins first); hidden for channels unless you are an admin.
+- Tests: q10-user-sheet.mjs (phone + desktop).
 ## 0.43.0
 - New chat info page (Telegram style, glass): tap the avatar/name in the chat header -> big avatar, name, quick actions (message, mute, call, video/invite), about/username/invite link, tabs Media / Files / Links / Music built from the loaded timeline. Settings & management (the old dialog) moved behind its menu; the header dots still open it directly.
 

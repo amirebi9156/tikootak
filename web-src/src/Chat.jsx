@@ -13,6 +13,7 @@ import { useBackLayer } from './backstack.js';
 import { AddTo } from './Music.jsx';
 import { isMusic, musicMeta, importFromMessage } from './chatMusic.js';
 import ChatInfo from './ChatInfo.jsx';
+import UserSheet from './UserSheet.jsx';
 import RoomSettings from './RoomSettings.jsx';
 import ForwardDialog from './ForwardDialog.jsx';
 import { saveToSaved } from './forward.js';
@@ -164,6 +165,9 @@ export default function Chat({
   onCall,
   callHere,
   onProfile,
+  onMessage,
+  onBlock,
+  blocked,
   player,
   onOpenPost,
   onRecovery,
@@ -211,6 +215,7 @@ export default function Chat({
   }, [attachOpen]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [userSheet, setUserSheet] = useState(null);
   const [forwardEv, setForwardEv] = useState(null);
   const [upAllowed, setUpAllowed] = useState({ image: true, video: true, voice: true, music: true, file: true });
   useEffect(() => {
@@ -956,8 +961,8 @@ export default function Chat({
     if (firstUnread && id === firstUnread.id) rows.push(<div key="unread-div" className="unread-div" data-testid="unread-divider"><span>{tr('پیام‌های جدید')}</span></div>);
     rows.push(<div key={id || `t${ts}`} data-evid={id} tabIndex={0} onKeyDown={e => onMessageKeyDown(e, id)} className={`msg ${isChannel ? 'theirs chan' : mine ? 'mine' : 'theirs'} ${grouped ? 'grouped' : ''} ${tail ? 'tail' : ''} ${multi?.has(id) ? 'picked' : ''} ${hitSet.has(id) ? 'hit' : ''} ${curHit === id ? 'hit-cur' : ''} ${(content['m.mentions']?.user_ids || []).includes(me) ? 'mention-me' : ''}`}>
         {multi && <span className={`pick-mark ${multi.has(id) ? 'on' : ''}`} aria-hidden="true">{multi.has(id) && <Icon n="check" size={14} />}</span>}
-        {showIdentity && <span className="msg-av">{isChannel ? <RoomAvatar client={client} room={room} name={chanName} id={avatarId} size={32} /> : <Avatar name={name} id={sender} size={32} />}</span>}
-        {showIdentity && <span className="msg-name" data-testid={isChannel ? 'channel-name' : 'msg-sender'} style={isChannel ? undefined : {
+        {showIdentity && <span className={`msg-av ${isChannel || mine ? '' : 'tappable'}`} onClick={isChannel || mine ? undefined : (e) => { e.stopPropagation(); setUserSheet(sender); }} role={isChannel || mine ? 'presentation' : 'button'} aria-label={isChannel || mine ? undefined : name} data-testid={isChannel ? undefined : 'msg-avatar'}>{isChannel ? <RoomAvatar client={client} room={room} name={chanName} id={avatarId} size={32} /> : <Avatar name={name} id={sender} size={32} />}</span>}
+        {showIdentity && <span className={`msg-name ${isChannel || mine ? '' : 'tappable'}`} onClick={isChannel || mine ? undefined : (e) => { e.stopPropagation(); setUserSheet(sender); }} data-testid={isChannel ? 'channel-name' : 'msg-sender'} style={isChannel ? undefined : {
         color: NAME_COLORS[hue(sender) % NAME_COLORS.length]
       }}>{name}</span>}
         <div className={`bubble ${isSel ? 'sel' : ''} ${content[ST_FLAG] ? 'sticker' : ''}`}>
@@ -1106,7 +1111,11 @@ export default function Chat({
       {infoOpen && <ChatInfo client={client} room={room} me={me} kind={roomType} peerId={dmPeerId} muted={muted} onMute={onMute} onClose={() => setInfoOpen(false)}
           onCall={() => { setInfoOpen(false); onCall(); }} onInvite={() => { setInfoOpen(false); onInvite(); }}
           onSearch={() => { setInfoOpen(false); setSearchOpen(true); }} onSettings={() => setSettingsOpen(true)}
-          onProfile={(id) => { setInfoOpen(false); onProfile(id); }} onOpenMedia={setViewer} />}
+          onProfile={(id) => { setInfoOpen(false); onProfile(id); }} onOpenMedia={setViewer}
+          canSeeMembers={roomType !== 'channel' || power >= 50} onUser={setUserSheet} />}
+      {userSheet && <UserSheet client={client} room={room} me={me} userId={userSheet} token={client.getAccessToken()} blocked={!!blocked?.has?.(userSheet)}
+          onClose={() => setUserSheet(null)} onMessage={(id) => { setInfoOpen(false); onMessage?.(id); }} onProfile={(id) => { setInfoOpen(false); onProfile(id); }}
+          onBlock={(id) => { setInfoOpen(false); onBlock?.(id); }} onOpenMedia={setViewer} />}
       {settingsOpen && <RoomSettings
           client={client}
           room={room}

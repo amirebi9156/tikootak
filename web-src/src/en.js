@@ -822,5 +822,10 @@ export default {
  "هنوز مدیایی نیست.": "No media yet.",
  "فایلی نیست.": "No files.",
  "لینکی نیست.": "No links.",
- "موزیکی نیست.": "No music."
+ "موزیکی نیست.": "No music.",
+ "پروفایل کاربر": "User profile",
+ "مالک": "Owner",
+ "لینک": "links",
+ "مسدود": "Block",
+ "اشتراک‌گذاشته در این گفتگو": "Shared in this chat"
 };

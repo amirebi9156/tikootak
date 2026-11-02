@@ -63,6 +63,7 @@ const P = {
   down: <path d="M6 9l6 6 6-6" />,
   belloff: (<><path d="M18 8a6 6 0 0 0-9.3-5" /><path d="M6 8c0 7-3 9-3 9h13M10.3 21a2 2 0 0 0 3.4 0M3 3l18 18" /></>),
   pip: (<><rect x="3" y="4" width="18" height="16" rx="3" /><rect x="11" y="11" width="7" height="5" rx="1.2" fill="currentColor" stroke="none" /></>),
+  block: (<><circle cx="12" cy="12" r="9" /><path d="M5.6 5.6l12.8 12.8" /></>),
   flag: (<><path d="M5 21V4" /><path d="M5 4h9l-1 3h6v9h-7l-1 2H5" /></>),
 };
 
