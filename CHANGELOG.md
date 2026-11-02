@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.42.2
+- Message menu: tapping a message no longer triggers the item under the finger (copy/reply) - the tap that opens the menu is ignored by its items for 450 ms on touch. Taps on emoji, emote, long-text and music-card messages now open the menu.
+- Pin bar and mini player are merged into one glass block (no gap, no line); player is compact with a thin seek row.
+- Shared-track card: Telegram-style, play button on the cover inside the bubble, narrower.
+- "Scroll to last message" button was drawn off-screen (position: relative from the glass layer); now fixed bottom-right.
+
 ## 0.42.1
 - Send-music dialog: now a glass sheet above the composer (scrim z-index), buttons always visible and clickable, responsive.
 - Mini player moved to the top of the chat under the pin bar; compact, seek bar no longer overlaps cover/play. Pin bar made smaller. Bottom is only the composer.

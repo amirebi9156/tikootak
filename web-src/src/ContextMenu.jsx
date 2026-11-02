@@ -10,6 +10,7 @@ export default function ContextMenu({ x = 0, y = 0, items, header, label, onClos
   const pillRef = useRef(null);
   const cardRef = useRef(null);
   const [pos, setPos] = useState({ ready: false });
+  const openedAt = useRef(Date.now()); // کلیکِ همان لمسی که منو را باز کرده نباید آیتم زیر انگشت را بزند
   const [touch] = useState(() => {
     try {
       return !!window.matchMedia?.('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
@@ -85,7 +86,7 @@ export default function ContextMenu({ x = 0, y = 0, items, header, label, onClos
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const run = (it) => () => { if (!it.keepOpen) onClose(); it.onClick?.(); };
+  const run = (it) => () => { if (touch && Date.now() - openedAt.current < 450) return; if (!it.keepOpen) onClose(); it.onClick?.(); };
   const place = (p) => (p ? { left: p.left, top: p.top, transformOrigin: `${p.ox - p.left}px ${p.oy - p.top}px`, visibility: 'visible' } : { visibility: 'hidden' });
   const body = (
     <div className={`ctx-layer glass ${touch ? 'touch' : ''}`} onContextMenu={(e) => e.preventDefault()}>

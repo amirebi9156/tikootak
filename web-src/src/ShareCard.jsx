@@ -35,12 +35,13 @@ export default function ShareCard({
   if (d.kind === 'track') {
     const t = d.track;
     const on = player.track?.id === t.id;
-    return <div className="share-card" data-testid="share-track">
-        <Cover src={t.cover} seed={t.title} size={56} radius={0} />
-        <div className="share-main"><strong dir="auto">{t.title}</strong><span dir="auto">{t.artist || t.owner}</span></div>
-        <button className="vp-btn" onClick={() => on ? player.toggle() : player.play([t], 0)} aria-label={on && player.playing ? tr("توقف") : tr("پخش آهنگ")} data-testid="share-play">
-          {on && player.playing ? <Icon n="pause" size={18} /> : <Icon n="play" size={18} />}
+    const playing = on && player.playing;
+    return <div className="share-card share-track music-card" data-testid="share-track" dir="ltr">
+        <button type="button" className={`mc-cover ${t.cover ? 'has' : 'none'}`} onClick={() => on ? player.toggle() : player.play([t], 0)} aria-label={playing ? tr("توقف") : tr("پخش آهنگ")} data-testid="share-play">
+          {t.cover && <img src={t.cover} alt="" />}
+          <span className="mc-btn">{playing ? <Icon n="pause" size={22} /> : <Icon n="play" size={22} />}</span>
         </button>
+        <div className="mc-main"><strong dir="auto">{t.title}</strong><span className="mc-sub" dir="auto">{t.artist || t.owner}</span></div>
       </div>;
   }
   if (d.kind === 'playlist') {
