@@ -1,5 +1,6 @@
 import { tr } from './i18n.js';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { sdk, localpart } from './matrix.js';
 import { Icon } from './icons.jsx';
 import { Avatar, Dialog } from './ui.jsx';
@@ -24,7 +25,7 @@ import { useReport } from './Report.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import { canOpenMessageMenu, canReplyOnDoubleClick } from './msgGestures.js';
 import { attachSwipeReply, rowFromEvent } from './swipeReply.js';
-import { uploadPolicy } from './api.js';
+import { uploadPolicy, shareGet } from './api.js';
 import EmojiPanel from './EmojiPanel.jsx';
 import { sendSticker, stickerFromMessage, ST_FLAG } from './stickers.js';
 import { keyboardHeight, lockViewport, unlockViewport, waitKeyboard } from './viewport.js';
@@ -151,6 +152,7 @@ function SignName({ id, room }) {
   return <>{p?.name || room.getMember(id)?.name || localpart(id)}</>;
 }
 export default function Chat({
+  topPlayer = null,
   otherUnread = 0,
   client,
   room,
@@ -189,8 +191,23 @@ export default function Chat({
   const [tick, setTick] = useState(0);
   const [pickMusic, setPickMusic] = useState(false);
   const [addMusicEv, setAddMusicEv] = useState(null);
+  const [addShareTrack, setAddShareTrack] = useState(null);
   const [viewer, setViewer] = useState(null);
   const [attachOpen, setAttachOpen] = useState(false);
+  const attachBtnRef = useRef(null);
+  const [attachPos, setAttachPos] = useState(null);
+  useLayoutEffect(() => {
+    if (!attachOpen) return undefined;
+    const place = () => {
+      const r = attachBtnRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const rtl = document.documentElement.dir === 'rtl';
+      setAttachPos({ bottom: Math.round(window.innerHeight - r.top + 10), ...(rtl ? { right: Math.max(8, Math.round(window.innerWidth - r.right)) } : { left: Math.max(8, Math.round(r.left)) }) });
+    };
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [attachOpen]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [forwardEv, setForwardEv] = useState(null);
   const [upAllowed, setUpAllowed] = useState({ image: true, video: true, voice: true, music: true, file: true });
@@ -305,7 +322,7 @@ export default function Chat({
   useEffect(() => {
     if (!attachOpen) return undefined;
     const onDoc = e => {
-      if (!e.target.closest('.attach-wrap')) setAttachOpen(false);
+      if (!e.target.closest('.attach-wrap') && !e.target.closest('.attach-pop')) setAttachOpen(false);
     };
     const onEsc = e => {
       if (e.key === 'Escape') setAttachOpen(false);
@@ -525,6 +542,7 @@ export default function Chat({
       content.body && isText && { key: 'copy', icon: 'copy', label: tr("کپی"), hint: 'Ctrl+C', onClick: () => navigator.clipboard?.writeText(content.body) },
       content.msgtype === 'm.image' && !content[ST_FLAG] && { key: 'addst', icon: 'image', label: tr('افزودن به استیکرها'), onClick: () => stickerFromMessage(client, content).then(() => setFileErr(tr('به استیکرها اضافه شد.'))).catch(e => setFileErr(e.message || '')) },
       isMusic(content) && { key: 'addpl', icon: 'music', label: tr('افزودن به پلی‌لیست'), onClick: () => setAddMusicEv(content) },
+      pickEvent(content, 'share')?.code && pickEvent(content, 'share').kind !== 'post' && { key: 'addpl2', icon: 'music', label: tr('افزودن به پلی‌لیست'), onClick: () => shareGet(client.getAccessToken(), pickEvent(content, 'share').code).then(r => r?.track && setAddShareTrack(r.track)).catch(() => {}) },
       !isCall && { key: 'fwd', icon: 'forward', label: tr('ارسال به…'), onClick: () => setForwardEv(ev) },
       !isCall && { key: 'save', icon: 'bookmark', label: tr('ذخیره'), onClick: () => save(ev) },
       canPin && { key: 'pin', icon: 'pin', label: pinnedNow ? tr("برداشتن پین") : tr("پین"), onClick: () => togglePin(ev) },
@@ -1046,6 +1064,7 @@ export default function Chat({
         setPinIdx(0);
       }} aria-label={tr("برداشتن پین")}><Icon n="close" size={18} /></button>}
         </div>}
+      {topPlayer}
       {searchOpen && <div className="chat-searchbar" role="search">
           <Icon n="search" size={18} />
           <input autoFocus value={searchQ} onChange={e => setSearchQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goHit(searchIdx + (e.shiftKey ? 1 : -1)); } if (e.key === 'Escape') { setSearchOpen(false); setSearchQ(''); } }} placeholder={tr("جستجو در این گفتگو")} aria-label={tr("جستجو در این گفتگو")} dir="auto" data-testid="chat-search-input" />
@@ -1145,6 +1164,7 @@ export default function Chat({
         </div>}
       {staged && <SendPreview files={staged} encrypted={encrypted} onCancel={() => setStaged(null)} onSend={(fs, cap) => { setStaged(null); sendFiles(fs, cap); }} />}
       {pollOpen && <PollDialog onClose={() => setPollOpen(false)} onSend={p => client.sendMessage(roomId, { msgtype: 'm.text', body: `📊 ${p.question}\n` + p.options.map((o, i) => `${i + 1}. ${o.text}`).join('\n'), [EV.poll]: p })} />}
+      {addShareTrack && <AddTo token={client.getAccessToken()} track={addShareTrack} onClose={() => setAddShareTrack(null)} />}
       {addMusicEv && <AddTo token={client.getAccessToken()} ensure={(p) => importFromMessage(client, client.getAccessToken(), addMusicEv, p)} onClose={() => setAddMusicEv(null)} />}
       {pickMusic && <ShareMusic token={client.getAccessToken()} onPick={sh => sendShare(client, roomId, sh)} onDevice={() => pick('audio/*')} onClose={() => setPickMusic(false)} />}
       {recErr && <div className="file-status" role="alert">{recErr}</div>}
@@ -1174,8 +1194,8 @@ export default function Chat({
           <div className="cpill lg">
           {encrypted && <span className="composer-lock" title={tr('رمزنگاری سرتاسری')} aria-label={tr('رمزنگاری سرتاسری')}><Icon n="lock" size={14} /></span>}
           <div className="attach-wrap">
-            <button type="button" className={`icon ${attachOpen ? 'on' : ''}`} aria-label={tr("پیوست")} title={tr("پیوست")} aria-haspopup="menu" aria-expanded={attachOpen} onClick={() => setAttachOpen(o => !o)}><Icon n="clip" /></button>
-            {attachOpen && <div className="attach-menu" role="menu" aria-label={tr("پیوست")}>
+            <button type="button" className={`icon ${attachOpen ? 'on' : ''}`} aria-label={tr("پیوست")} title={tr("پیوست")} ref={attachBtnRef} aria-haspopup="menu" aria-expanded={attachOpen} onClick={() => setAttachOpen(o => !o)}><Icon n="clip" /></button>
+            {attachOpen && attachPos && createPortal(<div className="attach-menu attach-pop" style={attachPos} role="menu" aria-label={tr("پیوست")}>
               <button type="button" role="menuitem" onClick={() => {
               setAttachOpen(false);
               pick('image/*');
@@ -1189,7 +1209,7 @@ export default function Chat({
               pick('');
             }} disabled={!upAllowed.file} title={upAllowed.file ? undefined : tr('توسط ادمین غیرفعال است')}><Icon n="clip" size={18} /><span>{tr("فایل")}</span></button>
               <button type="button" role="menuitem" onClick={() => { setAttachOpen(false); setPollOpen(true); }} data-testid="attach-poll"><Icon n="poll" size={18} /><span>{tr("نظرسنجی")}</span></button>
-            </div>}
+            </div>, document.body)}
           </div>
           <textarea ref={taRef} onPointerDown={onFieldTouch} onPaste={onPaste} value={text} onChange={e => {
           setText(e.target.value);

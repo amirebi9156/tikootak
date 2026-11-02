@@ -808,5 +808,5 @@ export default {
  "بستن پنجرهٔ شناور": "Close floating player",
  "باز کردن در پنجرهٔ شناور": "Open in floating window",
  "پخش‌کنندهٔ شناور": "Floating player",
- "جابه‌جایی پنجره؛ با کلیدهای جهت‌دار": "Move window (use arrow keys)"
+ "جابه‌جایی پنجره؛ با کلیدهای جهت‌دار": "Move window (use arrow keys)",
 };
