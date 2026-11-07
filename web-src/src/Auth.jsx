@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { login, register, errText, publicConfig } from './api.js';
 import { setLoginPassword } from './recovery.js';
 import { Logo, LogoWordmark, LangSwitch } from './ui.jsx';
+import { Icon } from './icons.jsx';
 export default function Auth({
   onAuthed
 }) {
   const [mode, setMode] = useState('login');
+  const [showPw, setShowPw] = useState(false);
   const [f, setF] = useState({
     invite: '',
     username: '',
@@ -76,7 +78,10 @@ export default function Auth({
             </label>}
           <label>
             {tr("رمز عبور")}
-            <input type="password" value={f.password} onChange={set('password')} dir="ltr" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'register' ? 10 : undefined} required />
+            <span className="pw-wrap">
+              <input type={showPw ? 'text' : 'password'} value={f.password} onChange={set('password')} dir="ltr" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'register' ? 10 : undefined} required />
+              <button type="button" className="pw-eye" onClick={() => setShowPw(v => !v)} aria-label={showPw ? tr("پنهان کردن رمز") : tr("نمایش رمز")} aria-pressed={showPw} data-testid="pw-eye"><Icon n={showPw ? 'eyeoff' : 'eye'} size={18} /></button>
+            </span>
           </label>
           {mode === 'register' && <p className="hint">{tr("رمز حداقل ۱۰ کاراکتر باشد. اگر فراموشش کنی راه بازیابی نداریم.")}</p>}
           {mode === 'register' && closed && <p className="error" role="status">{closed}</p>}
