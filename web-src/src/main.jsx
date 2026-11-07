@@ -7,6 +7,7 @@ import './tg.css';
 import './q.css';
 import './lg.css';
 import './design.css';
+import './polish.css';
 import { initGlass } from './glass.js';
 import { initAutoLens } from './lens.js';
 import { initViewport } from './viewport.js';

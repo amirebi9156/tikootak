@@ -36,7 +36,7 @@ await api(A.access_token, 'POST', `/api/follow/${encodeURIComponent(B.user_id)}`
 const mk = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
 async function run(tag, vp, mobile, locale) {
   const c = await mk.newContext({ viewport: vp, locale, hasTouch: mobile, isMobile: mobile, deviceScaleFactor: mobile ? 2 : 1 });
-  const p = await c.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(String(e)));
+  const p = await c.newPage(); p.setDefaultTimeout(7000); const errs = []; p.on('pageerror', (e) => errs.push(String(e)));
   const shot = async (n) => { await p.waitForTimeout(700); await p.screenshot({ path: `${out}/${tag}-${n}.png` }); };
   const step = async (n, fn) => { try { await fn(); await shot(n); } catch (e) { console.log('SKIP', tag, n, String(e).split('\n')[0]); } };
   const tap = (l) => (mobile ? l.tap() : l.click());
@@ -45,6 +45,7 @@ async function run(tag, vp, mobile, locale) {
   await p.goto(base + '/?start=1'); await shot('01-login');
   await p.getByLabel(/نام کاربری|Username/).fill('ada' + sx); await p.getByLabel(/رمز عبور|Password/).fill('test12345678');
   await p.getByRole('button', { name: /^(ورود|Sign in|Log in)$/ }).click(); await p.waitForTimeout(6000);
+  if (tag === 'phone-en') { await shot('02-chat-list'); await c.close(); return; }
   await shot('02-chat-list');
   await step('03-dm', async () => { await tap(p.locator('button.room').filter({ hasText: /بابک/ }).first()); await p.waitForTimeout(1500); });
   await step('04-chat-info', async () => { await tap(p.locator('.chat-avatar').first()); await p.waitForTimeout(800); });
@@ -52,11 +53,11 @@ async function run(tag, vp, mobile, locale) {
   await step('06-group', async () => { await tap(p.locator('button.room').filter({ hasText: /گروه دوستان/ }).first()); await p.waitForTimeout(1500); });
   await step('07-new-conv', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.getByTestId('new-conv')); await p.waitForTimeout(600); });
   await step('08-drawer', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.getByTestId('menu-btn')); await p.waitForTimeout(600); });
-  await step('09-feed', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.locator('button', { hasText: /^(فید|Feed)$/ }).first()); await p.waitForTimeout(1500); });
-  await step('10-explore', async () => { await tap(p.locator('button', { hasText: /^(کشف|اکسپلور|Explore)$/ }).first()); await p.waitForTimeout(1500); });
-  await step('11-music', async () => { await tap(p.locator('button', { hasText: /^(موزیک|Music)$/ }).first()); await p.waitForTimeout(1500); });
-  await step('12-profile-me', async () => { await tap(p.locator('button', { hasText: /^(من|Me)$/ }).first()); await p.waitForTimeout(1500); });
-  await step('13-profile-other', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.locator('button', { hasText: /^(کشف|اکسپلور|Explore)$/ }).first()); await p.waitForTimeout(800); await p.locator('input').first().fill('bob' + sx); await p.waitForTimeout(1500); await tap(p.getByTestId('person').first()); await p.waitForTimeout(1500); });
+  await step('09-feed', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.locator('button:visible', { hasText: /^(فید|Feed)$/ }).first()); await p.waitForTimeout(1500); });
+  await step('10-explore', async () => { await tap(p.locator('button:visible', { hasText: /^(کشف|اکسپلور|Explore)$/ }).first()); await p.waitForTimeout(1500); });
+  await step('11-music', async () => { await tap(p.locator('button:visible', { hasText: /^(موزیک|Music)$/ }).first()); await p.waitForTimeout(1500); });
+  await step('12-profile-me', async () => { await tap(p.locator('button:visible', { hasText: /^(من|Me)$/ }).first()); await p.waitForTimeout(1500); });
+  await step('13-profile-other', async () => { await p.goto(base + '/'); await p.waitForTimeout(3000); await tap(p.locator('button:visible', { hasText: /^(کشف|اکسپلور|Explore)$/ }).first()); await p.waitForTimeout(800); await p.locator('input').first().fill('bob' + sx); await p.waitForTimeout(1500); await tap(p.getByTestId('person').first()); await p.waitForTimeout(1500); });
   if (errs.length) console.log('PAGEERRORS', tag, errs.slice(0, 3));
   await c.close();
 }

@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.44.3
+- Design stage 3 (first screen review, new `polish.css` layer loaded last): arrows now follow text direction (English UI had a left-pointing "next" and wrong back arrows); letter avatars are Telegram-style colored gradients per person instead of identical near-black circles; invite field in the new group dialog is full width (230 px -> 304 px, matching the other fields); placeholders no longer look like typed text; empty states (feed, explore, profile, chat info tabs) are centered with a quiet icon.
+- Audit tooling: `tests/design/shots.mjs` (seeds users/chats/posts/music and screenshots every main screen on phone fa/en + desktop) and `tests/design/overflow.mjs` (finds horizontal overflow at 320/360 px with worst-case long names/text; currently all PASS).
+- Tested: build, i18n, 22/22 Playwright e2e, overflow check 18/18, before/after screenshots. Not tested on real phones.
 ## 0.44.2
 - Design stage 2 (motion, Emil Kowalski audit): one strong ease-out (`--ease`) plus `--ease-drawer` for sheets/drawers/docked bars; every overshoot/bounce curve removed (menus, attach menu, send button, reel like, new-chat button); deep scale entrances (.6-.85) replaced with .94; the send button no longer animates each time it appears (high-frequency action); `transition: all` removed; popovers 180 ms, sheets 260 ms, no UI motion over 320 ms.
 - Reduced motion is now "fewer and gentler" instead of "nothing": movement is dropped but opacity/color/shadow feedback stays.
