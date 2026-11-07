@@ -1,0 +1,34 @@
+/* ===== TIKOOTAK design tokens (0.44.1): single source for motion, layers, type scale =====
+   Loaded FIRST (main.jsx). Later CSS layers consume these; do not redefine them elsewhere.
+   Existing tokens that stay where they are: colors (theme.css/tg.css palettes), --space-*, --tap,
+   --r-pill/--r-card/--r-bub (design.css), --r-s/--r-m (theme.css palette blocks).
+   Stage 3 (per-screen polish) migrates raw z-index / font-size / radius values to these names. */
+:root {
+  /* Easing. Values equal what the app effectively used before (no visual change in stage 1). */
+  --ease: cubic-bezier(.2, .7, .2, 1);          /* default: enter/exit, hover, press */
+  --ease-out: var(--ease);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);  /* on-screen movement / morphs */
+  /* Never ease-in and never overshoot on UI (see DESIGN.md). */
+
+  /* Durations */
+  --dur-press: 100ms;                           /* :active feedback */
+  --t-fast: .16s;                               /* small state change (kept name for old CSS) */
+  --t-med: .28s;                                /* popovers/menus/sheets (kept name for old CSS) */
+  --dur-slow: 320ms;                            /* full sheets/pages; anything longer needs a reason */
+
+  /* z-index layers (stage 3 migrates the 29 raw values to these) */
+  --z-base: 0;
+  --z-raised: 2;     /* bubbles, avatars overlapping */
+  --z-sticky: 5;     /* day chips, scroll-down button */
+  --z-bar: 10;       /* header, pinbar, composer */
+  --z-menu: 30;      /* popovers, context menu */
+  --z-overlay: 60;   /* scrims, full-screen viewers */
+  --z-sheet: 70;     /* bottom sheets */
+  --z-dialog: 75;    /* dialogs (above scrim) */
+  --z-toast: 80;
+  --z-lightbox: 90;
+
+  /* Type scale (px, stage 3 collapses the 38 raw sizes onto these) */
+  --fs-2xs: 11px; --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px;
+  --fs-lg: 15px;  --fs-xl: 16px; --fs-2xl: 20px; --fs-3xl: 24px;
+}

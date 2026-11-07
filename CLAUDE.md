@@ -4,7 +4,7 @@ Private friends platform (chat, calls, music, reels). Self-hosted on an Iran ser
 Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, scripts and terminal output in English.** Web only (no native app planned).
 
 ## Layout
-- `web-src/` React + Vite UI (build: `cd web-src && npx vite build` -> `web/dist`). CSS layers load in order: styles.css, theme.css, ui34.css, tg.css, q.css, lg.css, design.css (last wins; many `!important`). Glass lens: `src/lens.js` (Chromium only).
+- `web-src/` React + Vite UI (build: `cd web-src && npx vite build` -> `web/dist`). CSS layers load in order: tokens.css, styles.css, theme.css, ui34.css, tg.css, q.css, lg.css, design.css (last wins; many `!important`). Glass lens: `src/lens.js` (Chromium only).
 - `gateway/` Express + better-sqlite3 API in front of Matrix Synapse. `docker-compose.yml`, `Caddyfile`, `scripts/` ops scripts.
 - `tests/e2e/*.mjs` Playwright scripts (need the local test env, see below). `docs/` guides. `CHANGELOG.md` newest first.
 
@@ -54,7 +54,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - 0.42.2: `.pin-stack` wraps pinbar + docked MiniPlayer (one glass lens block); context menu ignores item clicks for 450 ms after a touch open (`ContextMenu.jsx openedAt`); share-track card reuses `.music-card` classes; `.scroll-down` needs `position:absolute !important` because the `.lg` rule sets relative.
 - 0.43.0: `ChatInfo.jsx` = Telegram-style glass info page opened from the chat header title/avatar (`infoOpen` in Chat.jsx); old `RoomSettings` dialog is reached via its menu or the header dots. Tabs scan only the loaded timeline (no server-side media search).
 - 0.44.0: `UserSheet.jsx` = in-chat glass user profile (opened from `msg-av`/`msg-name` taps and the Members tab in `ChatInfo.jsx`; state `userSheet` in Chat.jsx; Shell passes `onMessage/onBlock/blocked`). Note: tag v0.43.1 points at the same commit as 0.43.0 (VERSION still 0.43.0). No presence/last-seen yet (not enabled on Synapse).
-- Redesign stage 0 done (branch feat/design-roadmap): skills installed in `.claude/skills/`, `DESIGN.md`/`PRODUCT.md` written, detector baseline in `docs/design/`. Next: stage 1 (tokens.css, hover media query), then stage 2 motion. Run `npx impeccable detect web-src/src` to track findings (baseline 28 raw / 22 with DESIGN.md).
+- Redesign stage 0 done (branch feat/design-roadmap): skills installed in `.claude/skills/`, `DESIGN.md`/`PRODUCT.md` written, detector baseline in `docs/design/`. Stage 1 done in 0.44.1 (tokens.css loaded first; all :hover rules inside `@media (hover:hover)`). Next: stage 2 motion (replace 6 bounce curves, keyframes->transitions, press feedback). Run `npx impeccable detect web-src/src` to track findings (baseline 28 raw / 22 with DESIGN.md).
 - Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
 
 ## Local test env (cloud sandbox; Docker is unavailable)

@@ -1,11 +1,14 @@
 # UI guide: styling, theming, gestures, i18n
 
 ## CSS layers (load order in `web-src/src/main.jsx`; later wins)
-`styles.css` (base, 2020s structure) → `theme.css` (2000+ lines, tokens + old Telegram-ish look) → `ui34.css` → `tg.css` (palette blocks, `.timeline` wallpaper rule) → `q.css` (message menu, composer, attach menu, emoji panel/dock, FAB, round avatars) → `lg.css` (header pills, pinned card, composer pill, bubbles) → `design.css` (**newest; glass material, bubbles, music cards, Now Playing, auto lens**). Many rules use `!important`; to override, add to `design.css` with equal/greater specificity. Do not delete old layers without screenshotting every screen.
+`tokens.css` (0.44.1: easing, durations, z-index layers, type scale; define motion tokens only here) → `styles.css` (base, 2020s structure) → `theme.css` (2000+ lines, tokens + old Telegram-ish look) → `ui34.css` → `tg.css` (palette blocks, `.timeline` wallpaper rule) → `q.css` (message menu, composer, attach menu, emoji panel/dock, FAB, round avatars) → `lg.css` (header pills, pinned card, composer pill, bubbles) → `design.css` (**newest; glass material, bubbles, music cards, Now Playing, auto lens**). Many rules use `!important`; to override, add to `design.css` with equal/greater specificity. Do not delete old layers without screenshotting every screen.
 
 ## Theming (look.js, ChatLook.jsx)
 `data-theme` = dark | light | oled; `data-palette` = navy (default) | green | blue | gen (generated from one hex: purple/orange/rose/teal/custom via `buildVars`). Tokens: `--bg --surface* --ink --muted --accent* --mine --mine-2 --bubble-other --glass --tg-wall --tg-pat`. Look settings persist in `localStorage tikootak.look` (`DEFAULT` in look.js: navy, wall `dusk`, radius 20, font size 15, gradient bubbles). Wallpapers: built-in SVG data-URIs (dusk/aurora/peaks), dots/lines/grad/plain, or user image; applied as `--wall-bg/--wall-size` on `.chat`.
 Palette fonts: Vazirmatn (Persian) + Inter (Latin) from `web-src/public/fonts`.
+
+## Hover rule
+Every `:hover` style must live inside `@media (hover:hover)` (touch screens keep hover after a tap). Wrap new rules; a check: no `:hover` rule outside that media query.
 
 ## Glass system
 1. **Material** (design.css): translucent gradient fill + `backdrop-filter: blur saturate` + gradient 1px rim drawn with `::before` + mask-composite + soft specular `::after`. Classes: `.lg`, `.pinbar`, `.chat .day`, `.scroll-down`, `.chat .older`, header pills `.hp`.

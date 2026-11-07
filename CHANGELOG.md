@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.44.1
+- Design stage 1 (foundations, no visual change): all 86 `:hover` rules moved into `@media (hover:hover)`, so hover styles no longer stick on touch screens after a tap. New `web-src/src/tokens.css` (loaded first) is the single place for easing, durations, named z-index layers and the type scale; duplicate `--ease`/`--t-fast`/`--t-med` definitions in theme.css/design.css removed (effective values kept).
+- Design context for AI-assisted redesign: `DESIGN.md`, `PRODUCT.md`, `docs/DESIGN-ROADMAP.md`, `docs/design/` detector baseline, design skills in `.claude/skills/`.
+- Tested: vite build, i18n check, pixel-identical onboarding screen old vs new (desktop + phone), hover works on desktop and is off on touch emulation, all 22 Playwright e2e scripts pass (0 FAIL). Not tested on real phones.
 ## 0.44.0
 - Telegram-style user profile inside the chat (UserSheet.jsx): tap a sender's avatar or name in a group, or a row in the new "Members" tab of the chat info page, and a glass sheet opens in place (bottom sheet on phone, centred card on desktop) with avatar, @username, role (owner/admin/member), bio, quick actions (message, full profile, report, block) and what this person shared in the chat (media thumbnails, file/link/music counts). Chat is not left; Esc / back closes it.
 - Chat info page: new "Members" tab (owner/admins first); hidden for channels unless you are an admin.
