@@ -379,7 +379,6 @@ h2, h3 { margin: 0; }
 .bubble.sel{outline:2px solid var(--turq);outline-offset:1px}
 .msg{position:relative}
 .msg.flash .bubble,.msg .bubble.flash{animation:flash 1.2s}
-@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--saffron)}100%{box-shadow:none}}
 .quote{display:flex;flex-direction:column;align-items:flex-start;text-align:start;padding:4px 8px;margin:0 0 6px;border-inline-start:3px solid var(--saffron);background:rgb(0 0 0/.18);border-radius:6px;color:inherit;width:100%;gap:1px}
 .quote strong{font-size:12px}
 .quote span{font-size:12px;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}

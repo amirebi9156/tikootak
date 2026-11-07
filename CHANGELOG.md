@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.44.5
+- CSS cleanup: removed duplicate `@keyframes flash` (the later one always won).
+
 ## 0.44.4
 - Login/register: show/hide password button (`pw-eye`, new `eyeoff` icon).
 - Offline banner restyled (warning tint, pulsing dot, soft entrance).
