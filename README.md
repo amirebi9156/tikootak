@@ -14,19 +14,25 @@
 ## نصب روی سرور خام (یک دستور)
 راهنمای کامل قدم‌به‌قدم: `docs/INSTALL-FA.md`
 ```bash
-tar -xzf tikootak-UI34.tar.gz && cd tikootak
+tar -xf tikootak-full-X.Y.Z.tar && cd tikootak      # کیت کامل آفلاین (یا tar.gz معمولی release)
 sudo ./scripts/bootstrap.sh --domain tikootak.ir --yes
 ```
 Docker، فایروال، HTTPS، بکاپ شبانه و فرمان `tikootak` خودکار نصب می‌شوند و در پایان یک کد دعوت چاپ می‌شود.
 
-## اگه Docker Hub روی سرور باز نیست
-روی سیستمی که دسترسی داره: `./scripts/save-images.sh` و فایل `images.tar.gz` رو به سرور ببر،
-بعد روی سرور: `./scripts/load-images.sh` و سپس `./scripts/install.sh`.
+## حالت آفلاین (جنگ / قطع اینترنت بین‌المللی)
+اگه کنار `bootstrap.sh` فایل `offline-images.tar.gz` باشد (کیت کامل)، نصب خودکار **آفلاین** انجام می‌شود:
+هیچ دانلودی از GitHub، Docker Hub، npm یا apt لازم نیست و حتی Docker از بسته‌های داخل کیت نصب می‌شود.
+- ساخت کیت: `./scripts/make-kit.sh --with-docker-debs ubuntu:24.04,ubuntu:22.04` (یا از Release در GitHub، فایل `tikootak-full-*.tar`).
+- گواهی اضطراری HTTPS: `sudo tikootak cert export-auto` (گواهی فعلی را برای روز قطعی ذخیره می‌کند)؛ نصب دستی: `bootstrap.sh --cert fullchain.pem --key key.pem`.
+- آینه‌های داخلی: `tikootak mirrors test`.
+- آمادگی: `sudo tikootak ready` (کیت، گواهی، بکاپ، دیسک، ساعت را چک می‌کند).
+
+راهنمای کامل فارسی: **`docs/OFFLINE-FA.md`**
 
 ## گواهی HTTPS
 مرورگر برای میکروفون و دوربین حتما HTTPS می‌خواد.
-اگه سرور به Let's Encrypt دسترسی نداره، گواهی رو دستی در `certs/cert.pem` و `certs/key.pem` بذار
-و در `.env` بنویس `CADDYFILE=./Caddyfile.manual-cert`.
+اگه سرور به Let's Encrypt دسترسی نداره، `sudo tikootak cert` (status / install / use-manual / howto) را ببین؛
+گواهی دستی در `certs/cert.pem` و `certs/key.pem` است و `CADDYFILE=./Caddyfile.manual-cert` در `.env` می‌شود.
 
 ## پورت‌هایی که باید باز باشن
 `80/tcp`، `443/tcp`، `7881/tcp`، `7882/udp`، `3478/udp`، `30000-30100/udp`

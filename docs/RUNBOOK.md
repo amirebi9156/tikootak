@@ -149,17 +149,19 @@ docker compose exec gateway node -e "fetch('http://localhost:3000/api/admin/invi
 
 ## ۶. به‌روزرسانی
 
-- **کد رابط کاربری یا اسکریپت‌ها** (فایل tar جدید): `sudo tar -xzf <فایل>` و بعد `sudo ./scripts/install.sh` (امن است؛ دیتا دست نمی‌خورد و سرویس‌ها از نو ساخته می‌شوند).
+- **کد رابط کاربری یا اسکریپت‌ها** (فایل tar جدید یا کیت آفلاین): `sudo tikootak update <فایل>` (بکاپ می‌گیرد، تصاویر آفلاین را load می‌کند، در خرابی برمی‌گردد). دستی: `sudo tar -xf <فایل>` و `sudo ./scripts/install.sh`.
 - **نسخه سرویس‌های اصلی** (Synapse، Caddy، LiveKit): `docker compose pull && docker compose up -d`. قبلش بکاپ بگیر.
 
 ## ۷. کیت بقا (اگه اینترنت قطع شد، این‌ها را از قبل داشته باش)
 
-1. پوشه پروژه (کد + اسکریپت‌ها)
-2. `images.tar.gz` (از `./scripts/save-images.sh`؛ بدون آن Docker نمی‌تواند سرویس‌ها را دوباره بسازد)
-3. جدیدترین فایل بکاپ
-4. فایل `.env`
-5. گواهی دستی (`certs/`) اگه استفاده می‌کنی
-6. همین راهنما (چاپ‌شده یا روی گوشی)
+1. **کیت کامل آفلاین** `tikootak-full-X.Y.Z.tar` + `.sha256` (کد + همه تصاویر Docker + بستهٔ Docker؛ `./scripts/make-kit.sh` یا Release در GitHub) — حداقل در ۳ جا
+2. جدیدترین فایل بکاپ (بیرون از سرور؛ `BACKUP_SCP_TARGET`) و `BACKUP_PASSPHRASE`
+3. فایل `.env` و `GATEWAY_ADMIN_KEY`
+4. گواهی اضطراری HTTPS: `sudo tikootak cert export-auto` (پوشهٔ `certs/` در بکاپ هم هست)
+5. یک سرور آماده‌باش در دیتاسنتر دیگر
+6. همین راهنما و `docs/OFFLINE-FA.md` (چاپ‌شده یا روی گوشی)
+
+بررسی یک‌جا: `sudo tikootak ready`.
 
 این‌ها را روی یک فلش یا حداقل یک جای دیگر غیر از خود سرور نگه دار. بکاپی که فقط روی همان سرور باشد، با از دست رفتن سرور از بین می‌رود.
 

@@ -1,0 +1,48 @@
+name: Offline kit
+# Builds the FULL OFFLINE KIT (app + all Docker images incl. the prebuilt gateway + Docker engine packages for fresh
+# Ubuntu/Debian servers) and attaches it to the release. Runs after the Release workflow, or by hand for an existing tag.
+# Download the kit now (with a VPN), keep copies, and you can install with NO access to GitHub/Docker Hub/npm/apt.
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build the kit for, e.g. v0.45.0'
+        required: true
+permissions:
+  contents: write
+jobs:
+  kit:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          T="${{ inputs.tag || github.event.workflow_run.head_branch }}"
+          echo "tag=$T" >> "$GITHUB_OUTPUT"; echo "ver=${T#v}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm, cache-dependency-path: web-src/package-lock.json }
+      - name: Build web
+        working-directory: web-src
+        run: npm ci --no-audit --no-fund && npx vite build
+      - name: Build the kit
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/make-kit.sh --with-docker-debs ubuntu:24.04,ubuntu:22.04,debian:12 --out kit-out
+          ls -lh kit-out
+          SIZE=$(stat -c %s kit-out/tikootak-full-*.tar)
+          echo "kit size: $SIZE bytes"
+          [ "$SIZE" -lt 2000000000 ] || { echo "::error::kit is larger than the 2 GB release-asset limit; drop a distro from --with-docker-debs"; exit 1; }
+      - name: Attach to the release
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          T="${{ steps.tag.outputs.tag }}"; V="${{ steps.tag.outputs.ver }}"
+          gh release view "$T" >/dev/null 2>&1 || { echo "release $T does not exist yet"; exit 1; }
+          gh release upload "$T" "kit-out/tikootak-full-$V.tar" "kit-out/tikootak-full-$V.tar.sha256" --clobber

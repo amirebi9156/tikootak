@@ -66,6 +66,8 @@ else
   echo "If the new server has a different IP, change PUBLIC_IP in .env (or pass --ip); it is required for calls."
 fi
 set -a; . ./.env; set +a
+# the backup's .env may pin image digests that an offline bundle cannot satisfy: re-check now
+offline_settle
 
 mkdir -p data/postgres data/caddy certs config backups web/dist
 cp -r "$STAGE/synapse" data/synapse
@@ -73,6 +75,8 @@ cp -r "$STAGE/gateway" data/gateway
 [ -d "$STAGE/certs" ] && cp -r "$STAGE/certs/." certs/ || true
 chown -R 991:991 data/synapse 2>/dev/null || true
 chown -R 1000:1000 data/gateway 2>/dev/null || true
+# no route to Let's Encrypt (blackout)? use the certificate that came with the backup
+[ -f certs/cert.pem ] && ./scripts/cert.sh auto-fallback --no-restart || true
 
 render() {
   sed \

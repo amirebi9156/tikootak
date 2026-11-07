@@ -21,7 +21,9 @@ SCP=(scp -q -P "$PORT" -o BatchMode=yes)
 
 echo "[1/6] Checking connection and Docker on the target ..."
 "${SSH[@]}" 'command -v docker >/dev/null && docker compose version >/dev/null' \
-  || { echo "[FAIL] SSH failed or Docker/compose is not installed on the target."; exit 1; }
+  || { echo "[FAIL] SSH failed or Docker/compose is not installed on the target."
+       echo "       Install Docker there first. With no internet: copy the full offline kit to the target and run its bootstrap.sh"
+       echo "       (see docs/OFFLINE-FA.md), then run this migration again."; exit 1; }
 
 if [ "$NOBK" != 1 ]; then echo "[2/6] Creating a fresh backup ..."; ./scripts/backup.sh | tail -3; else echo "[2/6] Using the latest backup"; fi
 # shellcheck disable=SC2010  # controlled backup globs (file names are safe)
@@ -37,7 +39,7 @@ if [ "$OFFLINE" = 1 ]; then echo "[3/6] Building the image bundle ..."; ./script
 
 echo "[3/6] Sending the project ..."
 "${SSH[@]}" "mkdir -p '$DIR/backups'"
-tar czf - --exclude=./data --exclude=./backups --exclude=./.env --exclude=node_modules --exclude=./.git --exclude='./offline-images*' --exclude='./.monitor.state' . \
+tar czf - --exclude=./data --exclude=./backups --exclude=./.env --exclude=node_modules --exclude=./.git --exclude='./offline-images*' --exclude=./offline --exclude='./.monitor.state' . \
   | "${SSH[@]}" "tar xzf - -C '$DIR'"
 echo "[4/6] Sending the backup$([ "$OFFLINE" = 1 ] && echo ' and images') ..."
 "${SCP[@]}" "$BK" "$BK.sha256" "$HOST:$DIR/backups/" 2>/dev/null || "${SCP[@]}" "$BK" "$HOST:$DIR/backups/"
