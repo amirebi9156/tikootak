@@ -1,4 +1,8 @@
 # CHANGELOG
+## 0.44.2
+- Design stage 2 (motion, Emil Kowalski audit): one strong ease-out (`--ease`) plus `--ease-drawer` for sheets/drawers/docked bars; every overshoot/bounce curve removed (menus, attach menu, send button, reel like, new-chat button); deep scale entrances (.6-.85) replaced with .94; the send button no longer animates each time it appears (high-frequency action); `transition: all` removed; popovers 180 ms, sheets 260 ms, no UI motion over 320 ms.
+- Reduced motion is now "fewer and gentler" instead of "nothing": movement is dropped but opacity/color/shadow feedback stays.
+- Detector: bounce-easing findings 5 -> 0. Tested: build, i18n, all 22 Playwright e2e scripts pass. Feel of the new curves must be checked by hand on a phone.
 ## 0.44.1
 - Design stage 1 (foundations, no visual change): all 86 `:hover` rules moved into `@media (hover:hover)`, so hover styles no longer stick on touch screens after a tap. New `web-src/src/tokens.css` (loaded first) is the single place for easing, durations, named z-index layers and the type scale; duplicate `--ease`/`--t-fast`/`--t-med` definitions in theme.css/design.css removed (effective values kept).
 - Design context for AI-assisted redesign: `DESIGN.md`, `PRODUCT.md`, `docs/DESIGN-ROADMAP.md`, `docs/design/` detector baseline, design skills in `.claude/skills/`.

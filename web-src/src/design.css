@@ -178,7 +178,7 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 :root.lens-auto .player-bar.mp.lens-on { background: linear-gradient(135deg, rgb(255 255 255 / .14), rgb(255 255 255 / .03)) !important; }
 :root[data-theme='light'].lens-auto .player-bar.mp.lens-on { background: linear-gradient(135deg, rgb(255 255 255 / .7), rgb(255 255 255 / .45)) !important; }
 @media (prefers-reduced-transparency: reduce) { .player-bar.mp, .np-float .npf-glass { background: var(--surface) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; } }
-.player-bar.mp { animation: mpIn .32s cubic-bezier(.2, .8, .2, 1) both; }
+.player-bar.mp { animation: mpIn .26s var(--ease-drawer) both; }
 @keyframes mpIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 
 /* پنجرهٔ تمام‌صفحه: دکمه‌ها کنار هم و عنوان بلند خراب نشود */
@@ -192,7 +192,7 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 
 /* پنجرهٔ شیشه‌ای شناور (جابه‌جاشدنی) */
 .np-float { position: fixed; left: 0; top: 0; z-index: 58; width: min(340px, calc(100vw - 16px)); will-change: transform; }
-.np-float .npf-glass, .np-float .npf-shadow { animation: mpIn .26s cubic-bezier(.2, .8, .2, 1) both; }
+.np-float .npf-glass, .np-float .npf-shadow { animation: mpIn .26s var(--ease-drawer) both; }
 .np-float .npf-shadow { position: absolute; inset: 0; border-radius: 28px; pointer-events: none; box-shadow: 0 26px 50px -22px rgb(0 0 0 / .75), 0 6px 16px -6px rgb(0 0 0 / .35); }
 .np-float .npf-glass { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 6px 14px 14px; border-radius: 28px; color: var(--ink); overflow: visible; }
 .np-float .npf-glass.lens-on { box-shadow: none !important; }
@@ -336,7 +336,7 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 /* ===== صفحهٔ مشخصات گفتگو (مثل تلگرام، شیشه‌ای) ===== */
 .cinfo { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; color: var(--ink);
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg, #060b1f) 84%, transparent), color-mix(in srgb, var(--bg, #060b1f) 93%, transparent));
-  -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5); animation: ciIn .26s cubic-bezier(.2, .8, .2, 1) both; }
+  -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5); animation: ciIn .26s var(--ease-drawer) both; }
 @keyframes ciIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .ci-top { position: absolute; top: 0; inset-inline: 0; z-index: 3; display: flex; justify-content: space-between; padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 0; pointer-events: none; }
 .ci-top > * { pointer-events: auto; }
@@ -393,7 +393,7 @@ form.composer:focus-within .cpill { box-shadow: var(--g-shadow), 0 0 0 2px color
 .usheet { position: relative; width: min(100%, 440px); max-height: 86%; overflow-y: auto; overscroll-behavior: contain; color: var(--ink);
   padding: 10px 14px calc(18px + env(safe-area-inset-bottom, 0px)); border-radius: 26px 26px 0 0;
   background: color-mix(in srgb, var(--surface) 62%, transparent); -webkit-backdrop-filter: blur(26px) saturate(1.6); backdrop-filter: blur(26px) saturate(1.6);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), inset 0 1.5px 0 rgb(255 255 255 / .32); animation: ushUp .28s cubic-bezier(.2, .8, .2, 1) both; }
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .2), inset 0 1.5px 0 rgb(255 255 255 / .32); animation: ushUp .28s var(--ease-drawer) both; }
 @media (min-width: 700px) { .usheet-wrap { align-items: center; } .usheet { border-radius: 26px; max-height: 80%; } }
 .usheet-grab { display: block; width: 38px; height: 4px; border-radius: 4px; margin: 0 auto 10px; background: rgb(255 255 255 / .35); }
 .usheet-hero { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 4px 0 10px; }

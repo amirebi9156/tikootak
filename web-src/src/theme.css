@@ -324,7 +324,7 @@ img, video { background: #000; }
   position: absolute; bottom: calc(100% + 10px); inset-inline-start: 0; min-width: 176px;
   padding: 6px; background: var(--surface); border: 1px solid var(--line2);
   border-radius: 18px; box-shadow: var(--shadow-2); display: flex; flex-direction: column; gap: 2px;
-  z-index: 30; animation: menu-in 0.14s var(--ease);
+  z-index: 30; transform-origin: bottom; animation: menu-in var(--dur-pop) var(--ease-out);
 }
 .attach-menu button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; color: var(--ink); font-size: 13.5px; text-align: start; }
 @media (hover:hover) {
@@ -1595,7 +1595,7 @@ html[dir='rtl'] .msg.theirs .bubble { border-end-end-radius: 6px !important; bor
 .ctx-sep { height: 1px; background: var(--line-soft); margin: 4px 6px; }
 .ctx-scrim { position: fixed; inset: 0; z-index: 1000; background: rgb(0 0 0 / 0.5); display: flex; align-items: flex-end; animation: ctx-fade 0.15s; }
 @keyframes ctx-fade { from { opacity: 0; } to { opacity: 1; } }
-.ctx-menu.sheet { position: static; width: 100%; max-width: none; border-radius: 22px 22px 0 0; padding: 8px 10px calc(12px + env(safe-area-inset-bottom)); animation: ctx-up 0.2s var(--ease); background: var(--surface); }
+.ctx-menu.sheet { position: static; width: 100%; max-width: none; border-radius: 22px 22px 0 0; padding: 8px 10px calc(12px + env(safe-area-inset-bottom)); animation: ctx-up 0.26s var(--ease-drawer); background: var(--surface); }
 @keyframes ctx-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .ctx-grip { width: 38px; height: 4px; border-radius: 4px; background: var(--line2); align-self: center; margin: 2px 0 8px; }
 .ctx-menu.sheet .ctx-item { min-height: 48px; font-size: 15px; }
@@ -1970,11 +1970,11 @@ input:focus-visible, textarea:focus-visible { outline: none !important; border-c
 .reel-media.loading::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(110deg, #111 30%, #1c1c1c 50%, #111 70%); background-size: 200% 100%; animation: reel-shimmer 1.4s linear infinite; }
 @keyframes reel-shimmer { to { background-position: -200% 0; } }
 .pause-badge { position: absolute; z-index: 3; top: 50%; left: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: rgb(0 0 0 / 0.45); backdrop-filter: blur(8px); pointer-events: none; animation: pause-pop 0.18s ease-out; }
-@keyframes pause-pop { from { transform: scale(0.7); opacity: 0; } }
+@keyframes pause-pop { from { transform: scale(0.9); opacity: 0; } }
 .reel-side .rbtn { transition: transform var(--t-fast, 0.12s) ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .reel-side .rbtn:active { transform: scale(0.88); }
-.reel-side .rbtn.on .ico { animation: heart-pop 0.32s cubic-bezier(0.2, 1.6, 0.4, 1); }
-@keyframes heart-pop { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+.reel-side .rbtn.on .ico { animation: heart-pop 0.24s var(--ease-out); }
+@keyframes heart-pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
 .reel-side .rbtn span { font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgb(0 0 0 / 0.8); }
 .reel-user strong, .reel-cap, .reel-cap p { text-shadow: 0 1px 4px rgb(0 0 0 / 0.75); }
 .reel-user .avatar { box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9); }

@@ -134,7 +134,7 @@
 /* unread indicator next to the chat back button: arrow + count pill, like Telegram */
 .chat-head .back:has(.back-badge) { width: auto; min-width: 40px; padding-inline: 8px 6px; display: inline-flex; align-items: center; gap: 4px; }
 .back-badge { position: static; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--accent); color: var(--on-accent, #04120c); font-size: 11.5px; font-weight: 700; display: inline-grid; place-items: center; line-height: 1; animation: bb-pop .25s ease-out; }
-@keyframes bb-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bb-pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .chat-head .back svg { flex: none; }
 .tab-badge { min-width: 17px !important; height: 17px !important; font-size: 10.5px !important; font-weight: 700; display: inline-grid; place-items: center; line-height: 1; box-shadow: 0 0 0 2px var(--night, #0b1411); }
 
@@ -187,7 +187,7 @@
 .addto-row.on .addto-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 /* مینی‌پلیر نرم‌تر: از پایین می‌لغزد، حرکت‌ها با transition */
-.player-bar { animation: pbIn .32s cubic-bezier(.2,.8,.2,1) both; transition: box-shadow .2s ease, transform .2s ease; }
+.player-bar { animation: pbIn .26s var(--ease-drawer) both; transition: box-shadow .2s ease, transform .2s ease; }
 @keyframes pbIn { from { opacity: 0; transform: translateY(16px) scale(.985); } to { opacity: 1; transform: none; } }
 .player-bar .icon { transition: background-color .15s ease, transform .12s ease, opacity .15s ease; }
 @media (hover:hover) {
@@ -203,7 +203,7 @@
 }
 .player-bar .seek { -webkit-appearance: none; appearance: none; height: 14px; background: transparent; cursor: pointer; }
 .player-bar .seek::-webkit-slider-runnable-track { height: 3px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); }
-.player-bar .seek::-webkit-slider-thumb { -webkit-appearance: none; width: 0; height: 0; transition: all .15s ease; margin-top: -4px; }
+.player-bar .seek::-webkit-slider-thumb { -webkit-appearance: none; width: 0; height: 0; transition: width .15s var(--ease-out), height .15s var(--ease-out), margin-top .15s var(--ease-out); margin-top: -4px; }
 @media (hover:hover) {
 .player-bar .seek:hover::-webkit-slider-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--accent); }
 }
@@ -218,7 +218,7 @@
 .np-scrim { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px;
   background: rgb(0 0 0 / .55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: npFade .22s ease both; }
 .np-scrim .np { position: relative; inset: auto; z-index: auto; width: min(100%, 400px); max-height: min(92vh, 720px); border-radius: 26px; border: 1px solid var(--line);
-  box-shadow: 0 30px 80px -20px rgb(0 0 0 / .65); padding: 12px 20px 22px; gap: 12px; animation: npPop .28s cubic-bezier(.2,.9,.25,1) both; }
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / .65); padding: 12px 20px 22px; gap: 12px; animation: npPop .26s var(--ease-out) both; }
 .np-scrim .np-cover { padding: 0; border: 0; }
 .np-scrim .np-cover .cover { width: min(64vw, 260px) !important; height: min(64vw, 260px) !important; }
 @keyframes npFade { from { opacity: 0; } to { opacity: 1; } }
@@ -240,7 +240,7 @@
   -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
   border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
   box-shadow: 0 10px 34px rgb(0 0 0 / 0.38);
-  animation: ctx-pop 0.26s cubic-bezier(.2, .9, .25, 1.15) both;
+  animation: ctx-pop var(--dur-pop) var(--ease-out) both;
 }
 .ctx-layer.glass .ctx-pill {
   display: flex; align-items: center; gap: 2px; padding: 3px 5px; border-radius: 26px;
@@ -263,7 +263,7 @@
 .ctx-layer.glass .ctx-item .ico { color: var(--ink); opacity: .85; }
 .ctx-layer.glass .ctx-item.danger .ico, .ctx-layer.glass .ctx-item.danger { color: var(--danger); opacity: 1; }
 .ctx-layer.glass .ctx-sep { background: color-mix(in srgb, var(--ink) 10%, transparent); }
-@keyframes ctx-pop { from { opacity: 0; transform: scale(.78); } to { opacity: 1; transform: none; } }
+@keyframes ctx-pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ctx-layer.glass, .ctx-layer.glass .ctx-pill, .ctx-layer.glass .ctx-menu { animation: none; } }
 
 /* ---------- نوار پایین چت: شیشه‌ای و شناور ---------- */
@@ -300,8 +300,8 @@ form.composer .send {
 form.composer .send:active { transform: scale(.88); }
 form.composer .send.mic { background: transparent !important; color: var(--muted) !important; border: 0 !important; box-shadow: none !important; }
 @media (hover: hover) { form.composer .send.mic:hover { background: color-mix(in srgb, var(--ink) 10%, transparent) !important; color: var(--ink) !important; } }
-form.composer .send:not(.mic) { animation: sendPop .22s cubic-bezier(.2, .9, .25, 1.3); }
-@keyframes sendPop { from { transform: scale(.6); opacity: .4; } to { transform: none; opacity: 1; } }
+/* send button appears on every typed message: no entrance animation (high frequency) */
+form.composer .send:not(.mic) { animation: none; }
 .composer.recording { align-items: center !important; padding: 6px 10px !important; }
 
 /* پیش‌نمایش پاسخ/ویرایش */
@@ -309,7 +309,7 @@ form.composer .send:not(.mic) { animation: sendPop .22s cubic-bezier(.2, .9, .25
   margin: 6px 10px -2px !important; padding: 7px 12px !important; border: 0 !important; border-radius: 18px 18px 8px 8px;
   background: color-mix(in srgb, var(--surface) 62%, transparent) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
-  animation: ctxbarIn .2s cubic-bezier(.2, .9, .25, 1);
+  animation: ctxbarIn .2s var(--ease-out);
 }
 @keyframes ctxbarIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
@@ -319,10 +319,10 @@ form.composer .send:not(.mic) { animation: sendPop .22s cubic-bezier(.2, .9, .25
   -webkit-backdrop-filter: blur(24px) saturate(1.7); backdrop-filter: blur(24px) saturate(1.7);
   border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent) !important; border-radius: 20px !important;
   box-shadow: 0 12px 34px -8px rgb(0 0 0 / 0.5) !important;
-  transform-origin: bottom left; animation: attachPop .22s cubic-bezier(.2, .9, .25, 1.15) both !important;
+  transform-origin: bottom left; animation: attachPop var(--dur-pop) var(--ease-out) both !important;
 }
 [dir='rtl'] .attach-menu, [dir='rtl'] .emoji-pop { transform-origin: bottom right; }
-@keyframes attachPop { from { opacity: 0; transform: translateY(10px) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes attachPop { from { opacity: 0; transform: translateY(8px) scale(.94); } to { opacity: 1; transform: none; } }
 .attach-menu { min-width: 190px !important; padding: 5px !important; }
 .attach-menu button { min-height: 44px !important; border-radius: 14px !important; gap: 12px !important; font-size: 14.5px !important; }
 .attach-menu button:active { background: color-mix(in srgb, var(--ink) 12%, transparent); }
@@ -343,7 +343,7 @@ form.composer .send:not(.mic) { animation: sendPop .22s cubic-bezier(.2, .9, .25
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important; color: var(--on-accent, #fff) !important;
   box-shadow: 0 10px 24px -8px var(--accent), 0 4px 10px rgb(0 0 0 / .35);
-  transition: transform .18s cubic-bezier(.2, .9, .25, 1.2), box-shadow .2s;
+  transition: transform .18s var(--ease-out), box-shadow .2s var(--ease-out);
 }
 .new-conv-btn:active { transform: scale(.9); }
 @media (hover: hover) { .new-conv-btn:hover { transform: translateY(-2px); } }
@@ -367,7 +367,7 @@ form.composer .emoji-wrap { position: static; }
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   -webkit-backdrop-filter: blur(26px) saturate(1.7); backdrop-filter: blur(26px) saturate(1.7);
   border: 1px solid color-mix(in srgb, var(--ink) 13%, transparent); box-shadow: 0 14px 40px -10px rgb(0 0 0 / .55);
-  animation: attachPop .22s cubic-bezier(.2, .9, .25, 1.1) both; transform-origin: bottom;
+  animation: attachPop var(--dur-pop) var(--ease-out) both; transform-origin: bottom;
 }
 @media (min-width: 761px) { .emoji-panel { inset-inline-end: auto; width: 400px; } }
 .ep-top { padding: 8px 10px 4px; display: flex; flex-direction: column; gap: 6px; flex: none; }
@@ -418,12 +418,12 @@ form.composer .emoji-wrap { position: static; }
 form.composer { z-index: 31; }
 
 /* پنل جای کیبورد (موبایل): کشویی از پایین، زیر نوار پیام */
-.emoji-dock { flex: none; height: 0; overflow: hidden; transition: height .28s cubic-bezier(.2, .85, .25, 1); }
+.emoji-dock { flex: none; height: 0; overflow: hidden; transition: height .26s var(--ease-drawer); }
 .emoji-dock.open { height: var(--dock-h, 310px); }
 .emoji-panel.docked {
   position: relative; bottom: auto; inset-inline: auto; height: calc(var(--dock-h, 310px) - 8px); margin: 0 10px 8px; animation: none;
   border-radius: 22px 22px 18px 18px;
-  transform: translateY(0); transition: transform .28s cubic-bezier(.2, .85, .25, 1), opacity .2s;
+  transform: translateY(0); transition: transform .26s var(--ease-drawer), opacity .2s var(--ease-out);
 }
 .emoji-dock:not(.open) .emoji-panel.docked { transform: translateY(40%); opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .emoji-dock, .emoji-panel.docked { transition: none; } }

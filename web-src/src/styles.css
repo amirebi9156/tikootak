@@ -231,7 +231,8 @@ h2, h3 { margin: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  /* fewer and gentler, not zero: keep color/opacity feedback, drop movement */
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-property: opacity, color, background-color, border-color, box-shadow, fill, stroke, filter !important; }
 }
 .small-note{font-size:12px;margin:0}
 .rkey{display:block;padding:12px;border-radius:10px;background:var(--raise,#1B2858);border:1px solid var(--line,#2A3869);word-break:break-all;user-select:all;font-size:14px;line-height:1.7}
