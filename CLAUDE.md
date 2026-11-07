@@ -12,6 +12,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - `docs/ARCHITECTURE.md` — services, request routing, auth/invites, gateway modules, DB/migrations, upload policy, chat model, client file map, backups.
 - `docs/UI-GUIDE.md` — CSS layer order, theming/look engine, glass material + SVG lens (and its pitfalls), gesture rules, i18n, UI testing.
 - `docs/DECISIONS.md` — why things are the way they are, newest first.
+- `docs/DESIGN-ROADMAP.md` + `DESIGN.md` + `PRODUCT.md` — redesign plan, design direction, motion rules. Design skills live in `.claude/skills/` (impeccable, emil-*, taste-skill); for UI work load impeccable first, Emil's skills for motion; taste-skill only for the idea of a one-line Design Read (its landing-page defaults do not fit this app).
 - `docs/RUNBOOK.md`, `docs/MIGRATION.md`, `docs/INSTALL-FA.md`, `docs/UPLOAD-CONTROL.md` — operations. Other files in `docs/` are old history.
 
 ## Product & owner
@@ -53,6 +54,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - 0.42.2: `.pin-stack` wraps pinbar + docked MiniPlayer (one glass lens block); context menu ignores item clicks for 450 ms after a touch open (`ContextMenu.jsx openedAt`); share-track card reuses `.music-card` classes; `.scroll-down` needs `position:absolute !important` because the `.lg` rule sets relative.
 - 0.43.0: `ChatInfo.jsx` = Telegram-style glass info page opened from the chat header title/avatar (`infoOpen` in Chat.jsx); old `RoomSettings` dialog is reached via its menu or the header dots. Tabs scan only the loaded timeline (no server-side media search).
 - 0.44.0: `UserSheet.jsx` = in-chat glass user profile (opened from `msg-av`/`msg-name` taps and the Members tab in `ChatInfo.jsx`; state `userSheet` in Chat.jsx; Shell passes `onMessage/onBlock/blocked`). Note: tag v0.43.1 points at the same commit as 0.43.0 (VERSION still 0.43.0). No presence/last-seen yet (not enabled on Synapse).
+- Redesign stage 0 done (branch feat/design-roadmap): skills installed in `.claude/skills/`, `DESIGN.md`/`PRODUCT.md` written, detector baseline in `docs/design/`. Next: stage 1 (tokens.css, hover media query), then stage 2 motion. Run `npx impeccable detect web-src/src` to track findings (baseline 28 raw / 22 with DESIGN.md).
 - Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
 
 ## Local test env (cloud sandbox; Docker is unavailable)
