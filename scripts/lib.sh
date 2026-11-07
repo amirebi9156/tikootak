@@ -63,9 +63,68 @@ PY
 }
 
 export OFFLINE_LOADED=0
-load_offline_images() {
+
+# Prints the path of the offline image bundle if one exists in the project dir (empty otherwise).
+offline_bundle_file() {
+  local f
   for f in offline-images.tar.gz offline-images.tar images.tar.gz; do
-    if [ -f "$f" ]; then echo "Loading offline images from $f ..."; docker load -i "$f" >/dev/null && echo "[OK] Images loaded"; return 0; fi
+    [ -f "$f" ] && { echo "$f"; return 0; }
   done
+  return 1
+}
+
+# True when every image used by docker-compose.yml is already present locally (no pull/build needed).
+compose_images_present() {
+  local img missing=0
+  while IFS= read -r img; do
+    [ -n "$img" ] || continue
+    docker image inspect "$img" >/dev/null 2>&1 || { echo "  missing image: $img"; missing=1; }
+  done < <(docker compose config --images 2>/dev/null | sort -u)
+  return "$missing"
+}
+
+# Digest pins (KEY=repo@sha256:...) written by pin-images.sh cannot be satisfied by images loaded from a tar
+# (docker load keeps tags, not digests). If a pinned image is missing locally, comment the pin out so the
+# default tag from the bundle is used. Prints what it changed.
+offline_unpin_missing() {
+  [ -f .env ] || return 0
+  local key val
+  for key in CADDY_IMAGE POSTGRES_IMAGE SYNAPSE_IMAGE LIVEKIT_IMAGE GATEWAY_IMAGE; do
+    val="$(grep -E "^${key}=" .env | head -1 | cut -d= -f2-)"
+    case "$val" in *@sha256:*)
+      if ! docker image inspect "$val" >/dev/null 2>&1; then
+        sed -i "s|^${key}=|# (unpinned for offline install) ${key}=|" .env
+        echo "[WARN] ${key} was pinned by digest but that image is not in the bundle; using the default tag instead"
+      fi;;
+    esac
+  done
+}
+
+# Decide whether the bundle fully satisfies docker-compose.yml. Sets OFFLINE_LOADED=1 when it does.
+# Call again after .env changes (restore.sh does, after copying the backup's .env).
+offline_settle() {
+  [ "${OFFLINE_BUNDLE_LOADED:-0}" = 1 ] || return 0
+  offline_unpin_missing
+  if compose_images_present; then
+    OFFLINE_LOADED=1; export OFFLINE_LOADED
+    echo "[OK] All images are available locally; no download or build is needed"
+  else
+    OFFLINE_LOADED=0; export OFFLINE_LOADED
+    echo "[WARN] Some images are still missing (listed above); the installer will try to fetch/build them"
+  fi
+}
+
+# Loads the offline bundle (if any), then settles. $1 (optional) = explicit bundle path.
+load_offline_images() {
+  local f="${1:-}"
+  [ -n "$f" ] || f="$(offline_bundle_file)" || return 0
+  [ -f "$f" ] || return 0
+  echo "Loading offline images from $f (can take a few minutes) ..."
+  if docker load -i "$f" >/dev/null; then
+    OFFLINE_BUNDLE_LOADED=1; export OFFLINE_BUNDLE_LOADED
+    offline_settle
+  else
+    echo "[WARN] docker load failed for $f"
+  fi
   return 0
 }

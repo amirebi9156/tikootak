@@ -15,18 +15,18 @@
 ## ۳) بردن فایل روی سرور
 از کامپیوتر خودت (ویندوز PowerShell یا لینوکس/مک):
 ```bash
-scp tikootak-UI34.tar.gz root@IP_SERVER:/root/
+scp tikootak-full-X.Y.Z.tar root@IP_SERVER:/root/
 ```
 (در ویندوز می‌توانی از WinSCP هم استفاده کنی.)
 
 ## ۴) نصب
 ```bash
 ssh root@IP_SERVER
-tar -xzf tikootak-UI34.tar.gz && cd tikootak
+tar -xf tikootak-full-X.Y.Z.tar && cd tikootak
 ./scripts/bootstrap.sh --domain tikootak.ir --yes
 ```
 اسکریپت خودش: سرور را بررسی می‌کند، DNS را چک می‌کند، Docker نصب می‌کند، (اگر Docker Hub بسته بود آینه امتحان می‌کند)، فایروال و fail2ban را می‌گذارد، سرویس‌ها را بالا می‌آورد، گواهی HTTPS می‌گیرد، بکاپ شبانه می‌گذارد و تست امنیت اجرا می‌کند.
-اگر Docker Hub یا npm از سرور باز نبود، پیام می‌دهد؛ گزینه‌ها: `--mirror https://docker.arvancloud.ir`، `--npm <آینه>`، یا بستهٔ آفلاین (`scripts/save-images.sh` روی سیستم دیگر).
+اگر کیت کامل (`tikootak-full-*.tar`) را داشته باشی، همه‌چیز **آفلاین** نصب می‌شود (بدون GitHub/Docker Hub/npm/apt؛ حتی Docker از بسته‌های داخل کیت). در غیر این صورت اگر Docker Hub یا npm باز نبود، پیام می‌دهد؛ گزینه‌ها: `--mirror https://docker.arvancloud.ir`، `--npm <آینه>`، `sudo tikootak mirrors test`، یا کیت آفلاین. گواهی آماده داری؟ `--cert fullchain.pem --key key.pem`. جزئیات: `docs/OFFLINE-FA.md`.
 
 در پایان این‌ها چاپ می‌شود: **کد دعوت اول**، **کلید ادمین** و **کلید رمز بکاپ**. هر دو کلید را بیرون از سرور هم ذخیره کن.
 
@@ -38,12 +38,12 @@ tar -xzf tikootak-UI34.tar.gz && cd tikootak
 ## ۶) آپدیت‌های بعدی
 فایل tar جدید را با `scp` ببر روی سرور و:
 ```bash
-sudo tikootak update /root/tikootak-UI35.tar.gz
+sudo tikootak update /root/tikootak-full-X.Y.Z.tar    # کیت آفلاین یا tar.gz معمولی؛ فایل .sha256 کنارش خودکار چک می‌شود
 ```
 قبل از آپدیت بکاپ گرفته می‌شود و اگر خراب شد خودکار برمی‌گردد. `.env` و داده‌ها حفظ می‌شوند.
 
 ## ۷) عوض کردن سرور (اگر فیلتر شد)
-روی سرور قدیم: `sudo tikootak backup` و فایل بکاپ را بردار. روی سرور جدید: مراحل ۳ و ۴، بعد `sudo tikootak restore <فایل>`، سپس رکورد A دامنه را به IP جدید بده.
+روی سرور قدیم: `sudo tikootak backup` و فایل بکاپ را بردار. روی سرور جدید: مراحل ۳ و ۴ (با کیت کامل بدون اینترنت هم می‌شود)، بعد `sudo tikootak restore <فایل>` (گواهی ذخیره‌شده در `certs/` هم برمی‌گردد)، سپس رکورد A دامنه را به IP جدید بده.
 
 ## عیب‌یابی سریع
 | مشکل | کار |

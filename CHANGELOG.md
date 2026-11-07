@@ -1,4 +1,13 @@
 # CHANGELOG
+## 0.45.0
+- Blackout-ready install: `bootstrap.sh` auto-detects an offline bundle (`offline-images.tar.gz`) and installs with no GitHub/Docker Hub/npm/apt access; Docker itself can come from bundled .deb files (`offline/docker/<id-version>/`).
+- New `scripts/make-kit.sh` (+ `fetch-docker-debs.sh`) builds one file `tikootak-full-<ver>.tar` (+ `.sha256`); new workflow `.github/workflows/kit.yml` attaches it to each Release.
+- New `scripts/cert.sh` / `tikootak cert`: emergency HTTPS certificate (export the live Let's Encrypt cert, install your own, manual/auto switch, auto-fallback when ACME is unreachable, expiry check). `bootstrap.sh --cert F --key F`; weekly export in cron; `restore.sh` falls back to the saved cert.
+- New `scripts/mirror-test.sh` + `mirrors.list` (`tikootak mirrors test [--apply]`): probes Iranian Docker/npm/apt mirrors.
+- New `tikootak ready`: readiness check (images, kit, debs, cert days, backup age, off-site target, disk, NTP).
+- Offline update: `tikootak update X.tar` (plain .tar, sha256 auto-check, images loaded, `--no-build`), safe rollback via `tikootak-gateway:rollback`.
+- Fixed: OFFLINE_LOADED was never set; pinned image digests broke `docker load`; bootstrap offline check died with a single bundle file.
+- Docs: new `docs/OFFLINE-FA.md`; README, INSTALL-FA, RUNBOOK updated. Tests: tests/scripts/offline.test.sh, cert.test.sh (fake docker + real openssl).
 ## 0.44.0
 - Telegram-style user profile inside the chat (UserSheet.jsx): tap a sender's avatar or name in a group, or a row in the new "Members" tab of the chat info page, and a glass sheet opens in place (bottom sheet on phone, centred card on desktop) with avatar, @username, role (owner/admin/member), bio, quick actions (message, full profile, report, block) and what this person shared in the chat (media thumbnails, file/link/music counts). Chat is not left; Esc / back closes it.
 - Chat info page: new "Members" tab (owner/admins first); hidden for channels unless you are an admin.
