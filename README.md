@@ -12,12 +12,31 @@
 - **web/dist**: رابط کاربری کامل (چت، فید، استوری، موزیک، پروفایل، اعلان‌ها، تنظیمات)
 
 ## نصب روی سرور خام (یک دستور)
-راهنمای کامل قدم‌به‌قدم: `docs/INSTALL-FA.md`
+پیش‌نیاز: سرور Ubuntu 22.04/24.04 یا Debian 12 (حداقل ۲ هسته، ۴ گیگ رم، ۲۰ گیگ دیسک)، دسترسی root، و یک دامنه که رکورد A آن به IP سرور اشاره کند (ابر آروان **خاکستری** باشد). پورت‌ها را در بخش «پورت‌ها» پایین ببین.
+
+روی سرور، به‌عنوان root:
 ```bash
-tar -xf tikootak-full-X.Y.Z.tar && cd tikootak      # کیت کامل آفلاین (یا tar.gz معمولی release)
-sudo ./scripts/bootstrap.sh --domain tikootak.ir --yes
+bash <(curl -fsSL https://raw.githubusercontent.com/amirebi9156/tikootak/main/install.sh)
 ```
-Docker، فایروال، HTTPS، بکاپ شبانه و فرمان `tikootak` خودکار نصب می‌شوند و در پایان یک کد دعوت چاپ می‌شود.
+اسکریپت می‌پرسد:
+1. **حالت نصب:** `1) آنلاین` (آخرین نسخه را خودش از GitHub می‌گیرد) یا `2) آفلاین` (فایل `tikootak-full-X.Y.Z.tar` را خودت با scp/WinSCP روی سرور گذاشته‌ای).
+2. **دامنه.**
+3. **بکاپ** (فقط اگر از سرور قبلی می‌آیی: مسیر فایل `.enc`؛ وگرنه Enter).
+
+Docker، فایروال، HTTPS، بکاپ شبانه و فرمان `tikootak` خودکار نصب می‌شوند و در پایان **کد دعوت اول**، **کلید ادمین** و **کلید رمز بکاپ** چاپ می‌شود (هر دو کلید را بیرون از سرور هم نگه دار).
+
+- **مخزن private است؟** آدرس بالا بدون توکن باز نمی‌شود؛ دستور مخصوص آن در `docs/INSTALL-FA.md` است (اسکریپت اگر توکن نداشته باشد خودش می‌پرسد).
+- **GitHub روی سرور بسته است؟** حالت ۲ (آفلاین) را انتخاب کن: فایل `install.sh` و کیت را با scp ببر و `bash install.sh` بزن.
+- **بدون سؤال:** `bash install.sh --online --domain example.com --yes` یا `bash install.sh --offline --file /root/tikootak-full-X.Y.Z.tar --domain example.com --yes`. گزینهٔ `--restore /root/backup.enc` بکاپ را هم برمی‌گرداند.
+- **فایل را قبلاً باز کرده‌ای؟** داخل پوشه `sudo bash install.sh` یا `sudo ./scripts/bootstrap.sh --domain example.com --yes`.
+
+راهنمای کامل قدم‌به‌قدم: `docs/INSTALL-FA.md` | عوض کردن سرور: `docs/MIGRATION.md`
+
+## آپدیت
+```bash
+sudo tikootak update              # آخرین Release را می‌گیرد (قبلش بکاپ می‌گیرد؛ در صورت خرابی برمی‌گردد)
+sudo tikootak update /root/tikootak-full-X.Y.Z.tar    # یا از فایل آپلودشده
+```
 
 ## حالت آفلاین (جنگ / قطع اینترنت بین‌المللی)
 اگه کنار `bootstrap.sh` فایل `offline-images.tar.gz` باشد (کیت کامل)، نصب خودکار **آفلاین** انجام می‌شود:
