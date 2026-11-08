@@ -10,3 +10,8 @@ node_modules/
 web/dist/
 web-src/node_modules/
 *.log
+/offline-images.tar.gz
+/offline-images.tar
+/offline-images.list
+/offline/
+/kit-out/

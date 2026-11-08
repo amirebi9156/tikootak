@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; S="$(mktemp -d)"; ok=0; bad=0
 chk() { if [ "$2" = "$3" ]; then ok=$((ok+1)); echo "PASS $1"; else bad=$((bad+1)); echo "FAIL $1 (انتظار «$3» ولی «$2»)"; fi; }
 mkdir -p "$S/bin" "$S/app/scripts" "$S/app/gateway" "$S/app/web/dist/assets" "$S/app/data" "$S/new/tikootak/"{gateway,scripts,web/dist/assets}
 printf '#!/bin/bash\nexit 0\n' > "$S/bin/docker"; chmod +x "$S/bin/docker"
-cp "$ROOT/scripts/tikootak.sh" "$ROOT/scripts/netlib.sh" "$S/app/scripts/"
+cp "$ROOT/scripts/tikootak.sh" "$ROOT/scripts/netlib.sh" "$ROOT/scripts/lib.sh" "$S/app/scripts/"
 for d in app new/tikootak; do touch "$S/$d/docker-compose.yml"; printf '#!/bin/bash\nexit 0\n' > "$S/$d/scripts/backup.sh"; printf '#!/bin/bash\n[ -f "%s/fail" ] && exit 1\nexit 0\n' "$S" > "$S/$d/scripts/doctor.sh"; done
 chmod +x "$S"/app/scripts/*.sh "$S"/new/tikootak/scripts/*.sh
 echo 1.0.0 > "$S/app/VERSION"; echo "DOMAIN=x.ir" > "$S/app/.env"; echo old > "$S/app/web/dist/assets/old.js"; echo keep > "$S/app/data/db"

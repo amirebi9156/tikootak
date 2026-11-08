@@ -1,0 +1,28 @@
+# Community-maintained list of Iranian mirrors (source: the Mirava project, https://github.com/MiravaOrg/Mirava).
+# NOTHING here is guaranteed to work or to stay online. Test from YOUR server:  sudo tikootak mirrors test
+# Edit freely. Format:   docker URL   |   npm URL   |   apt HOST   (HOST = name only, no https://)
+# Docker registry mirrors (pull-through caches: they only serve images somebody already pulled through them)
+docker https://docker.arvancloud.ir
+docker https://docker.mobinhost.com
+docker https://docker.iranserver.com
+docker https://docker.iranrepo.ir
+docker https://registry.docker.ir
+docker https://mirror-docker.runflare.com
+docker https://docker.kernel.ir
+docker https://focker.ir
+docker https://mirror2.chabokan.net
+docker https://mirror.atlantiscloud.ir
+# npm registries (only needed when the gateway image is BUILT on the server; the offline kit does not need npm)
+npm https://registry.npmmirror.com
+npm https://package-mirror.liara.ir/repository/npm
+npm https://registry.npmjs.org
+# Debian/Ubuntu package mirrors (full mirrors: they keep working when the international link is down)
+apt mirror.arvancloud.ir
+apt mirror.iranserver.com
+apt mirror.mobinhost.com
+apt ubuntu.pars.host
+apt linux-mirror.liara.ir
+apt mirror.shatel.ir
+apt repo.iut.ac.ir
+apt ir.archive.ubuntu.com
+apt mirror.0-1.cloud

@@ -9,6 +9,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 */5 * * * * root $D/scripts/monitor.sh >/dev/null 2>&1
 30 3 * * * root $D/scripts/backup.sh >> $D/backups/cron.log 2>&1
 30 5 * * 0 root $D/scripts/verify-backup.sh >> $D/backups/cron.log 2>&1
+0 4 * * 1 root $D/scripts/cert.sh export-auto --quiet >> $D/backups/cron.log 2>&1
 C
 chmod 644 /etc/cron.d/tikootak
-echo "Installed: monitor every 5 minutes, encrypted backup nightly at 03:30, restore test every Sunday at 05:30. Check: cat /etc/cron.d/tikootak"
+echo "Installed: monitor every 5 minutes, encrypted backup nightly at 03:30, restore test every Sunday at 05:30, emergency HTTPS certificate copy every Monday 04:00. Check: cat /etc/cron.d/tikootak"

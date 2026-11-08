@@ -6,15 +6,17 @@ set -euo pipefail
 cd "$(dirname "$0")/.." || exit 1
 echo "1) Backup..."
 ./scripts/backup.sh
-if [ "${1:-}" = "--images" ]; then
+if [ "${1:-}" = "--images" ] && [ "${OFFLINE_LOADED:-0}" != 1 ]; then
   echo "2) Pulling new images (previous pins are removed)..."
   sed -i '/^\(CADDY\|POSTGRES\|SYNAPSE\|LIVEKIT\)_IMAGE=/d' .env
   docker compose pull
 fi
 echo "3) Building web and gateway..."
-[ -x scripts/build-web.sh ] && ./scripts/build-web.sh || true
+# the release tar already contains web/dist; only build it (needs the internet) when it is missing
+[ -f web/dist/index.html ] || { [ -x scripts/build-web.sh ] && ./scripts/build-web.sh || true; }
 chown -R 1000:1000 data/gateway 2>/dev/null || true
-docker compose up -d --build
+BUILD=(--build); [ "${OFFLINE_LOADED:-0}" = 1 ] && BUILD=(--no-build)   # offline kit: images are already loaded
+docker compose up -d "${BUILD[@]}"
 docker compose up -d --force-recreate caddy   # Caddyfile may have changed (bind mount)
 sleep 8
 ./scripts/doctor.sh || { echo "[FAIL] doctor found a problem. Roll back: ./scripts/restore.sh backups/<latest-file>"; exit 1; }

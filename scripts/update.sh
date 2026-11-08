@@ -46,7 +46,12 @@ NEW="$(cat "$SRC/VERSION")"
 [ "$NEW" = "$CUR" ] && [ -z "${FORCE:-}" ] && { echo "Already on $CUR (FORCE=1 to reapply)."; exit 0; }
 [ -n "${DRY_RUN:-}" ] && { echo "[DRY] would apply $NEW over $CUR"; exit 0; }
 # copy new code over, never touching secrets/data
-(cd "$SRC" && tar cf - --exclude=./config --exclude=./.env --exclude=./data --exclude=./backups --exclude=./certs --exclude=./.update.conf .) | tar xf - -C "$ROOT"
+(cd "$SRC" && tar cf - --exclude=./config --exclude=./.env --exclude=./data --exclude=./backups --exclude=./certs --exclude=./.update.conf --exclude=./offline-images.tar.gz --exclude=./offline .) | tar xf - -C "$ROOT"
 chmod +x scripts/*.sh install.sh 2>/dev/null || true
+# a full offline kit carries its own images: load them and skip every download/build
+if [ -f "$SRC/offline-images.tar.gz" ]; then
+  . ./scripts/lib.sh
+  load_offline_images "$SRC/offline-images.tar.gz"
+fi
 ./scripts/upgrade.sh
 echo "[OK] Updated $CUR -> $NEW"

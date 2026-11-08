@@ -3,13 +3,16 @@
 #   sudo ./scripts/tikootak.sh install-cli     one time; afterwards from anywhere:  sudo tikootak
 #   tikootak                   interactive menu
 #   tikootak status            quick status (version, services, health, backup, signups, calls IP)
-#   tikootak update [file.tar.gz|dir] [--yes] [--no-backup]
-#                              upgrade/downgrade. Without a file it finds the newest tikootak*.tar.gz
+#   tikootak update [file.tar.gz|kit.tar|dir] [--yes] [--no-backup]
+#                              upgrade/downgrade. A full offline kit (contains offline-images.tar.gz) updates with NO internet.
+#                              Without a file it finds the newest tikootak*.tar.gz / .tar
 #                              in /root, $HOME, ./updates, /tmp. Backup first, automatic rollback.
 #   tikootak rollback          restore the code from before the last update (data is untouched)
 #   tikootak calls             voice/video self-check;  tikootak set-ip [IP]  fix the public IP used for calls
 #   tikootak restart | stop | start | settings | logs [service] | doctor | test | uninstall
-#   tikootak mirrors [show|set|clear]   Docker/npm/apt mirrors for restricted networks
+#   tikootak mirrors [show|test|set|clear]   Docker/npm/apt mirrors for restricted networks (test = which Iranian mirrors work now)
+#   tikootak cert [status|export-auto|install F K|use-manual|use-auto|howto]   HTTPS certificate / emergency copy
+#   tikootak ready             blackout-readiness checklist (offline images, certificate, backups, off-site copy, disk, clock)
 #   tikootak backup | verify [file] | restore <file> | migrate ...
 #   tikootak signup open|close|status   |   tikootak admin <command>
 set -uo pipefail
@@ -21,6 +24,7 @@ APP="${TIKOOTAK_DIR:-$(dirname "$(dirname "$SELF")")}"
 [ -f "$APP/docker-compose.yml" ] || { echo "App directory not found ($APP). First run: sudo ./scripts/tikootak.sh install-cli"; exit 1; }
 cd "$APP" || exit 1
 . ./scripts/netlib.sh
+. ./scripts/lib.sh
 
 R=$'\e[31m'; G=$'\e[32m'; Y=$'\e[33m'; B=$'\e[1m'; N=$'\e[0m'
 say()  { echo "${G}[..]${N} $*"; }
@@ -106,7 +110,7 @@ cmd_set_ip() {
 
 # ---------------------------------------------------------------- update / rollback
 SNAP_DIR=".releases"
-KEEP_EXCLUDES=(--exclude=./.env --exclude=./data --exclude=./backups --exclude=./.releases --exclude=./updates --exclude=./certs --exclude=./config --exclude=./node_modules --exclude=./web-src/node_modules --exclude=./offline-images.tar.gz)
+KEEP_EXCLUDES=(--exclude=./.env --exclude=./data --exclude=./backups --exclude=./.releases --exclude=./updates --exclude=./certs --exclude=./config --exclude=./node_modules --exclude=./web-src/node_modules --exclude=./offline-images.tar.gz --exclude=./offline)
 
 snapshot_code() { # $1=name
   mkdir -p "$SNAP_DIR"
@@ -126,21 +130,22 @@ rebuild_and_check() {
   chown -R 1000:1000 data/gateway 2>/dev/null || true
   ./scripts/render.sh >/dev/null 2>&1 || true
   local i
-  for i in 1 2 3; do dc up -d --build && dc up -d --force-recreate caddy && break; warn "build attempt $i failed; retrying in 10s"; sleep 10; done
+  local BUILD=(--build); [ "${OFFLINE_LOADED:-0}" = 1 ] && BUILD=(--no-build)
+  for i in 1 2 3; do dc up -d "${BUILD[@]}" && dc up -d --force-recreate caddy && break; warn "build attempt $i failed; retrying in 10s"; sleep 10; done
   say "Waiting for services..."; sleep 12
   ./scripts/doctor.sh
 }
 
 # Look for update archives: ./updates, /root, $HOME, /home/*, /tmp, current dir
 tar_version() {
-  local p; p="$(tar tzf "$1" 2>/dev/null | grep -E '(^|/)VERSION$' | head -1)"
-  [ -n "$p" ] && tar xzf "$1" "$p" -O 2>/dev/null | head -1 | tr -d ' \r\n'
+  local p; p="$(tar tf "$1" 2>/dev/null | grep -E '(^|/)VERSION$' | head -1)"
+  [ -n "$p" ] && tar xf "$1" "$p" -O 2>/dev/null | head -1 | tr -d ' \r\n'
 }
 find_updates() {
   local d f; local -a dirs=("$APP/updates" /root "${HOME:-/root}" /home/* /tmp "$PWD")
   for d in "${dirs[@]}"; do
     [ -d "$d" ] || continue
-    for f in "$d"/tikootak*.tar.gz "$d"/tikootak*.tgz; do [ -f "$f" ] && echo "$f"; done
+    for f in "$d"/tikootak*.tar.gz "$d"/tikootak*.tgz "$d"/tikootak*.tar; do [ -f "$f" ] && echo "$f"; done
   done | awk '!s[$0]++'
 }
 pick_update() { # prints the chosen file; returns 1 if none
@@ -174,12 +179,12 @@ cmd_update() {
       echo "(or put it in $APP/updates/), then run again:  sudo tikootak update"
       exit 1; }
   fi
-  local T; T="$(mktemp -d /tmp/tikootak-upd.XXXXXX)"; trap 'rm -rf "$T"' RETURN
+  local T; T="$(mktemp -d /var/tmp/tikootak-upd.XXXXXX 2>/dev/null || mktemp -d /tmp/tikootak-upd.XXXXXX)"; trap 'rm -rf "$T"' RETURN
   if [ -d "$SRC" ]; then cp -a "$SRC/." "$T/"; NEW="$T"
   else
     [ -f "$SRC" ] || die "File not found: $SRC"
     [ -f "$SRC.sha256" ] && { ( cd "$(dirname "$SRC")" && sha256sum -c "$(basename "$SRC").sha256" ) >/dev/null 2>&1 || die "Checksum mismatch (file damaged during upload?)"; say "checksum OK"; }
-    tar xzf "$SRC" -C "$T" || die "Could not open the archive"
+    tar xf "$SRC" -C "$T" || die "Could not open the archive"   # tar auto-detects .tar / .tar.gz (the full kit is a plain .tar)
     NEW="$(find "$T" -maxdepth 2 -name docker-compose.yml -printf '%h\n' | head -1)"
   fi
   [ -n "$NEW" ] && [ -f "$NEW/docker-compose.yml" ] && [ -d "$NEW/gateway" ] || die "This does not look like a TIKOOTAK archive (no docker-compose.yml / gateway)"
@@ -199,9 +204,16 @@ cmd_update() {
   if [ "$NOBK" = 0 ]; then say "1) Full data backup..."; ./scripts/backup.sh || { yn "Backup failed. Continue without a backup?" || exit 1; }; fi
   say "2) Saving current code for rollback ($SNAP_DIR/pre-$cur-*.tar.gz)"
   snapshot_code "pre-${cur}-$(date +%Y%m%d-%H%M%S)"
+  # keep the running gateway image so a rollback works even without internet
+  local GWIMG; GWIMG="$(getenv GATEWAY_IMAGE)"; GWIMG="${GWIMG:-tikootak-gateway:local}"
+  docker tag "$GWIMG" tikootak-gateway:rollback 2>/dev/null && say "   saved the current gateway image for rollback"
   say "3) Replacing application files (.env and data are kept)"
   apply_tree "$NEW"
   [ -n "$(getenv BACKUP_PASSPHRASE)" ] || warn ".env has no BACKUP_PASSPHRASE!"
+  if [ -f "$NEW/offline-images.tar.gz" ]; then
+    say "   offline kit detected: loading its images (no internet needed)"
+    OFFLINE_BUNDLE_LOADED=0; load_offline_images "$NEW/offline-images.tar.gz"
+  fi
   say "4) Building and starting..."
   if rebuild_and_check; then
     logline "update $cur -> $new OK"; okm "Update finished: $(version)"
@@ -218,6 +230,11 @@ cmd_update() {
 do_rollback_quiet() {
   local f; f="$(ls -t "$SNAP_DIR"/pre-*.tar.gz 2>/dev/null | head -1)"
   [ -n "$f" ] || { warn "No saved version to roll back to"; return 1; }
+  OFFLINE_LOADED=0
+  if docker image inspect tikootak-gateway:rollback >/dev/null 2>&1; then
+    local GWIMG; GWIMG="$(getenv GATEWAY_IMAGE)"; GWIMG="${GWIMG:-tikootak-gateway:local}"
+    docker tag tikootak-gateway:rollback "$GWIMG" && OFFLINE_LOADED=1 && say "   restored the previous gateway image (no rebuild needed)"
+  fi
   rm -rf web/dist; tar xzf "$f" -C "$APP" && rebuild_and_check
 }
 cmd_rollback() {
@@ -234,6 +251,7 @@ cmd_rollback() {
 cmd_mirrors() {
   need_root mirrors
   case "${1:-show}" in
+    test) shift; exec ./scripts/mirror-test.sh "$@";;
     show) echo "NPM_REGISTRY=$(getenv NPM_REGISTRY)"; echo "APT_MIRROR=$(getenv APT_MIRROR)"
           echo "Docker mirror: $(grep -h -o '"https\?://[^"]*"' /etc/docker/daemon.json 2>/dev/null | head -3 | tr '\n' ' ')";;
     clear) sed -i '/^\(NPM_REGISTRY\|APT_MIRROR\)=/d' .env; say "npm/apt mirrors cleared (Docker mirror untouched)";;
@@ -249,8 +267,33 @@ cmd_mirrors() {
         mkdir -p /etc/docker
         printf '{\n  "registry-mirrors": ["%s"]\n}\n' "$v" > /etc/docker/daemon.json && systemctl restart docker && say "Docker mirror set"
       fi;;
-    *) die "mirrors [show|set|clear]";;
+    *) die "mirrors [show|test|set|clear]";;
   esac
+}
+
+# ---------------------------------------------------------------- readiness
+cmd_ready() {
+  local bad=0
+  say "Blackout-readiness check (can this platform be rebuilt with NO internet?)"
+  if compose_images_present >/dev/null 2>&1; then okm "All Docker images exist locally"; else warn "Some Docker images are missing locally -> a rebuild would need the internet"; bad=1; fi
+  if offline_bundle_file >/dev/null; then okm "Offline image bundle on disk: $(offline_bundle_file) ($(du -h "$(offline_bundle_file)" | cut -f1))"
+  else warn "No offline-images.tar.gz in $APP -> keep the full kit somewhere safe (docs/OFFLINE-FA.md)"; bad=1; fi
+  [ -d offline/docker ] && ls offline/docker/*.deb >/dev/null 2>&1 && okm "Docker packages for a fresh server: offline/docker" || echo "     (optional) offline/docker not present: a fresh server without Docker needs working apt mirrors"
+  if [ -f certs/cert.pem ] && [ -f certs/key.pem ]; then
+    ./scripts/cert.sh check 30 >/dev/null 2>&1 && okm "Emergency certificate ready ($(./scripts/cert.sh check 0 | grep -o '[0-9-]* days left'))" || { warn "Emergency certificate expires in less than 30 days or is unreadable: sudo tikootak cert export-auto"; bad=1; }
+  else warn "No emergency certificate in certs/: run  sudo tikootak cert export-auto"; bad=1; fi
+  local last; last="$(ls -t backups/*.enc backups/*.tar.gz 2>/dev/null | head -1)"
+  if [ -n "$last" ]; then
+    local age=$(( ( $(date +%s) - $(stat -c %Y "$last") ) / 86400 ))
+    [ "$age" -le 2 ] && okm "Backup is recent ($age days old)" || { warn "Latest backup is $age days old: sudo tikootak backup"; bad=1; }
+  else warn "No backup yet: sudo tikootak backup"; bad=1; fi
+  [ -n "$(getenv BACKUP_SCP_TARGET)" ] && okm "Off-site backup copy is configured (BACKUP_SCP_TARGET)" || { warn "No off-site backup: set BACKUP_SCP_TARGET in .env (a second server) so a lost server loses nothing"; bad=1; }
+  local free; free="$(df -BG --output=avail / | tail -1 | tr -dc 0-9)"
+  [ "${free:-0}" -ge 10 ] && okm "Free disk: ${free}GB" || { warn "Free disk is only ${free}GB"; bad=1; }
+  if command -v timedatectl >/dev/null && [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = yes ]; then okm "Clock is synchronized"; else warn "Clock sync not confirmed. With no international internet the default NTP servers are unreachable: use an Iranian/provider NTP server (ask your hosting provider; unverified example: NTP=ir.pool.ntp.org) in /etc/systemd/timesyncd.conf, then: systemctl restart systemd-timesyncd"; fi
+  [ "$(getenv ADMIN_ALLOW_IPS)" ] && okm "Admin panel is restricted to your IP" || echo "     (tip) ADMIN_ALLOW_IPS is empty: the admin panel is reachable by anyone who has the key"
+  [ "$bad" = 0 ] && okm "Ready." || warn "Fix the WARN lines above, then run  sudo tikootak ready  again"
+  return "$bad"
 }
 
 # ---------------------------------------------------------------- logs
@@ -315,6 +358,8 @@ menu() {
   13) Mirrors for restricted networks (Docker/npm/apt)
   14) (Re)run the full installer
   15) Uninstall
+  16) HTTPS certificate (emergency copy, manual mode)
+  17) Blackout-readiness check
    0) Exit
 EOF
     read -r -p "Choice: " c
@@ -332,9 +377,11 @@ EOF
          case "$s" in a) ./scripts/backup.sh;; b) ./scripts/verify-backup.sh;; c) read -r -p "Backup file: " f; ./scripts/restore.sh "$f";; d) ./scripts/migrate.sh;; esac;;
       11) cmd_settings;;
       12) cmd_set_ip;;
-      13) read -r -p "show / set / clear: " s; cmd_mirrors "$s";;
+      13) read -r -p "show / test / set / clear: " s; cmd_mirrors "$s";;
       14) read -r -p "Domain [$(getenv DOMAIN)]: " d; d="${d:-$(getenv DOMAIN)}"; [ -n "$d" ] && ./scripts/bootstrap.sh --domain "$d";;
       15) cmd_uninstall;;
+      16) ./scripts/cert.sh status; read -r -p "export-auto / use-manual / use-auto / howto (empty = back): " s; [ -n "$s" ] && ./scripts/cert.sh "$s";;
+      17) cmd_ready;;
       0|q) exit 0;;
     esac
     echo; read -r -p "Press Enter to continue..." _
@@ -355,6 +402,8 @@ case "${1:-menu}" in
   start) need_root start; dc up -d;;
   settings) cmd_settings;;
   mirrors) shift; cmd_mirrors "$@";;
+  cert) shift; need_root cert; exec ./scripts/cert.sh "$@";;
+  ready) cmd_ready;;
   logs) shift; cmd_logs "$@";;
   backup) shift; exec ./scripts/backup.sh "$@";;
   verify) shift; exec ./scripts/verify-backup.sh "$@";;
