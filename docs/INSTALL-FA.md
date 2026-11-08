@@ -3,7 +3,7 @@
 ## ⚡ نصب با یک خط (پیشنهادی)
 روی سرور تازه (Ubuntu/Debian) به‌عنوان root:
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/amirebi9156/tikootak/main/get.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/amirebi9156/tikootak/main/install.sh)
 ```
 اسکریپت می‌پرسد:
 1. **حالت نصب:** `1) آنلاین` (آخرین Release را خودش از GitHub می‌گیرد) یا `2) آفلاین` (فایل کیت را خودت با scp/WinSCP روی سرور گذاشته‌ای؛ مسیرش را خودکار پیدا می‌کند یا می‌پرسد).
@@ -15,19 +15,19 @@ bash <(curl -fsSL https://raw.githubusercontent.com/amirebi9156/tikootak/main/ge
 بدون سؤال (برای اسکریپت‌نویسی):
 ```bash
 # آنلاین
-bash <(curl -fsSL URL/get.sh) --online --domain example.com --yes
+bash <(curl -fsSL URL/install.sh) --online --domain example.com --yes
 # آفلاین با فایل آپلود‌شده + بازیابی بکاپ
-bash get.sh --offline --file /root/tikootak-full-X.Y.Z.tar --domain example.com --restore /root/backup.enc --yes
+bash install.sh --offline --file /root/tikootak-full-X.Y.Z.tar --domain example.com --restore /root/backup.enc --yes
 ```
 گزینه‌های دیگر: `--version X.Y.Z`، `--mirror-base URL` (آینهٔ خودت به‌جای GitHub)، `--dir`، و هر گزینهٔ `bootstrap.sh` مثل `--mirror https://docker.arvancloud.ir`.
 
 **اگر مخزن private است:** آدرس raw بدون توکن باز نمی‌شود. توکن fine-grained (فقط همین مخزن، دسترسی `Contents: read`) بساز و روی سرور بزن (توکن را جایی در چت نفرست):
 ```bash
 export TOKEN=github_pat_xxx
-bash <(curl -fsSL -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.raw" "https://api.github.com/repos/amirebi9156/tikootak/contents/get.sh?ref=main")
+bash <(curl -fsSL -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.raw" "https://api.github.com/repos/amirebi9156/tikootak/contents/install.sh?ref=main")
 ```
 (اسکریپت اگر توکن را نداشته باشد خودش می‌پرسد و آن را در `.update.conf` با دسترسی ۶۰۰ نگه می‌دارد تا `tikootak update` کار کند.)
-اگر GitHub روی سرور فیلتر است: حالت آفلاین را انتخاب کن (یا فایل `get.sh` را هم با scp ببر و `bash get.sh` بزن).
+اگر GitHub روی سرور فیلتر است: حالت آفلاین را انتخاب کن (یا فایل `install.sh` را هم با scp ببر و `bash install.sh` بزن).
 
 ## ۰) پیش‌نیاز
 - سرور حداقل ۲ هسته، ۴ گیگ رم، ۲۰ گیگ دیسک؛ Ubuntu 22.04/24.04 یا Debian 12.

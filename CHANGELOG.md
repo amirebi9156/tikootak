@@ -1,7 +1,7 @@
 # CHANGELOG
 ## 0.46.0
-- One-line installer `get.sh`: `bash <(curl -fsSL .../get.sh)` asks ONLINE (downloads latest release from GitHub; asks for a token if the repo is private) or OFFLINE (finds/asks the uploaded kit file), verifies the checksum, asks domain and optional backup to restore, then runs `bootstrap.sh` (+ `restore.sh`). Non-interactive flags: `--online/--offline --file --domain --version --repo --token --mirror-base --restore --dir --yes`; other flags go to bootstrap.
-- Test: `tests/scripts/get.test.sh` (fake release, local mirror). Docs: `docs/INSTALL-FA.md`.
+- One-line installer `install.sh`: `bash <(curl -fsSL .../install.sh)` asks ONLINE (downloads latest release from GitHub; asks for a token if the repo is private) or OFFLINE (finds/asks the uploaded kit file), verifies the checksum, asks domain and optional backup to restore, then runs `bootstrap.sh` (+ `restore.sh`). Non-interactive flags: `--online/--offline --file --domain --version --repo --token --mirror-base --restore --dir --yes`; other flags go to bootstrap.
+- Test: `tests/scripts/install.test.sh` (fake release, local mirror). Docs: `docs/INSTALL-FA.md`.
 
 ## 0.45.1
 - Merged main (0.45.0 offline install) into the design-roadmap branch; design work 0.44.1-0.44.5 is included in this release.
