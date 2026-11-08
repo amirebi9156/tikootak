@@ -11,6 +11,7 @@ const P = {
   retry: <path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
   pause: <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" />,
+  eyeoff: (<><path d="M2 12s3.6-7 10-7c2 0 3.8.6 5.3 1.5M22 12s-3.6 7-10 7c-2 0-3.8-.6-5.3-1.5" /><path d="M3 3l18 18" /></>),
   eye: (<><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>),
   poll: <path d="M5 20V10M12 20V4M19 20v-7" />,
   timer: (<><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 2M9 2h6" /></>),

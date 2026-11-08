@@ -827,5 +827,7 @@ export default {
  "مالک": "Owner",
  "لینک": "links",
  "مسدود": "Block",
- "اشتراک‌گذاشته در این گفتگو": "Shared in this chat"
+ "اشتراک‌گذاشته در این گفتگو": "Shared in this chat",
+ "پنهان کردن رمز": "Hide password",
+ "نمایش رمز": "Show password"
 };

@@ -92,7 +92,9 @@
 }
 body { background: var(--bg) !important; }
 :root[data-theme='light'] .primary, .primary { background: var(--accent); color: var(--on-accent); box-shadow: none; }
+@media (hover:hover) {
 :root[data-theme='light'] .primary:hover:not(:disabled), .primary:hover:not(:disabled) { background: var(--accent-3); }
+}
 
 /* پس‌زمینهٔ چت: رنگ ساده + الگوی بسیار ملایم */
 .timeline {

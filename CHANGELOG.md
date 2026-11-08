@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.45.1
+- Merged main (0.45.0 offline install) into the design-roadmap branch; design work 0.44.1-0.44.5 is included in this release.
+
 ## 0.45.0
 - Blackout-ready install: `bootstrap.sh` auto-detects an offline bundle (`offline-images.tar.gz`) and installs with no GitHub/Docker Hub/npm/apt access; Docker itself can come from bundled .deb files (`offline/docker/<id-version>/`).
 - New `scripts/make-kit.sh` (+ `fetch-docker-debs.sh`) builds one file `tikootak-full-<ver>.tar` (+ `.sha256`); new workflow `.github/workflows/kit.yml` attaches it to each Release.
@@ -8,6 +11,27 @@
 - Offline update: `tikootak update X.tar` (plain .tar, sha256 auto-check, images loaded, `--no-build`), safe rollback via `tikootak-gateway:rollback`.
 - Fixed: OFFLINE_LOADED was never set; pinned image digests broke `docker load`; bootstrap offline check died with a single bundle file.
 - Docs: new `docs/OFFLINE-FA.md`; README, INSTALL-FA, RUNBOOK updated. Tests: tests/scripts/offline.test.sh, cert.test.sh (fake docker + real openssl).
+
+## 0.44.5
+- CSS cleanup: removed duplicate `@keyframes flash` (the later one always won).
+
+## 0.44.4
+- Login/register: show/hide password button (`pw-eye`, new `eyeoff` icon).
+- Offline banner restyled (warning tint, pulsing dot, soft entrance).
+- Reel caption text-shadow for legibility on bright footage.
+
+## 0.44.3
+- Design stage 3 (first screen review, new `polish.css` layer loaded last): arrows now follow text direction (English UI had a left-pointing "next" and wrong back arrows); letter avatars are Telegram-style colored gradients per person instead of identical near-black circles; invite field in the new group dialog is full width (230 px -> 304 px, matching the other fields); placeholders no longer look like typed text; empty states (feed, explore, profile, chat info tabs) are centered with a quiet icon.
+- Audit tooling: `tests/design/shots.mjs` (seeds users/chats/posts/music and screenshots every main screen on phone fa/en + desktop) and `tests/design/overflow.mjs` (finds horizontal overflow at 320/360 px with worst-case long names/text; currently all PASS).
+- Tested: build, i18n, 22/22 Playwright e2e, overflow check 18/18, before/after screenshots. Not tested on real phones.
+## 0.44.2
+- Design stage 2 (motion, Emil Kowalski audit): one strong ease-out (`--ease`) plus `--ease-drawer` for sheets/drawers/docked bars; every overshoot/bounce curve removed (menus, attach menu, send button, reel like, new-chat button); deep scale entrances (.6-.85) replaced with .94; the send button no longer animates each time it appears (high-frequency action); `transition: all` removed; popovers 180 ms, sheets 260 ms, no UI motion over 320 ms.
+- Reduced motion is now "fewer and gentler" instead of "nothing": movement is dropped but opacity/color/shadow feedback stays.
+- Detector: bounce-easing findings 5 -> 0. Tested: build, i18n, all 22 Playwright e2e scripts pass. Feel of the new curves must be checked by hand on a phone.
+## 0.44.1
+- Design stage 1 (foundations, no visual change): all 86 `:hover` rules moved into `@media (hover:hover)`, so hover styles no longer stick on touch screens after a tap. New `web-src/src/tokens.css` (loaded first) is the single place for easing, durations, named z-index layers and the type scale; duplicate `--ease`/`--t-fast`/`--t-med` definitions in theme.css/design.css removed (effective values kept).
+- Design context for AI-assisted redesign: `DESIGN.md`, `PRODUCT.md`, `docs/DESIGN-ROADMAP.md`, `docs/design/` detector baseline, design skills in `.claude/skills/`.
+- Tested: vite build, i18n check, pixel-identical onboarding screen old vs new (desktop + phone), hover works on desktop and is off on touch emulation, all 22 Playwright e2e scripts pass (0 FAIL). Not tested on real phones.
 ## 0.44.0
 - Telegram-style user profile inside the chat (UserSheet.jsx): tap a sender's avatar or name in a group, or a row in the new "Members" tab of the chat info page, and a glass sheet opens in place (bottom sheet on phone, centred card on desktop) with avatar, @username, role (owner/admin/member), bio, quick actions (message, full profile, report, block) and what this person shared in the chat (media thumbnails, file/link/music counts). Chat is not left; Esc / back closes it.
 - Chat info page: new "Members" tab (owner/admins first); hidden for channels unless you are an admin.

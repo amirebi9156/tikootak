@@ -4,7 +4,7 @@ Private friends platform (chat, calls, music, reels). Self-hosted on an Iran ser
 Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, scripts and terminal output in English.** Web only (no native app planned).
 
 ## Layout
-- `web-src/` React + Vite UI (build: `cd web-src && npx vite build` -> `web/dist`). CSS layers load in order: styles.css, theme.css, ui34.css, tg.css, q.css, lg.css, design.css (last wins; many `!important`). Glass lens: `src/lens.js` (Chromium only).
+- `web-src/` React + Vite UI (build: `cd web-src && npx vite build` -> `web/dist`). CSS layers load in order: tokens.css, styles.css, theme.css, ui34.css, tg.css, q.css, lg.css, design.css, polish.css (last wins; many `!important`). Glass lens: `src/lens.js` (Chromium only).
 - `gateway/` Express + better-sqlite3 API in front of Matrix Synapse. `docker-compose.yml`, `Caddyfile`, `scripts/` ops scripts.
 - `tests/e2e/*.mjs` Playwright scripts (need the local test env, see below). `docs/` guides. `CHANGELOG.md` newest first.
 
@@ -12,6 +12,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - `docs/ARCHITECTURE.md` — services, request routing, auth/invites, gateway modules, DB/migrations, upload policy, chat model, client file map, backups.
 - `docs/UI-GUIDE.md` — CSS layer order, theming/look engine, glass material + SVG lens (and its pitfalls), gesture rules, i18n, UI testing.
 - `docs/DECISIONS.md` — why things are the way they are, newest first.
+- `docs/DESIGN-ROADMAP.md` + `DESIGN.md` + `PRODUCT.md` — redesign plan, design direction, motion rules. Design skills live in `.claude/skills/` (impeccable, emil-*, taste-skill); for UI work load impeccable first, Emil's skills for motion; taste-skill only for the idea of a one-line Design Read (its landing-page defaults do not fit this app).
 - `docs/RUNBOOK.md`, `docs/MIGRATION.md`, `docs/INSTALL-FA.md`, `docs/UPLOAD-CONTROL.md` — operations. Other files in `docs/` are old history.
 
 ## Product & owner
@@ -54,6 +55,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - 0.43.0: `ChatInfo.jsx` = Telegram-style glass info page opened from the chat header title/avatar (`infoOpen` in Chat.jsx); old `RoomSettings` dialog is reached via its menu or the header dots. Tabs scan only the loaded timeline (no server-side media search).
 - 0.44.0: `UserSheet.jsx` = in-chat glass user profile (opened from `msg-av`/`msg-name` taps and the Members tab in `ChatInfo.jsx`; state `userSheet` in Chat.jsx; Shell passes `onMessage/onBlock/blocked`). Note: tag v0.43.1 points at the same commit as 0.43.0 (VERSION still 0.43.0). No presence/last-seen yet (not enabled on Synapse).
 - 0.45.0: offline/blackout install. `make-kit.sh` -> `tikootak-full-X.tar` (images + debs); bootstrap/restore/update auto-detect `offline-images.tar.gz` (`lib.sh offline_*`, `OFFLINE_LOADED=1` => `--no-build`); `scripts/cert.sh` emergency cert; `tikootak ready`; `mirror-test.sh`. Guide: `docs/OFFLINE-FA.md`. Tests: `bash tests/scripts/{offline,cert,tikootak-update}.test.sh` (fake docker + real openssl). NOT tested: real docker save/load, offline apt/dpkg, Caddy manual cert, kit size, kit.yml first run.
+- Redesign stage 0 done (branch feat/design-roadmap): skills installed in `.claude/skills/`, `DESIGN.md`/`PRODUCT.md` written, detector baseline in `docs/design/`. Stage 1 done in 0.44.1 (tokens.css loaded first; all :hover rules inside `@media (hover:hover)`). Stage 2 (motion) done in 0.44.2: strong ease-out + `--ease-drawer` tokens, no bounce, reduced-motion keeps opacity/color. Stage 3 first pass done in 0.44.3 (`polish.css` = last CSS layer; `tests/design/shots.mjs` + `overflow.mjs` are the audit harnesses, run them from `~/tikootak-testenv/tools`). Stages 4-6 done in 0.44.4/0.44.5 (offline banner, show-password toggle, reel text-shadow, duplicate keyframes removed). Next: PR/merge + owner review; deeper `!important` reduction only with visual tests. Run `npx impeccable detect web-src/src` to track findings (baseline 28 raw / 22 with DESIGN.md).
 - Open offers (not requested): merge music mini-player into pinned card; "press back again to exit"; group-level send limits for swipe-reply; sticker-pack import.
 
 ## Local test env (cloud sandbox; Docker is unavailable)
