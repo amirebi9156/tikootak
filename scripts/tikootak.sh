@@ -12,6 +12,7 @@
 #   tikootak restart | stop | start | settings | logs [service] | doctor | test | uninstall
 #   tikootak mirrors [show|test|set|clear]   Docker/npm/apt mirrors for restricted networks (test = which Iranian mirrors work now)
 #   tikootak cert [status|export-auto|install F K|use-manual|use-auto|howto]   HTTPS certificate / emergency copy
+#   tikootak update --online | --check | VERSION   update from the newest release (no file needed) / only check
 #   tikootak haproxy [status|enable|disable|snippet|test]   share port 443 with an existing haproxy (VPN server)
 #   tikootak ready             blackout-readiness checklist (offline images, certificate, backups, off-site copy, disk, clock)
 #   tikootak backup | verify [file] | restore <file> | migrate ...
@@ -27,7 +28,9 @@ cd "$APP" || exit 1
 . ./scripts/netlib.sh
 . ./scripts/lib.sh
 
-R=$'\e[31m'; G=$'\e[32m'; Y=$'\e[33m'; B=$'\e[1m'; N=$'\e[0m'
+R=$'\e[31m'; G=$'\e[32m'; Y=$'\e[33m'; B=$'\e[1m'; N=$'\e[0m'; C=$'\e[36m'; D=$'\e[2m'
+if [ ! -t 1 ]; then R=""; G=""; Y=""; B=""; N=""; C=""; D=""; fi
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in *UTF-8*|*utf8*|*UTF8*) HR="────────────────────────────────────────────────"; DOT="●"; UP="▲";; *) HR="------------------------------------------------"; DOT="*"; UP="^";; esac
 say()  { echo "${G}[..]${N} $*"; }
 okm()  { echo "${G}[OK]${N} $*"; }
 warn() { echo "${Y}[WARN]${N} $*"; }
@@ -168,10 +171,74 @@ pick_update() { # prints the chosen file; returns 1 if none
   if [ -z "$c" ]; then echo "$best"; else echo "${files[$((c - 1))]:-$best}"; fi
 }
 
+# ---------------------------------------------------------------- online update (GitHub release or your own mirror)
+GH_API="${GH_API:-https://api.github.com}"
+UPD_CACHE="${UPD_CACHE:-/var/tmp/tikootak-latest}"
+upd_conf() { # reads .update.conf (REPO / TOKEN / MIRROR_BASE); the default repo works without any file
+  U_REPO=amirebi9156/tikootak; U_TOKEN=""; U_MIRROR=""
+  if [ -f .update.conf ]; then
+    local REPO="" TOKEN="" MIRROR_BASE=""; . ./.update.conf
+    case "$REPO" in ""|YOUR_*) ;; *) U_REPO="$REPO";; esac
+    U_TOKEN="$TOKEN"; U_MIRROR="$MIRROR_BASE"
+  fi
+}
+curl_gh() { local a=(); [ -n "${U_TOKEN:-}" ] && a=(-H "Authorization: Bearer $U_TOKEN"); curl -fsSL -m "${GH_TIMEOUT:-15}" ${a[@]+"${a[@]}"} "$@"; }
+latest_version() { # prints the newest published version (0.47.1); returns 1 when it cannot be read
+  upd_conf
+  if [ -n "$U_MIRROR" ]; then curl -fsSL -m 10 "$U_MIRROR/LATEST" | tr -d '[:space:]'; return; fi
+  command -v python3 >/dev/null || return 1
+  curl_gh -H 'Accept: application/vnd.github+json' "$GH_API/repos/$U_REPO/releases/latest" \
+    | python3 -c 'import sys,json;print(json.load(sys.stdin)["tag_name"].lstrip("v"))'
+}
+download_release() { # download_release VERSION DIR  ->  DIR/tikootak-VERSION.tar.gz + .sha256 ; 2 = the release has no program file
+  local ver="$1" dir="$2" a="tikootak-$1.tar.gz" j url n
+  upd_conf
+  if [ -n "$U_MIRROR" ]; then
+    for n in "$a" "$a.sha256"; do curl -fSL -m 900 -o "$dir/$n" "$U_MIRROR/$n" || return 1; done; return 0
+  fi
+  command -v python3 >/dev/null || { echo "python3 is required (apt install python3)" >&2; return 1; }
+  j="$(curl_gh -H 'Accept: application/vnd.github+json' "$GH_API/repos/$U_REPO/releases/tags/v$ver" 2>/dev/null \
+       || curl_gh -H 'Accept: application/vnd.github+json' "$GH_API/repos/$U_REPO/releases/tags/$ver" 2>/dev/null)" || return 1
+  for n in "$a" "$a.sha256"; do
+    url="$(printf '%s' "$j" | python3 -c 'import sys,json;n=sys.argv[1];print(next((x["url"] for x in json.load(sys.stdin)["assets"] if x["name"]==n),""))' "$n")"
+    [ -n "$url" ] || { echo "Release $ver has no file $n (the release was published without its build; tag names must look like v$ver)" >&2; return 2; }
+    GH_TIMEOUT=900 curl_gh -H 'Accept: application/octet-stream' -o "$dir/$n" "$url" || return 1
+  done
+}
+refresh_latest_bg() { # non-blocking: asks for the newest version at most every 6 hours; the menu shows the cached answer
+  [ -f "$UPD_CACHE" ] && [ -n "$(find "$UPD_CACHE" -mmin -360 2>/dev/null)" ] && return 0
+  ( if latest_version > "$UPD_CACHE.tmp" 2>/dev/null && [ -s "$UPD_CACHE.tmp" ]; then mv -f "$UPD_CACHE.tmp" "$UPD_CACHE"; else rm -f "$UPD_CACHE.tmp"; : > "$UPD_CACHE"; fi ) >/dev/null 2>&1 &
+  disown 2>/dev/null || true
+}
+latest_known() { [ -s "$UPD_CACHE" ] && tr -d ' \r\n' < "$UPD_CACHE"; }
+cmd_check_update() {
+  local cur latest; cur="$(version)"
+  latest="$(latest_version)" || { warn "Cannot reach the release server. Offline? Use: sudo tikootak update <file>"; return 2; }
+  printf '%s' "$latest" > "$UPD_CACHE" 2>/dev/null || true
+  echo "Installed: $cur   |   Newest release: $latest"
+  case "$(vcmp "$latest" "$cur")" in
+    gt) echo "${Y}${UP} A newer version is available.${N}  Install it with:  sudo tikootak update --online"; return 10;;
+    *) okm "You are up to date."; return 0;;
+  esac
+}
+
 cmd_update() {
   need_root update
-  local SRC="" NOBK=0; YES="${YES:-0}"
-  for a in "$@"; do case "$a" in --yes|-y) YES=1;; --no-backup) NOBK=1;; *) SRC="$a";; esac; done
+  DLDIR=""; local SRC="" NOBK=0 ONLINE=0 WANT="" EXPLICIT=0; YES="${YES:-0}"
+  for a in "$@"; do case "$a" in
+    --yes|-y) YES=1;; --no-backup) NOBK=1;; --online|latest) ONLINE=1;;
+    --check) cmd_check_update; return;;
+    [0-9]*.[0-9]*) ONLINE=1; WANT="$a"; EXPLICIT=1;;
+    *) SRC="$a";; esac; done
+  if [ "$ONLINE" = 1 ]; then   # download the release first, then continue exactly like an update from a file
+    [ -n "$WANT" ] || WANT="$(latest_version)" || die "Cannot reach the release server (blocked/offline?). Upload the file by hand and run: sudo tikootak update"
+    local cur0; cur0="$(version)"; echo "Installed: $cur0   |   Release: $WANT"
+    if [ "$EXPLICIT" = 0 ] && [ "$(vcmp "$WANT" "$cur0")" = eq ]; then okm "Already up to date ($cur0)."; return 0; fi
+    DLDIR="$(mktemp -d /var/tmp/tikootak-dl.XXXXXX 2>/dev/null || mktemp -d /tmp/tikootak-dl.XXXXXX)"; trap 'rm -rf "$DLDIR"' EXIT
+    say "Downloading $WANT ..."
+    download_release "$WANT" "$DLDIR"; case $? in 0) ;; 2) die "Release $WANT cannot be installed (see the message above).";; *) die "Download failed (network/GitHub?). Try again, or upload the file by hand.";; esac
+    SRC="$DLDIR/tikootak-$WANT.tar.gz"
+  fi
   if [ -z "$SRC" ]; then
     SRC="$(pick_update)" || {
       echo "No update archive found."
@@ -217,7 +284,7 @@ cmd_update() {
   fi
   say "4) Building and starting..."
   if rebuild_and_check; then
-    logline "update $cur -> $new OK"; okm "Update finished: $(version)"
+    logline "update $cur -> $new OK"; okm "Update finished: $(version)"; rm -f "$UPD_CACHE"
     case "$SRC" in "$APP"/updates/*) mkdir -p "$APP/updates/applied"; mv -f "$SRC" "$APP/updates/applied/" 2>/dev/null;; esac
   else
     logline "update $cur -> $new FAILED, rolling back"
@@ -334,58 +401,75 @@ cmd_install_cli() {
 }
 
 # ---------------------------------------------------------------- menu
+menu_sec()  { printf '\n  %s%s%s\n' "$Y$B" "$1" "$N"; }
+menu_item() { printf '   %s%2s%s  %-34s %s%s%s\n' "$G$B" "$1" "$N" "$2" "$D" "${3:-}" "$N"; }
+menu_header() {
+  local total running col latest cur; cur="$(version)"
+  total="$(dc ps --format '{{.State}}' 2>/dev/null | grep -c .)"; running="$(dc ps --format '{{.State}}' 2>/dev/null | grep -c '^running')"
+  col="$G"; { [ "$total" = 0 ] || [ "$running" != "$total" ]; } && col="$R"
+  printf '\n  %s%sTIKOOTAK%s  v%s   %s%s  %s%s\n' "$C" "$B" "$N" "$cur" "$D" "$(getenv DOMAIN)" "$(getenv PUBLIC_IP)" "$N"
+  printf '  %s%s%s\n' "$D" "$HR" "$N"
+  printf '  Services  %s%s%s %s/%s running\n' "$col" "$DOT" "$N" "$running" "$total"
+  latest="$(latest_known 2>/dev/null)"
+  if [ -n "$latest" ] && [ "$(vcmp "$latest" "$cur")" = gt ]; then
+    printf '  %s%s %sNew version %s is available. Press %su%s%s to update now.%s\n' "$Y" "$UP" "$B" "$latest" "$G" "$Y" "$B" "$N"
+  fi
+}
 menu() {
+  refresh_latest_bg
   while true; do
-    clear 2>/dev/null
-    echo "${B}  TIKOOTAK $(version)${N}  -  $(getenv DOMAIN)  -  $(getenv PUBLIC_IP)"
-    cat <<EOF
-
-  --- Status ---
-   1) Quick status
-   2) Health check (doctor) + security test
-   3) Voice/video (calls) self-check
-  --- Updates ---
-   4) Update from a file (finds the newest tikootak-*.tar.gz you uploaded)
-   5) Roll back to the previous version
-  --- Operations ---
-   6) Restart services
-   7) Signups: open / close / status
-   8) Users and admin overview
-   9) Logs
-  10) Backup and restore ...
-  --- Configuration ---
-  11) Edit settings (.env)
-  12) Fix public IP (calls)
-  13) Mirrors for restricted networks (Docker/npm/apt)
-  14) (Re)run the full installer
-  15) Uninstall
-  16) HTTPS certificate (emergency copy, manual mode)
-  17) Blackout-readiness check
-   0) Exit
-EOF
-    read -r -p "Choice: " c
+    [ -t 1 ] && clear 2>/dev/null
+    menu_header
+    menu_sec "STATUS"
+    menu_item 1  "Quick status"
+    menu_item 2  "Health check + security test" "doctor"
+    menu_item 3  "Voice/video self-check" "calls"
+    menu_item 4  "Blackout readiness" "kit, certificate, backups"
+    menu_sec "UPDATES"
+    menu_item 5  "Update to the newest release" "online, one step  [u]"
+    menu_item 6  "Update from a file" "offline: uploaded tikootak-*.tar(.gz)"
+    menu_item 7  "Roll back to the previous version"
+    menu_sec "OPERATIONS"
+    menu_item 8  "Restart services"
+    menu_item 9  "Signups: open / close / status"
+    menu_item 10 "Users and admin overview"
+    menu_item 11 "Logs"
+    menu_item 12 "Backup and restore" "backup, verify, restore, move server"
+    menu_sec "SETTINGS"
+    menu_item 13 "Edit settings (.env)"
+    menu_item 14 "Fix public IP" "for calls"
+    menu_item 15 "Mirrors for restricted networks" "Docker / npm / apt"
+    menu_item 16 "HTTPS certificate" "emergency copy, manual mode"
+    menu_item 17 "Share the server with haproxy" "status, snippet, test"
+    menu_item 18 "(Re)run the full installer"
+    menu_item 19 "Uninstall"
+    printf '\n   %s 0%s  Exit\n\n' "$G$B" "$N"
+    read -r -p "  ${C}${B}>${N} Choice: " c
+    echo
     case "$c" in
       1) cmd_status;;
       2) ./scripts/doctor.sh; yn "Run the security test too?" && ./scripts/security-test.sh --app;;
       3) cmd_calls;;
-      4) cmd_update;;
-      5) cmd_rollback;;
-      6) dc restart && say "Done";;
-      7) read -r -p "open / close / status: " s; ./scripts/admin.sh signup "$s";;
-      8) ./scripts/admin.sh overview;;
-      9) read -r -p "Service (gateway/synapse/caddy/livekit/postgres/install, empty = all): " s; cmd_logs "$s";;
-      10) echo " a) Backup now  b) Verify a backup  c) Restore  d) Move to another server"; read -r -p "> " s
+      4) cmd_ready;;
+      5|u|U) cmd_update --online;;
+      6) cmd_update;;
+      7) cmd_rollback;;
+      8) dc restart && say "Done";;
+      9) read -r -p "open / close / status: " s; ./scripts/admin.sh signup "$s";;
+      10) ./scripts/admin.sh overview;;
+      11) read -r -p "Service (gateway/synapse/caddy/livekit/postgres/install, empty = all): " s; cmd_logs "$s";;
+      12) echo " a) Backup now  b) Verify a backup  c) Restore  d) Move to another server"; read -r -p "> " s
          case "$s" in a) ./scripts/backup.sh;; b) ./scripts/verify-backup.sh;; c) read -r -p "Backup file: " f; ./scripts/restore.sh "$f";; d) ./scripts/migrate.sh;; esac;;
-      11) cmd_settings;;
-      12) cmd_set_ip;;
-      13) read -r -p "show / test / set / clear: " s; cmd_mirrors "$s";;
-      14) read -r -p "Domain [$(getenv DOMAIN)]: " d; d="${d:-$(getenv DOMAIN)}"; [ -n "$d" ] && ./scripts/bootstrap.sh --domain "$d";;
-      15) cmd_uninstall;;
+      13) cmd_settings;;
+      14) cmd_set_ip;;
+      15) read -r -p "show / test / set / clear: " s; cmd_mirrors "$s";;
       16) ./scripts/cert.sh status; read -r -p "export-auto / use-manual / use-auto / howto (empty = back): " s; [ -n "$s" ] && ./scripts/cert.sh "$s";;
-      17) cmd_ready;;
-      0|q) exit 0;;
+      17) ./scripts/haproxy.sh status; read -r -p "snippet / test / enable / disable (empty = back): " s; [ -n "$s" ] && ./scripts/haproxy.sh "$s";;
+      18) read -r -p "Domain [$(getenv DOMAIN)]: " d; d="${d:-$(getenv DOMAIN)}"; [ -n "$d" ] && ./scripts/bootstrap.sh --domain "$d";;
+      19) cmd_uninstall;;
+      0|q|Q) exit 0;;
     esac
-    echo; read -r -p "Press Enter to continue..." _
+    echo; read -r -p "  ${D}Press Enter to go back to the menu...${N} " _
   done
 }
 
@@ -418,6 +502,6 @@ case "${1:-menu}" in
   test) exec ./scripts/security-test.sh --app;;
   uninstall) cmd_uninstall;;
   version|-v|--version) version;;
-  help|-h|--help) sed -n 2,17p "$SELF";;
+  help|-h|--help) sed -n 2,19p "$SELF";;
   *) echo "Unknown command: $1"; sed -n 2,17p "$SELF"; exit 1;;
 esac

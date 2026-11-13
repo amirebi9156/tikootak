@@ -201,7 +201,10 @@ function MenuDrawer({ me, name, theme, onTheme, onClose, items }) {
           </button>}
           <Switch title={tr('حالت شب')} checked={night} onChange={v => onTheme(v ? 'dark' : 'light')} testid="drawer-night" />
         </nav>
-        <div className="drawer-foot muted">TIKOOTAK</div>
+        <div className="drawer-foot muted">
+          <span>TIKOOTAK</span>
+          {typeof __APP_VERSION__ === 'string' && __APP_VERSION__ && <span className="drawer-ver" dir="ltr" data-testid="drawer-version">v{__APP_VERSION__}</span>}
+        </div>
       </aside>
     </div>
   );

@@ -65,6 +65,9 @@ tar -xf tikootak-full-X.Y.Z.tar && cd tikootak
 - مدیریت: `sudo tikootak` (منو)، `tikootak status`، `tikootak logs`.
 
 ## ۶) آپدیت‌های بعدی
+با اینترنت (ساده‌ترین راه): `sudo tikootak` را بزن و کلید `u` (یا گزینهٔ ۵). اگر نسخهٔ جدید باشد بالای منو نوشته می‌شود. بدون منو: `sudo tikootak update --online` (فقط بررسی: `--check`، نسخهٔ مشخص: `sudo tikootak update 0.48.0`). Release باید با تگ `vX.Y.Z` (با `v`) ساخته شده باشد.
+
+بدون اینترنت:
 فایل tar جدید را با `scp` ببر روی سرور و:
 ```bash
 sudo tikootak update /root/tikootak-full-X.Y.Z.tar    # کیت آفلاین یا tar.gz معمولی؛ فایل .sha256 کنارش خودکار چک می‌شود

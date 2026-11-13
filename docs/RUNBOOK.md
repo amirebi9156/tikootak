@@ -149,6 +149,7 @@ docker compose exec gateway node -e "fetch('http://localhost:3000/api/admin/invi
 
 ## ۶. به‌روزرسانی
 
+- **آنلاین، یک مرحله‌ای:** `sudo tikootak update --online` (یا منو ← `u`). `--check` فقط بررسی می‌کند. نسخهٔ نصب‌شده پایین کشوی پروفایل هم نوشته می‌شود.
 - **کد رابط کاربری یا اسکریپت‌ها** (فایل tar جدید یا کیت آفلاین): `sudo tikootak update <فایل>` (بکاپ می‌گیرد، تصاویر آفلاین را load می‌کند، در خرابی برمی‌گردد). دستی: `sudo tar -xf <فایل>` و `sudo ./scripts/install.sh`.
 - **نسخه سرویس‌های اصلی** (Synapse، Caddy، LiveKit): `docker compose pull && docker compose up -d`. قبلش بکاپ بگیر.
 
