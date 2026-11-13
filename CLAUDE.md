@@ -29,6 +29,7 @@ Owner: Amirreza. Talks Persian. **Reply to the owner in Persian; code, commits, 
 - Test env: registration rate limit ("Too many requests") → start gateway with `RATE_*` raised (tests/env/start.sh does); right after start Synapse/proxy can return bad gateway for ~20 s.
 - `web/dist` is not in git (CI/`build-web.sh` build it); the server needs no Node at runtime.
 - Release workflow can be re-run for an existing tag: Actions → Release → Run workflow → tag.
+- Release tags: name them `vX.Y.Z`. A tag made in the GitHub UI as plain `0.47.0` used to trigger nothing (release had no assets and install.sh failed with "Asset ... is not in release"); the workflow now also matches plain versions. Recovery for any existing tag: `gh api -X POST repos/amirebi9156/tikootak/actions/workflows/release.yml/dispatches -f ref=main -f inputs[tag]=TAG`, then the same for `kit.yml` (the automatic kit run fails after a manual dispatch because it reads the tag from the branch name).
 - GitHub from the sandbox: only REST via `gh api repos/amirebi9156/tikootak/...`; no GraphQL; tags cannot be pushed from the session (owner creates Releases in the GitHub UI).
 
 ## Rules
