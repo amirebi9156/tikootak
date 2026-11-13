@@ -1,4 +1,11 @@
 # CHANGELOG
+## 0.46.1
+- Installer is now tidy and safe: one short line per action, numbered steps, details only in `/var/log/tikootak-bootstrap.log` (new `scripts/ui.sh`; apt/Docker noise no longer reaches the terminal; terminal is reset after apt/needrestart so lines no longer "staircase").
+- Read-only preflight FIRST: if ports 80/443/7881/7882/3478 are used by another program (VPN, haproxy, nginx) the installer stops before changing anything (`--force` to override).
+- Docker Hub check is a real `docker pull` (the old `/v2/` ping said "reachable" while pulls got 403); mirrors from `mirrors.list` are tried automatically; Docker is only restarted when no other container runs.
+- Hardening is now opt-in (`--harden`) and runs LAST. `harden-host.sh` never resets ufw, keeps every port that is listening, no `ufw limit`, fail2ban ignores your SSH address, root password login is only disabled with `--ssh-keys-only` AND an existing authorized key.
+- apt waits for other apt processes (lock timeout) and never asks questions (needrestart off).
+- Tests: tests/scripts/clean-install.test.sh (30 checks, stubbed apt/docker/curl).
 ## 0.46.0
 - One-line installer `install.sh`: `bash <(curl -fsSL .../install.sh)` asks ONLINE (downloads latest release from GitHub; asks for a token if the repo is private) or OFFLINE (finds/asks the uploaded kit file), verifies the checksum, asks domain and optional backup to restore, then runs `bootstrap.sh` (+ `restore.sh`). Non-interactive flags: `--online/--offline --file --domain --version --repo --token --mirror-base --restore --dir --yes`; other flags go to bootstrap.
 - Test: `tests/scripts/install.test.sh` (fake release, local mirror). Docs: `docs/INSTALL-FA.md`.
