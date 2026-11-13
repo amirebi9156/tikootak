@@ -17,13 +17,14 @@ services:
     logging: *logging
     mem_limit: ${CADDY_MEM:-64m}
     ports:
-      - "80:80"
-      - "443:443"
+      - "${HTTP_BIND:-80}:80"      # behind haproxy: HTTP_BIND/HTTPS_BIND=127.0.0.1:PORT (see scripts/haproxy.sh)
+      - "${HTTPS_BIND:-443}:443"
     volumes:
       - ${CADDYFILE:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - ./web/dist:/srv/web:ro
       - ./certs:/certs:ro
       - ./data/caddy:/data
+      - ./config/caddy-extra:/etc/caddy/extra:ro   # optional *.caddy snippets (haproxy mode writes proxy-protocol.caddy here)
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS}
     depends_on:

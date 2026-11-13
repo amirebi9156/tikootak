@@ -1,3 +1,8 @@
+# Optional global settings: every *.caddy file in config/caddy-extra (empty folder = nothing; used by scripts/haproxy.sh).
+{
+	import /etc/caddy/extra/*.caddy
+}
+
 # حالت خودکار: Caddy خودش گواهی HTTPS می‌گیرد.
 # توجه: سرور باید به سرورهای ACME (Let's Encrypt) دسترسی داشته باشد.
 # اگه نداشت از Caddyfile.manual-cert استفاده کن.

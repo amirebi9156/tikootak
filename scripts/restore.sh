@@ -69,7 +69,7 @@ set -a; . ./.env; set +a
 # the backup's .env may pin image digests that an offline bundle cannot satisfy: re-check now
 offline_settle
 
-mkdir -p data/postgres data/caddy certs config backups web/dist
+mkdir -p data/postgres data/caddy certs config config/caddy-extra backups web/dist
 cp -r "$STAGE/synapse" data/synapse
 cp -r "$STAGE/gateway" data/gateway
 [ -d "$STAGE/certs" ] && cp -r "$STAGE/certs/." certs/ || true

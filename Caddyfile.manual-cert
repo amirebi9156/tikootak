@@ -1,3 +1,8 @@
+# Optional global settings: every *.caddy file in config/caddy-extra (empty folder = nothing; used by scripts/haproxy.sh).
+{
+	import /etc/caddy/extra/*.caddy
+}
+
 # حالت گواهی دستی (وقتی ACME در دسترس نیست).
 # فایل‌های certs/cert.pem و certs/key.pem رو خودت بذار.
 # مرورگر برای میکروفون و دوربین حتما HTTPS با گواهی معتبر می‌خواد.

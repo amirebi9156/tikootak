@@ -12,6 +12,9 @@
 #                     the whole server, so it must never run on a machine that has other services (VPN, tunnels) unless you ask.
 #                     (it keeps every port that is listening right now open; run "scripts/harden-host.sh --dry-run" first)
 #   --no-harden       accepted for old scripts; hardening is already off by default
+#   --behind-haproxy  this server already runs haproxy on 443 (VPN/tunnel): keep it, put TIKOOTAK behind it by SNI
+#                     (Caddy moves to 127.0.0.1:8443 with PROXY protocol; you add 2 small blocks to haproxy.cfg afterwards;
+#                     see: scripts/haproxy.sh snippet)
 #   --force           continue even if ports 80/443/7881/3478 are used by another program (NOT recommended)
 #   --no-cron         do not install nightly backup / monitor
 #   --ssh-keys-only   with --harden: disable SSH password login afterwards (ONLY if you have a working SSH key!)
@@ -29,16 +32,16 @@ LOG=/var/log/tikootak-bootstrap.log; export LOG
 . ./scripts/netlib.sh
 . ./scripts/lib.sh
 
-DOMAIN_ARG=""; IP_ARG=""; MIRROR=""; NPM=""; APT=""; LOCK=0; HARDEN=0; CRON=1; KEYS=0; YES=0; FORCE=0; FORCE_OFFLINE=0; FORCE_ONLINE=0; CERT_ARG=""; KEY_ARG=""
+DOMAIN_ARG=""; IP_ARG=""; MIRROR=""; NPM=""; APT=""; LOCK=0; HARDEN=0; BEHIND=0; CRON=1; KEYS=0; YES=0; FORCE=0; FORCE_OFFLINE=0; FORCE_ONLINE=0; CERT_ARG=""; KEY_ARG=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --domain) DOMAIN_ARG="$2"; shift;; --ip) IP_ARG="$2"; shift;; --mirror) MIRROR="$2"; shift;;
     --npm) NPM="$2"; shift;; --apt) APT="$2"; shift;; --lock-admin) LOCK=1;; --harden) HARDEN=1;; --no-harden) HARDEN=0;;
-    --force) FORCE=1;;
+    --force) FORCE=1;; --behind-haproxy) BEHIND=1;;
     --no-cron) CRON=0;; --ssh-keys-only) KEYS=1;; --yes|-y) YES=1;;
     --offline) FORCE_OFFLINE=1;; --online) FORCE_ONLINE=1;;
     --cert) CERT_ARG="$2"; shift;; --key) KEY_ARG="$2"; shift;;
-    -h|--help) sed -n 2,28p "$0"; exit 0;;
+    -h|--help) sed -n 2,31p "$0"; exit 0;;
     *) echo "Unknown option: $1 (see --help)"; exit 1;;
   esac; shift
 done
@@ -78,11 +81,13 @@ port_owner() { # port_owner tcp|udp PORT -> program name that listens there (emp
   echo "$o" | sed -n 's/.*users:(("\([^"]*\)".*/\1/p' | head -n1 | grep . || echo "an unknown program"
 }
 own_stack_running() { [ -f docker-compose.yml ] && command -v docker >/dev/null 2>&1 && docker compose ps -q 2>/dev/null | grep -q .; }
-CONFLICTS=()
+CONFLICTS=(); HAP_HINT=0
 for spec in tcp:80 tcp:443 tcp:7881 udp:7882 udp:3478; do
   proto="${spec%%:*}"; port="${spec##*:}"; owner="$(port_owner "$proto" "$port")"
   [ -n "$owner" ] || continue
   case "$owner" in docker-proxy) own_stack_running && continue;; esac   # a re-run: our own containers hold the port
+  if [ "$BEHIND" = 1 ]; then case "$spec" in tcp:80|tcp:443) continue;; esac; fi   # shared with haproxy: scripts/haproxy.sh moves Caddy
+  [ "$spec" = tcp:443 ] && [ "$owner" = haproxy ] && HAP_HINT=1
   CONFLICTS+=("$port/$proto is used by $owner")
 done
 if [ "${#CONFLICTS[@]}" -gt 0 ]; then
@@ -90,9 +95,12 @@ if [ "${#CONFLICTS[@]}" -gt 0 ]; then
   if [ "$FORCE" = 1 ]; then warn "Continuing because of --force; TIKOOTAK or that program may fail to start"
   else
     die "These ports are needed by TIKOOTAK but already used (VPN / web server / tunnel?)" \
-        "Best: install TIKOOTAK on a separate server. Or stop that service first. Or add --force (it can break that service). Nothing was changed on this server."
+        "$([ "$HAP_HINT" = 1 ] && echo "haproxy holds 443: TIKOOTAK can share it. Re-run with --behind-haproxy (docs/HAPROXY-FA.md). ")Or install on a separate server, or stop that service, or add --force (can break it). Nothing was changed on this server."
   fi
-else ok "Ports 80, 443, 7881, 7882, 3478 are free"; fi
+else
+  if [ "$BEHIND" = 1 ]; then ok "Shared mode: haproxy keeps 443; TIKOOTAK goes behind it (ports 7881, 7882, 3478 are free)"
+  else ok "Ports 80, 443, 7881, 7882, 3478 are free"; fi
+fi
 
 if [ -n "$IP_ARG" ]; then SRV_IP="$IP_ARG"; WHY="given with --ip"
 else pick_public_ip "$DOMAIN_ARG" || die "Could not detect the public IP" "Pass it with --ip"; SRV_IP="$PICKED_IP"; WHY="$PICKED_WHY"; fi
@@ -227,6 +235,10 @@ if [ -n "$CERT_ARG" ] || [ -f certs/cert.pem ]; then
   fi
 fi
 ok "Settings saved in .env for $DOMAIN_ARG"
+if [ "$BEHIND" = 1 ]; then
+  ./scripts/haproxy.sh enable --no-restart >>"$LOG" 2>&1 && ok "Shared mode: Caddy will listen on 127.0.0.1 only (haproxy forwards your domain to it)" \
+    || die "Could not prepare shared mode" "Look at: $LOG"
+fi
 # install the management command early, so it exists even if a later step fails
 ./scripts/tikootak.sh install-cli >/dev/null 2>&1 && ok "Management command installed:  sudo tikootak"
 
@@ -289,3 +301,9 @@ Next steps:    1) register with the invite code   2) sudo tikootak calls   (chec
 Optional:      firewall + fail2ban:  sudo ./scripts/harden-host.sh --dry-run   (shows what it would do; it keeps open ports working)
 Log:           $LOG
 M
+if [ "$BEHIND" = 1 ]; then
+  echo
+  echo "${Y}${B}ONE MORE STEP: the site works only after haproxy forwards ${DOMAIN_ARG} to Caddy.${N}"
+  ./scripts/haproxy.sh snippet
+  echo "After editing haproxy:   sudo ./scripts/haproxy.sh test"
+fi

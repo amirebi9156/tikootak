@@ -49,6 +49,9 @@ sudo tikootak update /root/tikootak-full-X.Y.Z.tar    # یا از فایل آپ�
 
 راهنمای کامل فارسی: **`docs/OFFLINE-FA.md`**
 
+## سرور مشترک با VPN / haproxy
+اگه haproxy پورت ۴۴۳ رو گرفته: `--behind-haproxy` (نصب پشت haproxy با SNI، بدون تغییر VPN). راهنما: **`docs/HAPROXY-FA.md`**
+
 ## گواهی HTTPS
 مرورگر برای میکروفون و دوربین حتما HTTPS می‌خواد.
 اگه سرور به Let's Encrypt دسترسی نداره، `sudo tikootak cert` (status / install / use-manual / howto) را ببین؛
