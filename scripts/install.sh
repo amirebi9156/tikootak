@@ -27,7 +27,7 @@ set -a; . ./.env; set +a
 case "$DOMAIN" in chat.example.ir|"") echo "[FAIL] Set DOMAIN in .env"; exit 1;; esac
 case "$PUBLIC_IP" in 1.2.3.4|"") echo "[FAIL] Set PUBLIC_IP in .env"; exit 1;; esac
 
-mkdir -p data/postgres data/synapse data/gateway data/caddy certs config backups web/dist
+mkdir -p data/postgres data/synapse data/gateway data/caddy certs config config/caddy-extra backups web/dist
 
 # the Synapse signing key is generated once (when moving servers it comes from the backup)
 if [ ! -f "data/synapse/${DOMAIN}.signing.key" ]; then

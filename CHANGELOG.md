@@ -1,4 +1,9 @@
 # CHANGELOG
+## 0.47.0
+- TIKOOTAK can share a server with haproxy (VPN/tunnel front end): `bootstrap.sh --behind-haproxy` / `tikootak haproxy enable`. haproxy keeps 443 and forwards your domain to Caddy by SNI; Caddy listens on 127.0.0.1:8443 with PROXY protocol (real client IPs). New `scripts/haproxy.sh` (status | enable | disable | snippet | test); it never edits haproxy.cfg, it prints the lines to add. Guide: docs/HAPROXY-FA.md.
+- docker-compose: Caddy ports via `HTTP_BIND` / `HTTPS_BIND` (default 80/443, so normal servers are unchanged); Caddyfile(s) import optional `config/caddy-extra/*.caddy`.
+- The port-conflict stop now says "re-run with --behind-haproxy" when haproxy holds 443.
+- Tests: tests/scripts/haproxy.test.sh (23 checks, includes real `caddy validate` when a caddy binary is available).
 ## 0.46.1
 - Installer is now tidy and safe: one short line per action, numbered steps, details only in `/var/log/tikootak-bootstrap.log` (new `scripts/ui.sh`; apt/Docker noise no longer reaches the terminal; terminal is reset after apt/needrestart so lines no longer "staircase").
 - Read-only preflight FIRST: if ports 80/443/7881/7882/3478 are used by another program (VPN, haproxy, nginx) the installer stops before changing anything (`--force` to override).

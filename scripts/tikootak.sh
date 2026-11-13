@@ -12,6 +12,7 @@
 #   tikootak restart | stop | start | settings | logs [service] | doctor | test | uninstall
 #   tikootak mirrors [show|test|set|clear]   Docker/npm/apt mirrors for restricted networks (test = which Iranian mirrors work now)
 #   tikootak cert [status|export-auto|install F K|use-manual|use-auto|howto]   HTTPS certificate / emergency copy
+#   tikootak haproxy [status|enable|disable|snippet|test]   share port 443 with an existing haproxy (VPN server)
 #   tikootak ready             blackout-readiness checklist (offline images, certificate, backups, off-site copy, disk, clock)
 #   tikootak backup | verify [file] | restore <file> | migrate ...
 #   tikootak signup open|close|status   |   tikootak admin <command>
@@ -403,6 +404,7 @@ case "${1:-menu}" in
   settings) cmd_settings;;
   mirrors) shift; cmd_mirrors "$@";;
   cert) shift; need_root cert; exec ./scripts/cert.sh "$@";;
+  haproxy) shift; need_root haproxy; exec ./scripts/haproxy.sh "$@";;
   ready) cmd_ready;;
   logs) shift; cmd_logs "$@";;
   backup) shift; exec ./scripts/backup.sh "$@";;
@@ -416,6 +418,6 @@ case "${1:-menu}" in
   test) exec ./scripts/security-test.sh --app;;
   uninstall) cmd_uninstall;;
   version|-v|--version) version;;
-  help|-h|--help) sed -n 2,16p "$SELF";;
-  *) echo "Unknown command: $1"; sed -n 2,16p "$SELF"; exit 1;;
+  help|-h|--help) sed -n 2,17p "$SELF";;
+  *) echo "Unknown command: $1"; sed -n 2,17p "$SELF"; exit 1;;
 esac

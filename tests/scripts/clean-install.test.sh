@@ -21,7 +21,7 @@ chk "ui6 stdin is closed for quiet commands" "$( ( export LOG="$S/ui.log"; . "$R
 
 # ---------- static checks on bootstrap.sh ----------
 B="$ROOT/scripts/bootstrap.sh"
-chk "s1 hardening is OFF by default" "$(grep -c 'HARDEN=0; CRON=1' "$B")" 1
+chk "s1 hardening is OFF by default" "$(grep -c 'HARDEN=0; BEHIND=0; CRON=1' "$B")" 1
 chk "s2 no tee of the whole script any more" "$(grep -c 'exec > >(tee' "$B")" 0
 chk "s3 hardening step comes after the final checks" "$([ "$(grep -n '^step "Final checks"' "$B" | cut -d: -f1)" -lt "$(grep -n 'step "Host hardening' "$B" | cut -d: -f1)" ] && echo yes)" yes
 chk "s4 apt never waits for a terminal (needrestart off, lock wait)" "$(grep -c 'NEEDRESTART_MODE=a' "$B")$(grep -c 'DPkg::Lock::Timeout=300' "$B")" "11"
