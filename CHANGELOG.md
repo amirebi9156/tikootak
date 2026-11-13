@@ -1,4 +1,9 @@
 # CHANGELOG
+## 0.48.0
+- `sudo tikootak` menu redesigned: colored, grouped (Status / Updates / Operations / Settings), service count in the header, banner when a newer release exists (checked at most every 6 h, cached).
+- One-step update: menu key `u` (item 5) or `tikootak update --online`; `--check` only reports (exit 10 = newer available); `tikootak update X.Y.Z` installs a specific release. Backup + rollback as before.
+- The installed version is shown in small type at the bottom of the profile drawer (build-time `__APP_VERSION__` from VERSION).
+- Tests: tests/scripts/menu-update.test.sh (23 checks).
 ## 0.47.0
 - TIKOOTAK can share a server with haproxy (VPN/tunnel front end): `bootstrap.sh --behind-haproxy` / `tikootak haproxy enable`. haproxy keeps 443 and forwards your domain to Caddy by SNI; Caddy listens on 127.0.0.1:8443 with PROXY protocol (real client IPs). New `scripts/haproxy.sh` (status | enable | disable | snippet | test); it never edits haproxy.cfg, it prints the lines to add. Guide: docs/HAPROXY-FA.md.
 - docker-compose: Caddy ports via `HTTP_BIND` / `HTTPS_BIND` (default 80/443, so normal servers are unchanged); Caddyfile(s) import optional `config/caddy-extra/*.caddy`.

@@ -35,6 +35,10 @@ Docker، HTTPS، بکاپ شبانه و فرمان `tikootak` خودکار نص�
 
 ## آپدیت
 ```bash
+sudo tikootak                     # منوی رنگی؛ کلید u = آپدیت یک‌مرحله‌ای به آخرین نسخه
+sudo tikootak update --check      # فقط می‌گوید نسخه جدید هست یا نه
+sudo tikootak update --online     # آخرین Release را می‌گیرد و نصب می‌کند
+sudo tikootak update 0.48.0       # یک نسخهٔ مشخص (حتی قدیمی‌تر)
 sudo tikootak update              # آخرین Release را می‌گیرد (قبلش بکاپ می‌گیرد؛ در صورت خرابی برمی‌گردد)
 sudo tikootak update /root/tikootak-full-X.Y.Z.tar    # یا از فایل آپلودشده
 ```
