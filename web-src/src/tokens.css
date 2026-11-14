@@ -24,6 +24,7 @@
   --z-sticky: 5;     /* day chips, scroll-down button */
   --z-bar: 10;       /* header, pinbar, composer */
   --z-menu: 30;      /* popovers, context menu */
+  --z-call: 45;      /* full call view: above composer (31), chat header (12), chat info (40); below float player (58) and scrims/dialogs (60+) */
   --z-overlay: 60;   /* scrims, full-screen viewers */
   --z-sheet: 70;     /* bottom sheets */
   --z-dialog: 75;    /* dialogs (above scrim) */

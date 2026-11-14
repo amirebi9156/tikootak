@@ -46,3 +46,6 @@ input::placeholder, textarea::placeholder { opacity: .55; }
 
 /* 8. Reels: caption text sat directly on the photo with only a bottom gradient. */
 .reel-info, .reel-info p, .reel-info b { text-shadow: 0 1px 3px rgb(0 0 0 / .55); }
+
+/* 9. Call view: .call was z-index 6, so the chat composer (31) and chat-top (12) glass painted over the call controls. */
+.call { z-index: var(--z-call); }
