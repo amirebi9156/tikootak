@@ -829,5 +829,8 @@ export default {
  "مسدود": "Block",
  "اشتراک‌گذاشته در این گفتگو": "Shared in this chat",
  "پنهان کردن رمز": "Hide password",
- "نمایش رمز": "Show password"
+ "نمایش رمز": "Show password",
+ "کوچک‌کردن عکس": "Shrink photo",
+ "بزرگ‌کردن عکس": "Enlarge photo",
+ "نمایش بیشتر": "Show more"
 };

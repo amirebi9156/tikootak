@@ -22,6 +22,12 @@ const P = {
   plus: <path d="M12 5v14M5 12h14" />,
   grid: (<><rect x="3.5" y="3.5" width="7" height="7" rx="1" /><rect x="13.5" y="3.5" width="7" height="7" rx="1" /><rect x="3.5" y="13.5" width="7" height="7" rx="1" /><rect x="13.5" y="13.5" width="7" height="7" rx="1" /></>),
   send: <path d="M21 3 10 14M21 3l-7 18-4-7-7-4z" />,
+  // آیکن‌های توپر (برای دکمه‌های پروفایل مثل تلگرام)
+  chatF: <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />,
+  bellF: <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z" />,
+  belloffF: <path d="M20 18.69 7.84 6.14 5.27 3.49 4 4.76l2.8 2.8c-.52.99-.8 2.16-.8 3.43v5l-2 2v1h13.73l2 2L21 19.72zM12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-7.32V11c0-3.08-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68c-.15.03-.29.08-.42.12L18 14.68z" />,
+  phoneF: <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02z" />,
+  camF: <path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z" />,
   back: <path d="M9 5l7 7-7 7" />,
   chev: <path d="M15 5l-7 7 7 7" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
@@ -68,10 +74,12 @@ const P = {
   flag: (<><path d="M5 21V4" /><path d="M5 4h9l-1 3h6v9h-7l-1 2H5" /></>),
 };
 
+const FILLED = new Set(['chatF', 'bellF', 'belloffF', 'phoneF', 'camF']);
 export function Icon({ n, size = 20 }) {
+  const f = FILLED.has(n);
   return (
-    <svg className={`ico ico-${n}`} viewBox="0 0 24 24" width={size} height={size} fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className={`ico ico-${n}`} viewBox="0 0 24 24" width={size} height={size} fill={f ? 'currentColor' : 'none'}
+      stroke={f ? 'none' : 'currentColor'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {P[n]}
     </svg>
   );

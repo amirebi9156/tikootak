@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { tr } from './i18n.js';
 import { Icon } from './icons.jsx';
 import RoomAvatar from './RoomAvatar.jsx';
 import { profileGet } from './api.js';
 import { fetchFile, fmtSize } from './media.js';
-import { isMusic, musicMeta } from './chatMusic.js';
+import { isMusic } from './chatMusic.js';
 import { kindLabel, roomAlias } from './roomtype.js';
-import { fa, fmtClock } from './util.js';
+import { fa } from './util.js';
 import { useBackLayer } from './backstack.js';
 import { Avatar } from './ui.jsx';
+import { useChatTrack, LoadRing } from './MusicCard.jsx';
 
 const URL_RE = /https?:\/\/[^\s<>"']+/g;
 
@@ -28,11 +29,39 @@ export function Thumb({ client, content, onOpen }) {
   </button>;
 }
 
-export default function ChatInfo({ client, room, me, kind, muted, onMute, onClose, onCall, onSearch, onInvite, onSettings, onProfile, onOpenMedia, peerId, onUser, canSeeMembers }) {
+// ردیف آهنگ در تب «موزیک»: همان‌جا پخش می‌شود (بدون رفتن به چت)، با حلقهٔ بارگیری و نشان «در حال پخش».
+function InfoTrack({ client, content, player }) {
+  const t = useChatTrack(client, content, player);
+  return <li className={`ci-track ${t.on ? 'on' : ''}`}>
+    <button type="button" className="ci-tr-btn" onClick={t.press} aria-label={`${t.playing ? tr('توقف') : tr('پخش آهنگ')}: ${t.title}`} data-testid="info-track">
+      <span className={`ci-tr-cover ${t.cover ? 'has' : ''}`} dir="ltr">
+        {t.cover && <img src={t.cover} alt="" />}
+        <span className="ci-tr-ic">{t.prog !== null ? <LoadRing prog={t.prog} size={26} /> : t.playing ? <Icon n="pause" size={18} /> : <Icon n="play" size={18} />}</span>
+      </span>
+      <span className="ci-tr-text">
+        <strong dir="auto">{t.title}</strong>
+        <em dir="ltr">{t.sub}</em>
+        {t.err && <span className="error small-note" role="alert">{t.err}</span>}
+      </span>
+    </button>
+  </li>;
+}
+
+// کشیدن صفحه به پایین (فقط وقتی بالای صفحه‌ایم) عکس را مربعی و تمام‌عرض می‌کند؛ کشیدن به بالا آن را برمی‌گرداند.
+const PULL_GO = 70;   // px کشیدنِ مؤثر برای باز شدن
+const PULL_MAX = 140; // px برای پر شدن نشانگر
+
+export default function ChatInfo({ client, room, me, kind, muted, onMute, onClose, onCall, onSearch, onInvite, onSettings, onProfile, onOpenMedia, peerId, onUser, canSeeMembers, player }) {
   useBackLayer(true, onClose);
   const [tab, setTab] = useState('media');
   const [prof, setProf] = useState(null);
   const [menu, setMenu] = useState(false);
+  const [big, setBig] = useState(false);       // عکس مربعی و تمام‌عرض
+  const [phase, setPhase] = useState('');      // '' | 'opening' | 'closing' (فقط برای انیمیشن)
+  const [musicN, setMusicN] = useState(40);
+  const scrollRef = useRef(null);
+  const bigRef = useRef(false);
+  bigRef.current = big;
   const token = client.getAccessToken();
   useEffect(() => {
     if (kind !== 'dm' || !peerId) return undefined;
@@ -45,6 +74,47 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
     window.addEventListener('keydown', k);
     return () => window.removeEventListener('keydown', k);
   }, [onClose]);
+
+
+  const expand = () => { if (bigRef.current) return; setBig(true); setPhase('opening'); setTimeout(() => setPhase(p => (p === 'opening' ? '' : p)), 380); };
+  const collapse = () => {
+    if (!bigRef.current) return;
+    setPhase('closing');
+    setTimeout(() => { setBig(false); setPhase(''); if (scrollRef.current) scrollRef.current.scrollTop = 0; }, 260);
+  };
+  const expandRef = useRef(expand); expandRef.current = expand;
+  const collapseRef = useRef(collapse); collapseRef.current = collapse;
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return undefined;
+    let y0 = null; let pulled = 0; let active = false;
+    const setPull = v => el.style.setProperty('--pull', String(v));
+    const start = e => { y0 = el.scrollTop <= 0 ? e.touches[0].clientY : null; pulled = 0; active = false; };
+    const move = e => {
+      if (y0 == null) return;
+      const d = e.touches[0].clientY - y0;
+      if (!bigRef.current) {
+        if (d > 6 && el.scrollTop <= 0) {
+          if (e.cancelable) e.preventDefault();
+          active = true; pulled = d * 0.55;
+          el.classList.add('pulling');
+          setPull(Math.min(1, pulled / PULL_MAX));
+        }
+      } else if (d < -10 && el.scrollTop <= 0) {
+        if (e.cancelable) e.preventDefault();
+        if (d < -44) { y0 = null; collapseRef.current(); }
+      }
+    };
+    const end = () => {
+      if (active) { active = false; el.classList.remove('pulling'); if (pulled >= PULL_GO) expandRef.current(); setPull(0); }
+      y0 = null;
+    };
+    el.addEventListener('touchstart', start, { passive: true });
+    el.addEventListener('touchmove', move, { passive: false });
+    el.addEventListener('touchend', end, { passive: true });
+    el.addEventListener('touchcancel', end, { passive: true });
+    return () => { el.removeEventListener('touchstart', start); el.removeEventListener('touchmove', move); el.removeEventListener('touchend', end); el.removeEventListener('touchcancel', end); };
+  }, []);
 
   const topic = room.currentState.getStateEvents('m.room.topic', '')?.getContent()?.topic || '';
   const members = room.getMembersWithMembership('join').length;
@@ -80,9 +150,9 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
     ? tr('پیوی')
     : `${kindLabel(kind)} · ${fa(members)} ${tr('عضو')}`;
   const tabs = [...(roster.length ? [['members', tr('اعضا')]] : []), ['media', tr('مدیا')], ['files', tr('فایل‌ها')], ['links', tr('لینک‌ها')], ['music', tr('موزیک')]];
-  const act = (icon, label, fn, on) => <button type="button" className={`ci-act ${on ? 'on' : ''}`} onClick={fn}><Icon n={icon} size={24} /><span>{label}</span></button>;
+  const act = (icon, label, fn, on) => <button type="button" className={`ci-act ${on ? 'on' : ''}`} onClick={fn}><Icon n={icon} size={22} /><span>{label}</span></button>;
 
-  return <div className="cinfo" role="dialog" aria-label={tr('مشخصات گفتگو')} data-testid="chat-info">
+  return <div className={`cinfo ${big ? 'big' : ''} ${phase}`} role="dialog" aria-label={tr('مشخصات گفتگو')} data-testid="chat-info">
     <div className="ci-top">
       <button type="button" className="ci-round" onClick={onClose} aria-label={tr('بازگشت')} data-testid="chat-info-back"><Icon n="back" size={22} /></button>
       <div className="ci-menu-wrap">
@@ -93,17 +163,19 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
         </div>}
       </div>
     </div>
-    <div className="ci-scroll">
-      <div className="ci-hero">
-        <span className="ci-avatar"><RoomAvatar client={client} room={room} name={name} id={peerId || room.roomId} size={124} /></span>
-        <h2 dir="auto">{name}</h2>
-        <p className="ci-sub">{sub}{client.isRoomEncrypted(room.roomId) ? ` · ${tr('رمزنگاری‌شده')}` : ''}</p>
-      </div>
-      <div className="ci-acts">
-        {act('chat', tr('پیام'), onClose)}
-        {act(muted ? 'belloff' : 'bell', muted ? tr('باصدا') : tr('بی‌صدا'), () => onMute?.(muted ? 0 : true), muted)}
-        {kind === 'channel' ? act('search', tr('جستجو'), onSearch) : act('phone', tr('تماس'), onCall)}
-        {kind === 'dm' ? act('cam', tr('تصویری'), onCall) : act('userplus', tr('دعوت'), onInvite)}
+    <div className="ci-scroll" ref={scrollRef}>
+      <div className="ci-head">
+        <div className="ci-hero">
+          <button type="button" className="ci-avatar" onClick={() => (big ? collapse() : expand())} aria-label={big ? tr('کوچک‌کردن عکس') : tr('بزرگ‌کردن عکس')} aria-expanded={big} data-testid="chat-info-avatar"><RoomAvatar client={client} room={room} name={name} id={peerId || room.roomId} size={big ? 420 : 124} /></button>
+          <h2 dir="auto">{name}</h2>
+          <p className="ci-sub">{sub}{client.isRoomEncrypted(room.roomId) ? ` · ${tr('رمزنگاری‌شده')}` : ''}</p>
+        </div>
+        <div className="ci-acts">
+          {act('chatF', tr('پیام'), onClose)}
+          {act(muted ? 'belloffF' : 'bellF', muted ? tr('باصدا') : tr('بی‌صدا'), () => onMute?.(muted ? 0 : true), muted)}
+          {kind === 'channel' ? act('search', tr('جستجو'), onSearch) : act('phoneF', tr('تماس'), onCall)}
+          {kind === 'dm' ? act('camF', tr('تصویری'), onCall) : act('userplus', tr('دعوت'), onInvite)}
+        </div>
       </div>
       {(prof?.bio || topic || link || kind === 'dm') && <div className="ci-card">
         {(prof?.bio || topic) && <div className="ci-line"><strong dir="auto">{prof?.bio || topic}</strong><span>{kind === 'dm' ? tr('درباره') : tr('توضیح')}</span></div>}
@@ -118,7 +190,10 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
         {tab === 'media' && (items.media.length ? <div className="ci-grid">{items.media.map(m => <Thumb key={m.id} client={client} content={m.c} onOpen={onOpenMedia} />)}</div> : <p className="ci-empty">{tr('هنوز مدیایی نیست.')}</p>)}
         {tab === 'files' && (items.files.length ? <ul className="ci-list">{items.files.map(f => <li key={f.id}><Icon n="clip" size={20} /><span dir="auto">{f.c.body}</span><em>{f.c.info?.size ? fmtSize(f.c.info.size) : ''}</em></li>)}</ul> : <p className="ci-empty">{tr('فایلی نیست.')}</p>)}
         {tab === 'links' && (items.links.length ? <ul className="ci-list">{items.links.map(l => <li key={l.id}><Icon n="globe" size={20} /><a href={l.u} target="_blank" rel="noopener noreferrer" dir="ltr">{l.u}</a></li>)}</ul> : <p className="ci-empty">{tr('لینکی نیست.')}</p>)}
-        {tab === 'music' && (items.music.length ? <ul className="ci-list">{items.music.map(s => { const m = musicMeta(s.c); return <li key={s.id}><Icon n="music" size={20} /><span dir="auto">{m.artist ? `${m.artist} – ${m.title}` : m.title}</span><em>{m.dur ? fmtClock(m.dur) : ''}</em></li>; })}</ul> : <p className="ci-empty">{tr('موزیکی نیست.')}</p>)}
+        {tab === 'music' && (items.music.length ? <>
+          <ul className="ci-list ci-tracks" data-testid="info-tracks">{items.music.slice(0, musicN).map(s => <InfoTrack key={s.id} client={client} content={s.c} player={player} />)}</ul>
+          {items.music.length > musicN && <button type="button" className="ci-more" onClick={() => setMusicN(n => n + 40)}>{tr('نمایش بیشتر')}</button>}
+        </> : <p className="ci-empty">{tr('موزیکی نیست.')}</p>)}
       </div>
     </div>
   </div>;
