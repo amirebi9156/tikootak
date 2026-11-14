@@ -7,7 +7,8 @@ import { fmtSize } from './media.js';
 import { fmtClock } from './util.js';
 import { musicMeta, loadMusic, cachedMusic, loadCover } from './chatMusic.js';
 
-export default function MusicCard({ client, content, player }) {
+// منطق مشترک پخش یک آهنگِ پیام (کارت چت و ردیف «موزیک» در مشخصات گفتگو): بارگیری با پیشرفت، کش، پلیر سراسری.
+export function useChatTrack(client, content, player) {
   const meta = musicMeta(content);
   const id = content.file?.url || content.url || meta.title;
   const [cover, setCover] = useState(null);
@@ -24,7 +25,6 @@ export default function MusicCard({ client, content, player }) {
 
   const on = player.track?.id === id;
   const playing = on && player.playing;
-  const pct = on && player.time.d ? Math.min(1, player.time.t / player.time.d) : 0;
   const mk = (url) => ({ id, url, title: meta.title, artist: meta.artist, cover, owner: '' });
 
   async function press() {
@@ -41,22 +41,32 @@ export default function MusicCard({ client, content, player }) {
       if (alive.current) { setProg(null); setErr(tr('دانلود نشد؛ دوباره بزن.')); }
     }
   }
-  const R = 22;
-  const C = 2 * Math.PI * R;
   const title = meta.artist ? `${meta.artist} – ${meta.title}` : meta.title;
   const sub = on && player.time.d
     ? `${fmtClock(player.time.t)} / ${fmtClock(player.time.d)}`
     : [meta.dur ? fmtClock(meta.dur) : '', meta.size ? fmtSize(meta.size) : ''].filter(Boolean).join(', ');
+  return { meta, id, cover, prog, err, on, playing, press, title, sub };
+}
+
+// حلقهٔ پیشرفت بارگیری دور دکمهٔ پلی
+export function LoadRing({ prog, size = 44 }) {
+  const R = 22;
+  const C = 2 * Math.PI * R;
+  return <svg width={size} height={size} viewBox="0 0 48 48" className="mc-ring" aria-hidden="true">
+    <circle cx="24" cy="24" r={R} fill="none" stroke="currentColor" strokeOpacity=".25" strokeWidth="3" />
+    <circle cx="24" cy="24" r={R} fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={C} strokeDashoffset={C * (1 - Math.max(0.06, prog))} transform="rotate(-90 24 24)" strokeLinecap="round" />
+  </svg>;
+}
+
+export default function MusicCard({ client, content, player }) {
+  const { cover, prog, err, playing, press, title, sub } = useChatTrack(client, content, player);
   return (
     <div className="music-card" data-testid="music-card" dir="ltr">
       <button type="button" className={`mc-cover ${cover ? 'has' : 'none'}`} onClick={press} aria-label={playing ? tr('توقف') : tr('پخش آهنگ')} data-testid="music-play">
         {cover && <img src={cover} alt="" />}
         <span className="mc-btn">
           {prog !== null
-            ? <svg width="44" height="44" viewBox="0 0 48 48" className="mc-ring" aria-hidden="true">
-                <circle cx="24" cy="24" r={R} fill="none" stroke="currentColor" strokeOpacity=".25" strokeWidth="3" />
-                <circle cx="24" cy="24" r={R} fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={C} strokeDashoffset={C * (1 - Math.max(0.06, prog))} transform="rotate(-90 24 24)" strokeLinecap="round" />
-              </svg>
+            ? <LoadRing prog={prog} />
             : playing ? <Icon n="pause" size={22} /> : <Icon n="play" size={22} />}
         </span>
       </button>

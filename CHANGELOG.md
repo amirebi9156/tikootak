@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.49.0
+- Profile page (chat info): songs in the Music tab now play right there (tap = play/pause, download ring, highlighted playing row, switch song with one tap) instead of having to open the chat. Shared hook `useChatTrack` in MusicCard.jsx (chat music card behaves as before).
+- Profile action buttons (Message, Mute, Call, Video) restyled like Telegram: smaller flat tiles (58px, 12.5px label, 22px filled icons: new `chatF/bellF/belloffF/phoneF/camF` icons).
+- Pull the profile down (touch) to expand the photo to a full-width square at the top; name, status and the four buttons sit on top of it as glass buttons. Drag up at the top (or tap the photo; click on desktop) to collapse. Short pulls do nothing.
+- Fix: profile page children were squeezed by the flex column on short screens (tabs bar clipped); they now keep their size and the page scrolls.
+- Test: tests/e2e/profile-telegram.mjs (26 checks: tile size, filled icons, real CDP touch pull/collapse, square header, glass buttons on photo, playback in place, desktop toggle).
 ## 0.48.2
 - Fix: a poll sent by someone else stuck out of its bubble on phones (the card had a fixed 280px min-width, wider than a received bubble beside its avatar). The poll bubble now has a 304px target width capped by the available space; the card has no fixed min-width. Long questions/options wrap inside the bubble.
 - Test: tests/design/poll-overflow.py (real built CSS, received + sent bubbles, 320/360/390 px and desktop, short/long/unbreakable text).

@@ -53,3 +53,60 @@ input::placeholder, textarea::placeholder { opacity: .55; }
 /* 10. Poll bubble: the card had a fixed min-width (280px) that is wider than a received bubble next to its avatar on phones,
    so the options stuck out of the bubble. The bubble now gets a target width and is capped by the space it really has. */
 .msg:has(> .bubble .poll-card) > .bubble { box-sizing: border-box; width: 304px; max-width: 100%; }
+
+/* 11. Profile page (ChatInfo): Telegram-like action tiles, pull-down to a square full-width photo, playable music rows. */
+/* children of the scroller must never be squeezed (overflow:hidden items shrank and clipped tabs/lists when the page got taller) */
+.cinfo .ci-scroll > * { flex-shrink: 0; }
+.cinfo .ci-head { display: flex; flex-direction: column; gap: 12px; }
+.cinfo .ci-acts { gap: 8px; }
+.cinfo .ci-act { min-height: 58px; gap: 3px; padding: 7px 2px 6px; border-radius: 14px; font-size: 12.5px; font-weight: 500;
+  background: color-mix(in srgb, var(--ink) 9%, transparent); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+@media (hover: hover) { .cinfo .ci-act:hover { background: color-mix(in srgb, var(--ink) 14%, transparent); } }
+.cinfo .ci-act:active { filter: none; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.cinfo button.ci-avatar { position: relative; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* pull feedback: the round photo grows with the finger (no layout jumps: transform + a spacer margin) */
+.cinfo .ci-scroll { --pull: 0; }
+.cinfo:not(.big) .ci-avatar { transform-origin: 50% 0; transform: scale(calc(1 + var(--pull) * .55)); margin-bottom: calc(var(--pull) * 68px); }
+.cinfo .ci-scroll:not(.pulling) .ci-avatar { transition: transform .28s var(--ease-drawer), margin-bottom .28s var(--ease-drawer); }
+
+/* expanded: square photo edge to edge, name + glass buttons on top of it */
+.cinfo.big .ci-scroll { padding-top: 0; }
+.cinfo.big .ci-head { position: relative; margin-inline: -14px; aspect-ratio: 1; max-height: 78dvh; justify-content: flex-end; padding: 0 14px 14px; gap: 14px; overflow: hidden; }
+.cinfo.big .ci-head::after { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(to top, rgb(0 0 0 / .72) 0%, rgb(0 0 0 / .26) 38%, transparent 62%), linear-gradient(to bottom, rgb(0 0 0 / .36), transparent 22%); }
+.cinfo.big .ci-avatar { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; margin: 0; transform: none; border-radius: 0; box-shadow: none; }
+.cinfo.big .ci-avatar > *, .cinfo.big .ci-avatar img { border-radius: 0 !important; }
+.cinfo.big .ci-hero { align-items: flex-start; text-align: start; gap: 2px; padding: 0; }
+.cinfo.big .ci-hero h2, .cinfo.big .ci-sub, .cinfo.big .ci-acts { position: relative; z-index: 1; }
+.cinfo.big .ci-hero h2 { margin: 0; color: #fff; font-size: 24px; text-shadow: 0 1px 8px rgb(0 0 0 / .45); }
+.cinfo.big .ci-sub { color: rgb(255 255 255 / .8); text-shadow: 0 1px 6px rgb(0 0 0 / .45); }
+.cinfo.big .ci-act, .cinfo.big .ci-act.on { color: #fff; background: rgb(14 14 20 / .34); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16), inset 0 1.5px 0 rgb(255 255 255 / .22); }
+@keyframes ciPhotoIn {
+  from { clip-path: inset(70px calc(50% - 62px) calc(100% - 194px) calc(50% - 62px) round 62px); }
+  to { clip-path: inset(0 0 0 0 round 0); }
+}
+@keyframes ciRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.cinfo.opening .ci-avatar { animation: ciPhotoIn .34s var(--ease-drawer) both; }
+.cinfo.closing .ci-avatar { animation: ciPhotoIn .26s var(--ease-drawer) reverse both; }
+.cinfo.opening .ci-hero h2, .cinfo.opening .ci-sub, .cinfo.opening .ci-acts { animation: ciRise .3s .06s var(--ease-drawer) both; }
+.cinfo.closing .ci-hero h2, .cinfo.closing .ci-sub, .cinfo.closing .ci-acts { animation: ciRise .22s var(--ease-drawer) reverse both; }
+@media (prefers-reduced-motion: reduce) {
+  .cinfo.opening .ci-avatar, .cinfo.closing .ci-avatar, .cinfo.opening .ci-hero h2, .cinfo.opening .ci-sub, .cinfo.opening .ci-acts,
+  .cinfo.closing .ci-hero h2, .cinfo.closing .ci-sub, .cinfo.closing .ci-acts { animation: none; }
+  .cinfo .ci-scroll:not(.pulling) .ci-avatar { transition: none; }
+}
+
+/* music tab rows: tap = play here (no need to open the chat) */
+.ci-tracks li { padding: 0; }
+.ci-tr-btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 6px 12px; border: 0; border-radius: 14px; background: none; color: inherit; text-align: start; }
+@media (hover: hover) { .ci-tr-btn:hover { background: rgb(255 255 255 / .06); } }
+.ci-tr-btn:active { background: rgb(255 255 255 / .1); }
+.ci-tr-cover { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; background: color-mix(in srgb, var(--accent) 38%, transparent); }
+.ci-tr-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ci-tr-ic { position: relative; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: rgb(0 0 0 / .4); color: #fff; }
+.ci-tr-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ci-tr-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 600; }
+.ci-track.on .ci-tr-text strong { color: var(--accent-2, var(--accent)); }
+.ci-more { display: block; width: 100%; min-height: 44px; margin-top: 4px; border: 0; background: none; color: var(--accent-2, var(--accent)); font-weight: 600; }

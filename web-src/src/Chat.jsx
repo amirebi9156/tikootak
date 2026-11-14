@@ -1111,7 +1111,7 @@ export default function Chat({
       {infoOpen && <ChatInfo client={client} room={room} me={me} kind={roomType} peerId={dmPeerId} muted={muted} onMute={onMute} onClose={() => setInfoOpen(false)}
           onCall={() => { setInfoOpen(false); onCall(); }} onInvite={() => { setInfoOpen(false); onInvite(); }}
           onSearch={() => { setInfoOpen(false); setSearchOpen(true); }} onSettings={() => setSettingsOpen(true)}
-          onProfile={(id) => { setInfoOpen(false); onProfile(id); }} onOpenMedia={setViewer}
+          onProfile={(id) => { setInfoOpen(false); onProfile(id); }} onOpenMedia={setViewer} player={player}
           canSeeMembers={roomType !== 'channel' || power >= 50} onUser={setUserSheet} />}
       {userSheet && <UserSheet client={client} room={room} me={me} userId={userSheet} token={client.getAccessToken()} blocked={!!blocked?.has?.(userSheet)}
           onClose={() => setUserSheet(null)} onMessage={(id) => { setInfoOpen(false); onMessage?.(id); }} onProfile={(id) => { setInfoOpen(false); onProfile(id); }}
