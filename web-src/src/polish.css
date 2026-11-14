@@ -49,3 +49,7 @@ input::placeholder, textarea::placeholder { opacity: .55; }
 
 /* 9. Call view: .call was z-index 6, so the chat composer (31) and chat-top (12) glass painted over the call controls. */
 .call { z-index: var(--z-call); }
+
+/* 10. Poll bubble: the card had a fixed min-width (280px) that is wider than a received bubble next to its avatar on phones,
+   so the options stuck out of the bubble. The bubble now gets a target width and is capped by the space it really has. */
+.msg:has(> .bubble .poll-card) > .bubble { box-sizing: border-box; width: 304px; max-width: 100%; }

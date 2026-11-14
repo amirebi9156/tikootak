@@ -1916,7 +1916,7 @@ input:focus-visible, textarea:focus-visible { outline: none !important; border-c
 .mention-pop .muted { margin-inline-start: auto; font-size: 12px; }
 
 /* ---- نظرسنجی ---- */
-.poll-card { display: flex; flex-direction: column; gap: 6px; min-width: min(280px, 72vw); padding: 2px 2px 0; }
+.poll-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 2px 2px 0; }
 .poll-q { display: flex; align-items: flex-start; gap: 6px; font-size: 15px; line-height: 1.5; }
 .poll-sub { font-size: 12px; opacity: 0.75; }
 .poll-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }

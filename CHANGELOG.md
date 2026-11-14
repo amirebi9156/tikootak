@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.48.2
+- Fix: a poll sent by someone else stuck out of its bubble on phones (the card had a fixed 280px min-width, wider than a received bubble beside its avatar). The poll bubble now has a 304px target width capped by the available space; the card has no fixed min-width. Long questions/options wrap inside the bubble.
+- Test: tests/design/poll-overflow.py (real built CSS, received + sent bubbles, 320/360/390 px and desktop, short/long/unbreakable text).
 ## 0.48.1
 - Fix: during a call the control buttons (mic, camera, screen share, hang up) were hidden under the glass message box. The call view (`.call`) had z-index 6 while the chat composer is 31 and the chat header 12; it now uses the new `--z-call: 45` token (above chat, below float player 58 and dialogs/scrims 60+).
 - Test: tests/design/call-z.py (real built CSS, real composer markup, before/after at 390 px and desktop; checks no point of the call view is covered by chat elements).
