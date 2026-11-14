@@ -498,11 +498,11 @@ function Reel({
       </div>
       <div className="reel-side">
         <button className={`rbtn ${p.liked ? 'on' : ''}`} onClick={like} aria-pressed={p.liked} aria-label={tr("پسندیدن")}><Icon n="heart" size={28} /><span>{p.likes ? fa(p.likes) : ''}</span></button>
-        <button className="rbtn" onClick={() => onComments(p, bump)} aria-label={tr("نظرها")}><Icon n="chat" size={26} /><span>{p.comments ? fa(p.comments) : ''}</span></button>
-        {share && <button className="rbtn" onClick={() => share.sharePost(p)} aria-label={tr("ارسال به چت")}><Icon n="send" size={24} /><span aria-hidden="true">&nbsp;</span></button>}
-        {p.kind === 'video' && <button className="rbtn" onClick={onMute} aria-label={muted ? tr("روشن کردن صدا") : tr("بی‌صدا")}><Icon n={muted ? 'volumeoff' : 'volume'} size={24} /><span aria-hidden="true">&nbsp;</span></button>}
+        <button className="rbtn" onClick={() => onComments(p, bump)} aria-label={tr("نظرها")}><Icon n="commentR" size={28} /><span>{p.comments ? fa(p.comments) : ''}</span></button>
+        {share && <button className="rbtn" onClick={() => share.sharePost(p)} aria-label={tr("ارسال به چت")}><Icon n="send" size={28} /><span aria-hidden="true">&nbsp;</span></button>}
+        {p.kind === 'video' && <button className="rbtn" onClick={onMute} aria-label={muted ? tr("روشن کردن صدا") : tr("بی‌صدا")}><Icon n={muted ? 'volumeoff' : 'volume'} size={28} /><span aria-hidden="true">&nbsp;</span></button>}
         <span className="post-more">
-          <button className="rbtn" onClick={() => setMenu(m => !m)} aria-label={tr("گزینه‌ها")} aria-expanded={menu}><Icon n="dots" size={24} /><span aria-hidden="true">&nbsp;</span></button>
+          <button className="rbtn" onClick={() => setMenu(m => !m)} aria-label={tr("گزینه‌ها")} aria-expanded={menu}><Icon n="dots" size={28} /><span aria-hidden="true">&nbsp;</span></button>
           {menu && <span className="post-menu reel-menu" role="menu">
               <button role="menuitem" onClick={hide}>{tr("علاقه ندارم")}</button>
               <button role="menuitem" onClick={() => { setMenu(false); report('post', p.id); }}>{tr("گزارش")}</button>

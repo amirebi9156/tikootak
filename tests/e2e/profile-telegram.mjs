@@ -75,8 +75,14 @@ const box = (p, sel) => p.locator(sel).first().boundingBox();
   await drag(p, 195, 260, 320);
   ok(await p.locator('.cinfo.big').count() === 0, 'phone: a short pull does not expand');
   // long pull: expands to a square photo, full width
+  // sample the header height every frame while pulling + releasing: it must grow gradually (no one-frame jump)
+  const samplesP = p.evaluate(() => new Promise(res => { const out = []; const t0 = performance.now(); const h = () => document.querySelector('.cinfo .ci-head')?.getBoundingClientRect().height || 0;
+    const tick = () => { out.push(Math.round(h())); if (performance.now() - t0 < 1800) requestAnimationFrame(tick); else res(out); }; tick(); }));
   await drag(p, 195, 220, 520);
   ok(await p.locator('.cinfo.big').count() === 1, 'phone: pulling down expands the photo');
+  const hs = await samplesP; const lo = Math.min(...hs), hi = Math.max(...hs);
+  const mid = new Set(hs.filter(v => v > lo + 8 && v < hi - 8)).size;
+  ok(hi - lo > 60 && mid >= 3, `phone: header height animates smoothly (min ${lo}, max ${hi}, ${mid} in-between frames)`);
   const head = await box(p, '.cinfo.big .ci-head');
   ok(head && head.x <= 1 && Math.abs(head.width - 390) <= 2 && Math.abs(head.height - head.width) <= 3, `phone: header is a full-width square (${Math.round(head?.width)}x${Math.round(head?.height)})`);
   const av = await box(p, '.cinfo.big .ci-avatar');

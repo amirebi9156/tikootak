@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.49.1
+- Profile page pull-down is smooth now: the header height animates (Web Animations, 340 ms open / 280 ms close, drawer easing) instead of jumping to the square photo in one frame; the content below slides with it. Reduced-motion: no animation.
+- Mini player is shown on top of EVERY page (chat list, feed, discover, music, me), not only inside a chat; compact two-row capsule on phones (row 1: cover + title | prev / play / next | close; row 2: full-width seek line) so the seek bar no longer overlaps the play button; 8px edge gap instead of ~20px. Desktop keeps the single-row capsule, moved to the top.
+- Reel side buttons restyled Instagram-like: same 28px icon / 1.7 stroke for like, comment (new round `commentR` icon), send, mute, more; no boxes, soft shadow, counts under icons, even 22px rhythm, liked heart red + filled.
+- Tests: `tests/design/player-reel.py` (static harness, real built CSS), profile-telegram.mjs now samples header height per frame.
+
 ## 0.49.0
 - Profile page (chat info): songs in the Music tab now play right there (tap = play/pause, download ring, highlighted playing row, switch song with one tap) instead of having to open the chat. Shared hook `useChatTrack` in MusicCard.jsx (chat music card behaves as before).
 - Profile action buttons (Message, Mute, Call, Video) restyled like Telegram: smaller flat tiles (58px, 12.5px label, 22px filled icons: new `chatF/bellF/belloffF/phoneF/camF` icons).

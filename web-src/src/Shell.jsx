@@ -1014,6 +1014,7 @@ export default function Shell({
             <Avatar name={myName} id={me} size={34} />
           </button>
         </header>
+        {player.track && <MiniPlayer player={player} floating={npMode === 'float'} onOpen={() => setNpMode('full')} onFloat={() => setNpMode(m => m === 'float' ? null : 'float')} />}
         <InstallBar />
 
         <div className="side-stories">
