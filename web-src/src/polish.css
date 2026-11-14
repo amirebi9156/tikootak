@@ -110,3 +110,38 @@ input::placeholder, textarea::placeholder { opacity: .55; }
 .ci-tr-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 600; }
 .ci-track.on .ci-tr-text strong { color: var(--accent-2, var(--accent)); }
 .ci-more { display: block; width: 100%; min-height: 44px; margin-top: 4px; border: 0; background: none; color: var(--accent-2, var(--accent)); font-weight: 600; }
+
+/* 12. Mini player outside the chat: lives at the TOP of every page (list, feed, discover, music, me), compact, edge-to-edge.
+   Mobile layout = row 1: cover+title | prev play next | close, row 2: full-width seek line (it used to be absolutely positioned
+   and overlapped the play button). Desktop keeps the single-row capsule, just moved to the top. */
+.main > .player-bar.mp, .sidebar > .player-bar.mp { order: -1; margin: calc(8px + env(safe-area-inset-top, 0px)) 10px 6px; width: auto; z-index: 6; }
+.sidebar > .player-bar.mp { display: none; order: 0; margin-top: 0; }
+@media (max-width: 780px) {
+  .sidebar > .player-bar.mp { display: grid; }
+  .main > .player-bar.mp, .sidebar > .player-bar.mp { margin-inline: 8px; padding: 6px 8px 4px; border-radius: 22px; gap: 0 4px;
+    grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: 'meta ctl end' 'seek seek seek'; }
+  .main > .player-bar.mp .mp-open, .sidebar > .player-bar.mp .mp-open { min-height: 40px; gap: 10px; }
+  .main > .player-bar.mp .mp-open .cover, .sidebar > .player-bar.mp .mp-open .cover { width: 36px !important; height: 36px !important; border-radius: 11px !important; }
+  .main > .player-bar.mp .mp-meta strong, .sidebar > .player-bar.mp .mp-meta strong { font-size: 13.5px; }
+  .main > .player-bar.mp .mp-meta span, .sidebar > .player-bar.mp .mp-meta span { font-size: 12px; }
+  .main > .player-bar.mp .mp-b, .sidebar > .player-bar.mp .mp-b { width: 40px; height: 40px; min-height: 40px; }
+  .main > .player-bar.mp .mp-seek, .sidebar > .player-bar.mp .mp-seek { position: relative; inset: auto; grid-area: seek; height: 12px; margin: 0; padding-inline: 4px; }
+}
+@media (min-width: 781px) { .main > .player-bar.mp { margin-inline: auto; width: min(calc(100% - 24px), 760px); } }
+
+/* 13. Reel side actions, Instagram-like: one icon size/weight, no boxes, even rhythm, soft shadow instead of backgrounds,
+   counts under the icons, liked heart pops in red. Wins over the older .feed.full rules in theme.css (they use !important). */
+.feed.full .reel-side, .rv .reel-side { display: flex !important; flex-direction: column; align-items: center; gap: 22px !important; width: 52px;
+  inset-inline-start: auto !important; inset-inline-end: 6px !important; bottom: calc(26px + env(safe-area-inset-bottom, 0px)) !important; }
+.feed.full .reel-side .rbtn, .rv .reel-side .rbtn { width: 52px !important; min-height: 44px; height: auto !important; padding: 0 !important; gap: 4px !important;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; border: 0 !important; border-radius: 0 !important;
+  background: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important;
+  color: #fff !important; filter: drop-shadow(0 1px 2px rgb(0 0 0 / .55)) drop-shadow(0 2px 10px rgb(0 0 0 / .3)); }
+.feed.full .reel-side .rbtn .ico, .rv .reel-side .rbtn .ico { width: 28px !important; height: 28px !important; stroke-width: 1.7 !important; overflow: visible;
+  transition: transform .18s var(--ease-out), fill .18s var(--ease-out), color .18s var(--ease-out); }
+.feed.full .reel-side .rbtn span, .rv .reel-side .rbtn span { font-size: 12.5px !important; font-weight: 600 !important; line-height: 1; min-height: 12px; letter-spacing: 0; text-shadow: none; }
+.feed.full .reel-side .rbtn:active .ico, .rv .reel-side .rbtn:active .ico { transform: scale(.86); }
+.feed.full .reel-side .rbtn.on, .rv .reel-side .rbtn.on { color: #ff3b5c !important; }
+.feed.full .reel-side .rbtn.on .ico, .rv .reel-side .rbtn.on .ico { fill: currentColor; animation: none; transform: scale(1.06); }
+.feed.full .reel-side .post-more, .rv .reel-side .post-more { margin-top: -4px; }
+@media (prefers-reduced-motion: reduce) { .feed.full .reel-side .rbtn .ico, .rv .reel-side .rbtn .ico { transition: none; } }

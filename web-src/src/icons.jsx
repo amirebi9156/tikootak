@@ -21,6 +21,7 @@ const P = {
   music: <path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3zM20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z" />,
   plus: <path d="M12 5v14M5 12h14" />,
   grid: (<><rect x="3.5" y="3.5" width="7" height="7" rx="1" /><rect x="13.5" y="3.5" width="7" height="7" rx="1" /><rect x="3.5" y="13.5" width="7" height="7" rx="1" /><rect x="13.5" y="13.5" width="7" height="7" rx="1" /></>),
+  commentR: <path d="M12 3a9 9 0 1 0 0 18c1.5 0 2.9-.35 4.15-.98L21 21l-1.5-4.6A9 9 0 0 0 12 3z" />,
   send: <path d="M21 3 10 14M21 3l-7 18-4-7-7-4z" />,
   // آیکن‌های توپر (برای دکمه‌های پروفایل مثل تلگرام)
   chatF: <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />,

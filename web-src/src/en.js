@@ -832,5 +832,5 @@ export default {
  "نمایش رمز": "Show password",
  "کوچک‌کردن عکس": "Shrink photo",
  "بزرگ‌کردن عکس": "Enlarge photo",
- "نمایش بیشتر": "Show more"
+ "نمایش بیشتر": "Show more",
 };

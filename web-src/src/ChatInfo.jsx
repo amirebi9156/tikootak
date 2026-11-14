@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { tr } from './i18n.js';
 import { Icon } from './icons.jsx';
 import RoomAvatar from './RoomAvatar.jsx';
@@ -60,6 +60,9 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
   const [phase, setPhase] = useState('');      // '' | 'opening' | 'closing' (فقط برای انیمیشن)
   const [musicN, setMusicN] = useState(40);
   const scrollRef = useRef(null);
+  const headRef = useRef(null);
+  const h0Ref = useRef(0);                   // ارتفاع هدر در حالت جمع (برای انیمیشن نرم ارتفاع)
+  const anim = useRef(null);
   const bigRef = useRef(false);
   bigRef.current = big;
   const token = client.getAccessToken();
@@ -76,12 +79,34 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
   }, [onClose]);
 
 
-  const expand = () => { if (bigRef.current) return; setBig(true); setPhase('opening'); setTimeout(() => setPhase(p => (p === 'opening' ? '' : p)), 380); };
+  const EASE = 'cubic-bezier(.32,.72,0,1)';
+  const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const expand = (fromPull) => {
+    if (bigRef.current) return;
+    if ((!fromPull || !h0Ref.current) && headRef.current) h0Ref.current = headRef.current.offsetHeight;
+    setBig(true); setPhase('opening'); setTimeout(() => setPhase(p => (p === 'opening' ? '' : p)), 380);
+  };
   const collapse = () => {
     if (!bigRef.current) return;
     setPhase('closing');
-    setTimeout(() => { setBig(false); setPhase(''); if (scrollRef.current) scrollRef.current.scrollTop = 0; }, 260);
+    const head = headRef.current; const h0 = h0Ref.current;
+    const done = () => { anim.current = null; setBig(false); setPhase(''); if (scrollRef.current) scrollRef.current.scrollTop = 0; };
+    if (head && h0 && head.animate && !reduced()) {
+      anim.current?.cancel();
+      const a = head.animate([{ height: `${head.offsetHeight}px` }, { height: `${h0}px` }], { duration: 280, easing: EASE, fill: 'forwards' });
+      anim.current = a; a.onfinish = done;
+    } else setTimeout(done, 260);
   };
+  // باز شدن: ارتفاع هدر از اندازهٔ جمع تا مربع نرم می‌رود (محتوای زیرش با آن پایین می‌آید، نه پرش)
+  useLayoutEffect(() => {
+    const head = headRef.current;
+    if (!big || !head || !h0Ref.current || !head.animate || reduced()) return;
+    anim.current?.cancel();
+    const to = head.offsetHeight;
+    if (Math.abs(to - h0Ref.current) < 4) return;
+    const a = head.animate([{ height: `${h0Ref.current}px` }, { height: `${to}px` }], { duration: 340, easing: EASE });
+    anim.current = a; a.onfinish = () => { anim.current = null; };
+  }, [big]);
   const expandRef = useRef(expand); expandRef.current = expand;
   const collapseRef = useRef(collapse); collapseRef.current = collapse;
   useEffect(() => {
@@ -96,6 +121,7 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
       if (!bigRef.current) {
         if (d > 6 && el.scrollTop <= 0) {
           if (e.cancelable) e.preventDefault();
+          if (!active && headRef.current) h0Ref.current = headRef.current.offsetHeight;
           active = true; pulled = d * 0.55;
           el.classList.add('pulling');
           setPull(Math.min(1, pulled / PULL_MAX));
@@ -106,7 +132,7 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
       }
     };
     const end = () => {
-      if (active) { active = false; el.classList.remove('pulling'); if (pulled >= PULL_GO) expandRef.current(); setPull(0); }
+      if (active) { active = false; el.classList.remove('pulling'); if (pulled >= PULL_GO) expandRef.current(true); setPull(0); }
       y0 = null;
     };
     el.addEventListener('touchstart', start, { passive: true });
@@ -164,7 +190,7 @@ export default function ChatInfo({ client, room, me, kind, muted, onMute, onClos
       </div>
     </div>
     <div className="ci-scroll" ref={scrollRef}>
-      <div className="ci-head">
+      <div className="ci-head" ref={headRef}>
         <div className="ci-hero">
           <button type="button" className="ci-avatar" onClick={() => (big ? collapse() : expand())} aria-label={big ? tr('کوچک‌کردن عکس') : tr('بزرگ‌کردن عکس')} aria-expanded={big} data-testid="chat-info-avatar"><RoomAvatar client={client} room={room} name={name} id={peerId || room.roomId} size={big ? 420 : 124} /></button>
           <h2 dir="auto">{name}</h2>
